@@ -1,0 +1,10 @@
+% \VignetteIndexEntry{vignette}
+% \VignetteKeywords{keywords here}
+% \VignettePackage{package name}
+
+\documentclass[a4paper]{article}
+\usepackage{hyperref}
+\usepackage{pdfpages}
+\begin{document}
+\includepdf[fitpaper=true,pages=-]{PICASSO.pdf}
+\end{document}

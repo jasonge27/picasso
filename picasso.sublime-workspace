@@ -1,0 +1,1746 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"realized",
+				"realized_fee"
+			],
+			[
+				"realize",
+				"realized_fee"
+			],
+			[
+				"rel",
+				"realized_fee"
+			],
+			[
+				"realiz",
+				"realized_fee"
+			],
+			[
+				"key",
+				"keyword_dir"
+			],
+			[
+				"tar",
+				"tarball_dir"
+			],
+			[
+				"clean",
+				"clean_data_path"
+			],
+			[
+				"sha",
+				"sharpe.ratio"
+			],
+			[
+				"Num",
+				"NumericVector"
+			],
+			[
+				"Nume",
+				"NumericVector"
+			],
+			[
+				"Nu",
+				"NumericVector"
+			],
+			[
+				"window",
+				"windowsize"
+			],
+			[
+				"featur",
+				"featureSeq"
+			],
+			[
+				"avocad",
+				"avocado.ret.512.5120"
+			],
+			[
+				"local",
+				"local_max"
+			],
+			[
+				"wind",
+				"window.size"
+			],
+			[
+				"avoca",
+				"avocado.orderbook.50.512"
+			],
+			[
+				"parent",
+				"parent.frame	{base}"
+			],
+			[
+				"banana",
+				"banana.quantile"
+			],
+			[
+				"empirical",
+				"empiricalQ_cpp"
+			],
+			[
+				"local_",
+				"local_avr"
+			],
+			[
+				"ts",
+				"tseries"
+			],
+			[
+				"error",
+				"errorL_Noisy"
+			],
+			[
+				"logi",
+				"logisticLoss"
+			],
+			[
+				"sm",
+				"sample_size"
+			],
+			[
+				"err",
+				"errorL"
+			],
+			[
+				"log",
+				"logisticLoss"
+			],
+			[
+				"lo",
+				"logisticLoss"
+			],
+			[
+				"check",
+				"check_placeholder_2"
+			],
+			[
+				"excp",
+				"exception_row_index"
+			],
+			[
+				"exc",
+				"exception_row_index"
+			],
+			[
+				"lon",
+				"longconctNDelta"
+			],
+			[
+				"open",
+				"openprice"
+			],
+			[
+				"sho",
+				"shortconctNDelta"
+			],
+			[
+				"longc",
+				"longconctN"
+			],
+			[
+				"lines",
+				"linesplit"
+			],
+			[
+				"sh",
+				"shortconctN"
+			],
+			[
+				"line",
+				"linesplit"
+			],
+			[
+				"di",
+				"digitBlock"
+			],
+			[
+				"digit",
+				"digitBlock"
+			],
+			[
+				"ex",
+				"extractMode"
+			],
+			[
+				"ext",
+				"extractBlockNumber"
+			],
+			[
+				"vis",
+				"visClusterDataPoints"
+			],
+			[
+				"digi",
+				"digitIdentifier"
+			],
+			[
+				"dig",
+				"digitIdentifier"
+			],
+			[
+				"_tr",
+				"_trainingData"
+			],
+			[
+				"_de",
+				"_digitsize"
+			],
+			[
+				"en",
+				"enhancefactor"
+			],
+			[
+				"img",
+				"imgEnhancedRGB"
+			],
+			[
+				"upp",
+				"upperOffset"
+			],
+			[
+				"lef",
+				"leftOffset"
+			],
+			[
+				"imgS",
+				"imgSplit"
+			],
+			[
+				"gray",
+				"grayimageBlock"
+			],
+			[
+				"_spli",
+				"_splity"
+			],
+			[
+				"crop",
+				"cropImageBlock"
+			],
+			[
+				"talb",
+				"tableColN"
+			],
+			[
+				"table",
+				"tableRowN"
+			],
+			[
+				"_sp",
+				"_splity"
+			],
+			[
+				"windo",
+				"windows"
+			],
+			[
+				"del",
+				"delta2"
+			],
+			[
+				"predi",
+				"predict_proba"
+			],
+			[
+				"delt",
+				"delta0"
+			],
+			[
+				"random",
+				"random_weight_matrix"
+			],
+			[
+				"cur",
+				"curatorN"
+			],
+			[
+				"curat",
+				"curatorN"
+			],
+			[
+				"eigen",
+				"eigenvecs"
+			],
+			[
+				"cura",
+				"curatorN"
+			],
+			[
+				"mul",
+				"multiplyVec"
+			],
+			[
+				"__U",
+				"__UStar"
+			],
+			[
+				"cu",
+				"curatorSampleN"
+			],
+			[
+				"curator",
+				"curators"
+			],
+			[
+				"clo",
+				"clockStart"
+			],
+			[
+				"US",
+				"UStarperp"
+			],
+			[
+				"col",
+				"colIdx0"
+			],
+			[
+				"row",
+				"rowIdx0"
+			],
+			[
+				"rowI",
+				"rowIdx1"
+			],
+			[
+				"rowId",
+				"rowIdx0"
+			],
+			[
+				"EM_",
+				"EM_Diagonal"
+			],
+			[
+				"logli",
+				"loglikelihood"
+			],
+			[
+				"sig",
+				"sigma_tmp"
+			],
+			[
+				"si",
+				"sigma_tmp"
+			],
+			[
+				"cluste",
+				"clusterRealLabels"
+			],
+			[
+				"cl",
+				"classificationError"
+			],
+			[
+				"fie",
+				"filename"
+			],
+			[
+				"Visu",
+				"VisualizePlot2"
+			],
+			[
+				"file",
+				"filename"
+			],
+			[
+				"KM",
+				"KMeans"
+			],
+			[
+				"cen",
+				"centerIdx"
+			],
+			[
+				"KMea",
+				"KMeansRandomInitiate"
+			],
+			[
+				"m",
+				"m"
+			],
+			[
+				"posF",
+				"posFeatureList"
+			],
+			[
+				"posFile",
+				"posFileList"
+			],
+			[
+				"negFile",
+				"negFileList"
+			],
+			[
+				"predic",
+				"predictedClickLabel"
+			],
+			[
+				"pred",
+				"predictedClickLabel"
+			],
+			[
+				"apr",
+				"aprioriClickedProb"
+			],
+			[
+				"lassoBe",
+				"lassoBeta2"
+			],
+			[
+				"lasso",
+				"lassoBeta1"
+			],
+			[
+				"diamo",
+				"diamondy"
+			],
+			[
+				"dia",
+				"diamondx"
+			],
+			[
+				"lassoB",
+				"lassoBeta1"
+			],
+			[
+				"lam",
+				"lambdaseq"
+			],
+			[
+				"lab",
+				"labelname"
+			],
+			[
+				"prei",
+				"predictY"
+			],
+			[
+				"ratio",
+				"ratio2Color"
+			],
+			[
+				"map",
+				"mapCountyNameList"
+			],
+			[
+				"count",
+				"countyList"
+			],
+			[
+				"cou",
+				"countyStateNameMat"
+			],
+			[
+				"cont",
+				"countyNameList"
+			],
+			[
+				"county",
+				"countyNameList"
+			],
+			[
+				"elec",
+				"electData"
+			],
+			[
+				"el",
+				"electData"
+			],
+			[
+				"Pro",
+				"ProfileIDFactor"
+			],
+			[
+				"femaleCA",
+				"femaileCARating"
+			],
+			[
+				"big",
+				"bigmemory"
+			],
+			[
+				"S",
+				"S"
+			],
+			[
+				"vol",
+				"volsize"
+			],
+			[
+				"vols",
+				"volsize"
+			],
+			[
+				"price",
+				"priceSeries"
+			],
+			[
+				"ton",
+				"tnovrank"
+			],
+			[
+				"stoc",
+				"stockdata1"
+			],
+			[
+				"tno",
+				"tnovrank"
+			],
+			[
+				"stockdata",
+				"stockdata0_sorted"
+			],
+			[
+				"line0",
+				"line0Split"
+			],
+			[
+				"date",
+				"datetime"
+			],
+			[
+				"las",
+				"lastPrice1"
+			],
+			[
+				"last",
+				"lastPrice0"
+			],
+			[
+				"input",
+				"inputfile1"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "R/picasso.R",
+			"settings":
+			{
+				"buffer_size": 3100,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/picasso_logit_cyclic.c",
+			"settings":
+			{
+				"buffer_size": 5479,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "R/picasso.lasso.R",
+			"settings":
+			{
+				"buffer_size": 8002,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "R/lasso.sc.cov.R",
+			"settings":
+			{
+				"buffer_size": 2716,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/mymath1.c",
+			"settings":
+			{
+				"buffer_size": 69616,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/picasso_lasso_sc_cov.c",
+			"settings":
+			{
+				"buffer_size": 12602,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "R/picasso.logit.R",
+			"settings":
+			{
+				"buffer_size": 7237,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/picasso_logit_prox.c",
+			"settings":
+			{
+				"buffer_size": 5321,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 47.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"pa",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"isntall",
+				"Package Control: Install Package"
+			],
+			[
+				"open",
+				"View: Toggle Open Files in Side Bar"
+			],
+			[
+				"add",
+				"Project: Add Folder"
+			],
+			[
+				"add fol",
+				"Project: Add Folder"
+			],
+			[
+				"Cscope: ",
+				"Cscope: Look up symbol"
+			],
+			[
+				"folder",
+				"Project: Add Folder"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			],
+			[
+				"add ",
+				"Project: Add Folder"
+			],
+			[
+				"ad",
+				"Project: Add Folder"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
+			[
+				"add f",
+				"Project: Add Folder"
+			],
+			[
+				"latexing se",
+				"Preferences: LaTeXing Settings - Toggle Value"
+			],
+			[
+				"latexing setting",
+				"Preferences: LaTeXing Settings - User"
+			],
+			[
+				"latexing",
+				"Preferences: LaTeXing Settings - User (Extended)"
+			],
+			[
+				"build",
+				"Build: Build"
+			],
+			[
+				"pdf",
+				"LaTeXTools: View PDF"
+			],
+			[
+				"la",
+				"LaTeXTools: Jump to PDF"
+			],
+			[
+				"reconi",
+				"LaTeXTools: Reconfigure and migrate settings"
+			],
+			[
+				"rec",
+				"LaTeXTools: Reconfigure and migrate settings"
+			],
+			[
+				"reconf",
+				"LaTeXTools: Reconfigure and migrate settings"
+			],
+			[
+				"open ",
+				"View: Toggle Open Files in Side Bar"
+			],
+			[
+				"Reconfi",
+				"LaTeXTools: Reconfigure and migrate settings"
+			],
+			[
+				"",
+				"Package Control: Install Package"
+			],
+			[
+				"fold",
+				"Project: Refresh Folders"
+			],
+			[
+				"sideb",
+				"View: Toggle Side Bar"
+			],
+			[
+				"sidebar",
+				"View: Toggle Side Bar"
+			],
+			[
+				"bar",
+				"View: Toggle Side Bar"
+			]
+		],
+		"width": 539.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/jian/Research/picasso",
+		"/Users/jian/Research/picasso/R",
+		"/Users/jian/Research/picasso/src"
+	],
+	"file_history":
+	[
+		"/Users/jian/AlgoTrader/AlgoDev/server/live/live.sublime-workspace",
+		"/Users/jian/Research/picasso/R/logit.R",
+		"/Users/jian/Research/picasso/src/mymath1.c",
+		"/Users/jian/Research/picasso/src/mymath.h",
+		"/Users/jian/Research/picasso/R/lasso.sc.naive.R",
+		"/Users/jian/AlgoTrader/AlgoDev/server/live/sftp-config.json",
+		"/Users/jian/AlgoTrader/AlgoDev/server/live/utils.cpp",
+		"/Users/jian/AlgoTrader/AlgoDev/server/live/config.R",
+		"/Users/jian/AlgoTrader/AlgoDev/server/live/clean_data.R",
+		"/Users/jian/AlgoTrader/AlgoDev/server/aj5/utils.cpp",
+		"/Users/jian/ChineseNLP/storage/0a07f869-aa9b-49b4-85e9-289ebdba5271.xml",
+		"/Users/jian/github/blocks-examples/mnist_lenet/__init__.py",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF504/FIN504 - Financial econometrics/HW/HW5/HW5.R",
+		"/Users/jian/AlgoTrader/AlgoDev/server/backup/aj4/main.R",
+		"/Users/jian/AlgoTrader/AlgoDev/server/aj4/signals.R",
+		"/Users/jian/AlgoTrader/AlgoDev/server/aj4/stats.R",
+		"/Users/jian/Dropbox/jiange/nips2015_privatepca/submission/reviewer_feedback.txt",
+		"/Users/jian/Downloads/weibo_text.txt",
+		"/Users/jian/AlgoTrader/AlgoDev/server/aj3/sftp-config.json",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF504/FIN504 - Financial econometrics/HW/HW3/HW3.R",
+		"/Users/jian/AlgoTrader/AlgoDev/server/aj2/signals.R",
+		"/Users/jian/Library/Application Support/Sublime Text 3/Packages/User/SublimeLinter.sublime-settings",
+		"/Users/jian/AlgoTrader/AlgoDev/server/aj2/empiricalQ.cpp",
+		"/Users/jian/AlgoTrader/AlgoDev/server/aj2/utils.cpp",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF525/hw1/AveRating.R",
+		"/Users/jian/github/arxiv-sanity-preserver/parse_pdf_to_text_TET.py",
+		"/Users/jian/Dropbox/ORF350-2016/Solutions/Jian/hw1/q2-2.R",
+		"/Users/jian/AlgoTrader/AlgoDev/neuralnets/lstm/generateData.R",
+		"/Users/jian/Research/OneBit/Lib.bib",
+		"/Users/jian/AlgoTrader/AlgoDev/neuralnets/lstm/testData/generateTestData.R",
+		"/Users/jian/AlgoTrader/AlgoDev/neuralnets/lstm/config.py",
+		"/Users/jian/AlgoTrader/AlgoDev/neuralnets/lstm/exp1/generateData.R",
+		"/Users/jian/AlgoTrader/PartTimeJob/assignment1/assignment1.R",
+		"/Users/jian/AlgoTrader/PartTimeJob/assignment1/scripts.R",
+		"/Users/jian/AlgoTrader/PartTimeJob/assignment1/stats.R",
+		"/Users/jian/github/dataScience/latex_source/languages.tex",
+		"/Users/jian/AlgoTrader/PartTimeJob/tmp.py",
+		"/Users/jian/AlgoTrader/TickData/cubic/parser.cpp",
+		"/Users/jian/github/dataScience/latex_source/languages.log",
+		"/Users/jian/github/dataScience/latex_source/toolkit.tex",
+		"/Users/jian/Downloads/parscit/demodata/sample2.txt",
+		"/Users/jian/Research/OneBit/simulation/sgd_lr.py",
+		"/Users/jian/Research/PrivateSparsePCA/simulation/PrivateSparsePCA.py",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF525/hw3/Q1_KMeans.R",
+		"/Users/jian/Desktop/test_blas.py",
+		"/Users/jian/Research/arxiv/arxiv-sanity-preserver/analyze.py",
+		"/Users/jian/github/arxiv-sanity-preserver/raw/out1450632131.xml",
+		"/Users/jian/Downloads/41177-Examples.py",
+		"/Users/jian/Desktop/Option Prices.py",
+		"/Users/jian/Research/OneBit/simulation/sgd.py",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF409/Ex717.py",
+		"/Users/jian/Kaggle/SpringLeaf/preprocess/preprocess.py",
+		"/Users/jian/Downloads/a2/part1.ml",
+		"/Users/jian/Downloads/dropnn-release 2/drop-nn/Makefile",
+		"/Users/jian/AlgoTrader/QiShi/ScreenTest/price_data_2013/targetuniv.20130903.txt",
+		"/Users/jian/AlgoTrader/QiShi/ScreenTest/submission/utils.py",
+		"/Users/jian/AlgoTrader/BarViewer/barviewer.py",
+		"/Users/jian/Downloads/stylenet.py",
+		"/Users/jian/PrincetonStudy/USTC Courses/GPU/Course/hw2/myspace/Makefile",
+		"/Users/jian/Research/GLasso/matlab/glasso.F",
+		"/Users/jian/AlgoTrader/7hcnData/getData.py",
+		"/Users/jian/AlgoTrader/7hcnData/splitTable.py",
+		"/Users/jian/AlgoTrader/7hcnData/vismtrade.py",
+		"/Users/jian/Research/GMA/matlab/GAMA_C.m",
+		"/Users/jian/Research/GMA/matlab/GAMA_C-mex.c",
+		"/Users/jian/Research/GMA/matlab/GAMA_C.c",
+		"/Users/jian/PrincetonStudy/DeepLearning/CS224d/assignment2/nn/math.py",
+		"/Users/jian/PrincetonStudy/DeepLearning/CS224d/assignment2/rnnlm.py",
+		"/Users/jian/PrincetonStudy/DeepLearning/CS224d/assignment2/softmax_example.py",
+		"/Users/jian/PrincetonStudy/DeepLearning/CS224d/assignment2/nn/base.py",
+		"/Users/jian/PrincetonStudy/DeepLearning/CS224d/assignment2/nerwindow.py",
+		"/Users/jian/PrincetonStudy/DeepLearning/CS224d/assignment2/data_utils/ner.py",
+		"/Users/jian/PrincetonStudy/DeepLearning/CS224d/assignment2/data_utils/utils.py",
+		"/Users/jian/AlgoTrader/Wind/demos/wsqsave.py",
+		"/Users/jian/PrincetonStudy/DeepLearning/CS224d/assignment3/starter_code/rnn_changed.py",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF523/final/P6.m",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF523/hw3/hw3_4.m",
+		"/Users/jian/Desktop/report.tex",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF523/hw6/hw6_3.m",
+		"/Users/jian/PrincetonStudy/GradCourses/ORF523/final/P2.m",
+		"/Users/jian/HardAcademics/GradCourses/ORF525/hw2/Q4Start.R",
+		"/Users/jian/HardAcademics/GradCourses/ORF525/hw2/Q5.R",
+		"/Users/jian/HardAcademics/GradCourses/ORF525/hw2/Q2-1.R",
+		"/Users/jian/HardAcademics/GradCourses/ORF525/hw2/Q3.R",
+		"/Users/jian/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/jian/HardAcademics/GradCourses/ORF525/hw2/Q2a.R",
+		"/Users/jian/HardAcademics/GradCourses/ORF525/hw1/q2-2.R",
+		"/Users/jian/HardAcademics/GradCourses/ORF525/hw1/p2-2.R",
+		"/Users/jian/AlgoTrader/Strategies/S1/main.py",
+		"/Users/jian/AlgoTrader/Strategies/S1/utils.py",
+		"/Users/jian/AlgoTrader/TickData/cubic/extract/ThostFtdcUserApiStruct.h",
+		"/Users/jian/HardAcademics/GradCourses/ECO527/hw2/pde.sas",
+		"/Users/jian/HardAcademics/GradCourses/ECO527/hw2/t1.sas",
+		"/Users/jian/WRDS/CompuStat/samples/pde.sas",
+		"/Users/jian/AlgoTrader/SandPointe/quantile_stdvar_surf.py",
+		"/Users/jian/AlgoTrader/SandPointe/quantile_return_plot.py",
+		"/Users/jian/AlgoTrader/SandPointe/qt_bs_mean_surf.py",
+		"/Users/jian/HardAcademics/GradCourses/ECO527 Wei/assignment1/reverse.sas",
+		"/Users/jian/CRSP/samples/momentum_m.sas",
+		"/Users/jian/Desktop/交易员终端_交叉外汇/交易员终端_交叉外汇/Config/Systems.xml",
+		"/Users/jian/Downloads/userapi/CFFEXFtdcTraderApi.h",
+		"/Users/jian/AlgoTrader/TickData/AliyunFilters/filter_day.py",
+		"/Users/jian/Desktop/ETTradingApi/trader_ctp_future_instance.cpp",
+		"/Users/jian/AlgoTrader/ABLViewer/ABLViewer.py",
+		"/Users/jian/Desktop/ETTradingApi/et_trader_ctp_future_instance.cpp",
+		"/Users/jian/AlgoTrader/ETigerFund/code/ctp_rtn_time_test/ctp_rtn_time_test/ITrader.h",
+		"/Users/jian/AlgoTrader/ETigerFund/code/ctp_rtn_time_test/ctp_rtn_time_test/traderspi.cpp",
+		"/Users/jian/AlgoTrader/ETigerFund/code/ctp_rtn_time_test/ctp_rtn_time_test/cscope.out",
+		"/Users/jian/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/Users/jian/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap",
+		"/Users/jian/Library/Application Support/Sublime Text 3/Packages/Default/Default (OSX).sublime-keymap",
+		"/Users/jian/AlgoTrader/ETigerFund/code/ctp_rtn_time_test/ctp_rtn_time_test/traderspi.h",
+		"/Users/jian/AlgoTrader/ETigerFund/code/ctp_rtn_time_test/ctp_rtn_time_test/common_var.cpp",
+		"/Users/jian/git/AliyunCode/testCTP/ReadMe.txt",
+		"/Users/jian/AlgoTrader/CTP/API/v6.2.5_P201403271045traderapi_linux64/reEncode.py",
+		"/Users/jian/Library/Application Support/Sublime Text 3/Packages/Package Control/Package Control.sublime-settings",
+		"/Users/jian/AlgoTrader/ETigerFund/code/ctp_rtn_time_test/ctp_rtn_time_test/mdspi.h",
+		"/Users/jian/git/AliyunCode/AllMarketDownload/main.cpp",
+		"/Users/jian/git/AliyunCode/AllMarketDownload/MdSpi.cpp",
+		"/Users/jian/git/AliyunCode/AllMarketDownload/MdSpi.hpp",
+		"/Users/jian/git/AliyunCode/CreateDB/createDB.cpp",
+		"/Users/jian/git/AliyunCode/AllMarketDownload/TraderSpi.h",
+		"/Users/jian/git/AliyunCode/AllMarketDownload/TraderSpi.cpp",
+		"/Users/jian/AlgoTrader/CTP/API/v6.2.5_P201403271045traderapi_linux64/ThostFtdcUserApiDataType.h",
+		"/Users/jian/git/AliyunCode/AllMarketDownload/testMdApi.cpp",
+		"/Users/jian/git/AliyunCode/CreateDB/createDB",
+		"/Users/jian/git/AliyunCode/AllMarketDownload/utils.h",
+		"/Users/jian/git/AliyunCode/AllMarketDownload/testTraderApi.cpp"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"updateXX",
+			"incorrect",
+			"idx",
+			"p[",
+			"exit_type",
+			"DATA.PATH",
+			"DATA.PATHi",
+			"DATA.PATH",
+			"load",
+			"SRC.DATAload",
+			"SRC.DATA",
+			"my.data",
+			"MyData",
+			"RawData",
+			"apply",
+			"ns",
+			"base",
+			"deviateFromMedian",
+			"LoadBlock",
+			"LoadBloc",
+			"6",
+			"roles",
+			"role.",
+			"LoadNMT",
+			"CheckpointNMT",
+			"batch_size",
+			"LSTM",
+			"Gated",
+			"gru",
+			"GRU",
+			"LSTM",
+			"sum",
+			"CThostFtdcDepthMarketDataField",
+			"images",
+			"server",
+			"References",
+			"__gfortran_transfer_character_write",
+			"double",
+			"show()",
+			"print",
+			"clusterLabels",
+			"count",
+			"fitLasso",
+			"lassoBeta2",
+			"lassoBeta1",
+			"fitLasso",
+			"width",
+			"toString",
+			"dataTrainAll",
+			"Earnings",
+			"&K",
+			"Et",
+			"m_accInfo",
+			"iAmount",
+			"dPrice",
+			"et_",
+			"CheckQueryInterval",
+			"InstrumentField",
+			"TThostFtdcExchangeIDType",
+			"TThostFtdcExchangeInstIDType",
+			"TThostFtdcExchangeIDType",
+			"InstrumentField",
+			"Instrument",
+			"TThostFtdcDateType",
+			"CThostFtdcInstrumentField",
+			"QryInstrumentField",
+			"InstrumentField",
+			"TThostFtdcExchangeInstIDType",
+			"TThostFtdcExchangeIDType",
+			"MarketData",
+			"Instrument",
+			"encoding",
+			"pUserApi",
+			"OnRtnQryInstrument",
+			"OnRtn",
+			"CThostFtdcQryInstrumentField",
+			"CThostFtdcQryInstrumentField ",
+			"ReqQryInstrument",
+			"CThostFtdcExchangeField",
+			"CThostFtdcRspInfoField",
+			"合约",
+			"全市场",
+			"quan'shi'chang",
+			"CThostFtdcQryProductField",
+			"合约",
+			"Subscribe",
+			"SubscribeMarket",
+			"SubscribeMarketData",
+			"Subscribe",
+			"ppInstrumentID",
+			",9:",
+			"CThostFtdcQryTrading",
+			"TThostFtdcCurrencyIDType",
+			"CThostFtdcQryTradingAccountField",
+			"ReqQryTradingAccount",
+			"InvestorPositionField",
+			"CThostFtdcInvestorPositionField",
+			"CThostFtdcInvestorPositionField ",
+			"CThostFtdcInvestorPositionField",
+			"ThostFtdcInvestorPositionField",
+			"TThostFtdcInvestorPositionField",
+			"CThostFtdcInvestorPositionField",
+			"ThostFtdcInvestorPositionField",
+			"CThostFtdcInvestorPositionField",
+			"ReqQryInvestPosition",
+			"ReqQry",
+			"仓位",
+			"\"51\"",
+			"CThostFtdcTradeField",
+			"CThostFtdcOrderField",
+			"CThostFtdcRspInfoField",
+			"UserID",
+			"CThost",
+			"Ftdc",
+			"RspInfo",
+			"RspInfoField",
+			"tickTime",
+			"preVol",
+			"PreOpenInt",
+			"linesplit",
+			"stIdx, edIdx",
+			"side = tk.LEFT",
+			"master",
+			"v_best",
+			"u_best",
+			"file",
+			"time",
+			"map::end"
+		],
+		"highlight": false,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"macro.indicators",
+			"my.data",
+			"raw.data",
+			"LoadBlock",
+			"CheckpointBlock",
+			"dataTest",
+			"",
+			"m_accountInfo",
+			"amount",
+			"price",
+			"",
+			"pTraderApi",
+			",09:",
+			"ny_best",
+			"nx_best"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": false
+	},
+	"folders":
+	[
+		{
+			"path": "/Users/jian/Research/picasso"
+		}
+	],
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "R/picasso.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3100,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1963,
+								1989
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"origin_encoding": "ASCII",
+							"r_box_status": false,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/R-Box/syntax/R Extended.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true,
+							"vintage":
+							{
+								"action": null,
+								"action_count": "",
+								"mode": "mode_visual",
+								"motion": null,
+								"motion_count": "",
+								"must_capture_register_name": false,
+								"partial_sequence": "",
+								"register": "\"",
+								"sequence": "",
+								"xpos": 25
+							}
+						},
+						"translation.x": 0.0,
+						"translation.y": 442.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/picasso_logit_cyclic.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5479,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5398,
+								5398
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"origin_encoding": "ASCII",
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"vintage":
+							{
+								"action": null,
+								"action_count": "",
+								"mode": "mode_normal",
+								"motion": null,
+								"motion_count": "",
+								"must_capture_register_name": false,
+								"partial_sequence": "",
+								"register": "\"",
+								"sequence": "",
+								"xpos": 15
+							}
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "R/picasso.lasso.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8002,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3273,
+								3273
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"origin_encoding": "ASCII",
+							"r_box_status": false,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/R-Box/syntax/R Extended.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true,
+							"vintage":
+							{
+								"action": null,
+								"action_count": "",
+								"mode": "mode_normal",
+								"motion": null,
+								"motion_count": "",
+								"must_capture_register_name": false,
+								"partial_sequence": "",
+								"register": "\"",
+								"sequence": "",
+								"xpos": 35
+							}
+						},
+						"translation.x": 0.0,
+						"translation.y": 1447.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "R/lasso.sc.cov.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2716,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1432,
+								1432
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"origin_encoding": "ASCII",
+							"r_box_status": false,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/R-Box/syntax/R Extended.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true,
+							"vintage":
+							{
+								"action": null,
+								"action_count": "",
+								"mode": "mode_normal",
+								"motion": null,
+								"motion_count": "",
+								"must_capture_register_name": false,
+								"partial_sequence": "",
+								"register": "\"",
+								"sequence": "",
+								"xpos": 28
+							}
+						},
+						"translation.x": 0.0,
+						"translation.y": 254.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/mymath1.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 69616,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								43686,
+								43686
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"origin_encoding": "ASCII",
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"vintage":
+							{
+								"action": null,
+								"action_count": "",
+								"mode": "mode_normal",
+								"motion": null,
+								"motion_count": "",
+								"must_capture_register_name": false,
+								"partial_sequence": "",
+								"register": "\"",
+								"sequence": "",
+								"xpos": 25
+							}
+						},
+						"translation.x": 0.0,
+						"translation.y": 31631.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/picasso_lasso_sc_cov.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12602,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5217,
+								5225
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"origin_encoding": "ASCII",
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"vintage":
+							{
+								"action": null,
+								"action_count": "",
+								"mode": "mode_visual",
+								"motion": null,
+								"motion_count": "",
+								"must_capture_register_name": false,
+								"partial_sequence": "",
+								"register": "\"",
+								"sequence": "",
+								"xpos": 24
+							}
+						},
+						"translation.x": 0.0,
+						"translation.y": 1870.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "R/picasso.logit.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7237,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1394,
+								1394
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"origin_encoding": "ASCII",
+							"r_box_status": false,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/R-Box/syntax/R Extended.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true,
+							"vintage":
+							{
+								"action": null,
+								"action_count": "",
+								"mode": "mode_normal",
+								"motion": null,
+								"motion_count": "",
+								"must_capture_register_name": false,
+								"partial_sequence": "",
+								"register": "\"",
+								"sequence": "",
+								"xpos": 40
+							}
+						},
+						"translation.x": 0.0,
+						"translation.y": 1394.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/picasso_logit_prox.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5321,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3861,
+								3861
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"origin_encoding": "ASCII",
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"vintage":
+							{
+								"action": null,
+								"action_count": "",
+								"mode": "mode_normal",
+								"motion": null,
+								"motion_count": "",
+								"must_capture_register_name": false,
+								"partial_sequence": "",
+								"register": "\"",
+								"sequence": "",
+								"xpos": 55
+							}
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.astyle_error_message":
+	{
+		"height": 0.0
+	},
+	"output.exec":
+	{
+		"height": 112.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.sftp":
+	{
+		"height": 238.0
+	},
+	"pinned_build_system": "",
+	"project": "",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"gene",
+				"generateData.R"
+			],
+			[
+				"gener",
+				"generateData.R"
+			],
+			[
+				"gen",
+				"generateData.R"
+			],
+			[
+				"make",
+				"make_dataset.py"
+			],
+			[
+				"model",
+				"model.py"
+			],
+			[
+				"sampl",
+				"sample.py"
+			],
+			[
+				"config",
+				"config.py"
+			],
+			[
+				"check",
+				"checkpoint.py"
+			],
+			[
+				"train.py",
+				"train.py"
+			],
+			[
+				"uti",
+				"utils.py"
+			],
+			[
+				"sig",
+				"signals.R"
+			],
+			[
+				"base",
+				"base.R"
+			],
+			[
+				"too",
+				"toolkit.tex"
+			],
+			[
+				"to",
+				"toolkit.tex"
+			],
+			[
+				"toolkit.tex",
+				"toolkit.tex"
+			],
+			[
+				"reco",
+				"recordCenter.h"
+			],
+			[
+				"record",
+				"recordCenter.cpp"
+			],
+			[
+				"main.cpp",
+				"main.cpp"
+			],
+			[
+				"itr",
+				"ITrader.h"
+			],
+			[
+				"com",
+				"common_var.cpp"
+			],
+			[
+				"creat",
+				"AliyunCode/CreateDB/createDB.cpp"
+			],
+			[
+				"mdspi",
+				"AliyunCode/AllMarketDownload/MdSpi.cpp"
+			],
+			[
+				"traderspi.h",
+				"AliyunCode/AllMarketDownload/TraderSpi.h"
+			],
+			[
+				"trader",
+				"ctp_rtn_time_test/traderspi.h"
+			],
+			[
+				"main",
+				"AliyunCode/AllMarketDownload/main.cpp"
+			],
+			[
+				"thos",
+				"v6.2.5_P201403271045traderapi_linux64/ThostFtdcUserApiStruct.h"
+			],
+			[
+				"apid",
+				"ThostFtdcUserApiDataType.h"
+			],
+			[
+				"apis",
+				"ThostFtdcUserApiStruct.h"
+			],
+			[
+				"ag",
+				"S0/Data/ag1412_2014-07-15.csv"
+			],
+			[
+				"ma",
+				"S1/main.py"
+			],
+			[
+				"res",
+				"RestSupLineDetect/RestSupLineDetect.py"
+			],
+			[
+				"load",
+				"Rtools/load_IFCleanData.R"
+			],
+			[
+				"tu",
+				"ana_hft/tu_GUI_IF.R"
+			],
+			[
+				"znlatex.tex",
+				"report/znlatex.tex"
+			],
+			[
+				"package",
+				"Package Control Messages"
+			],
+			[
+				"inc",
+				"src/IncQUIC.cpp"
+			],
+			[
+				"quic",
+				"src/QUIC.R"
+			],
+			[
+				"bigquic.h",
+				"bigquic/bigquic.h"
+			],
+			[
+				"bigquic",
+				"bigquic/bigquic.cpp"
+			],
+			[
+				"outp",
+				"ABIDE/output.txt"
+			],
+			[
+				"outpu",
+				"ABIDE/output.txt"
+			],
+			[
+				"red",
+				"ABIDE/reduced_ts.txt"
+			],
+			[
+				"redu",
+				"ABIDE/reduced_ts.txt"
+			],
+			[
+				"bigqui",
+				"BigQUIC_test/bigquic/bigquic.cpp"
+			],
+			[
+				"gra",
+				"ABIDE/graph116_fastclime.R"
+			],
+			[
+				"big",
+				"ABIDE/BigImage_reduced.R"
+			],
+			[
+				"gr",
+				"ADHD/graph.R"
+			],
+			[
+				"abide_or",
+				"ABIDE/ABIDE_order.txt"
+			],
+			[
+				"abide_label",
+				"ABIDE/ABIDE_label.csv"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+		"vintage":
+		{
+		}
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 200.0,
+	"status_bar_visible": false,
+	"template_settings":
+	{
+	}
+}

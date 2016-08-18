@@ -1,0 +1,15 @@
+Package: picasso
+Type: Package
+Title: Pathwise Calibrated Sparse Shooting Algorithm
+Version: 0.5.0
+Date: 2015-12-15
+Author: Xingguo Li, Tuo Zhao, Tong Zhang and Han Liu
+Maintainer: Xingguo Li <xingguo.leo@gmail.com>
+Depends: R (>= 2.15.0), lattice, igraph, MASS, Matrix
+Imports: methods
+Description: Implements the pathwise calibrated sparse shooting algorithm (PICASSO) for high dimensional regularized sparse linear regression, sparse logistic regression, and sparse undirected graphical model estimation. As a pathwise coordinate optimization algorithm, PICASSO exploits warm start initialization, active set updating, and strong rule for coordinate preselection to boost computation, and attains a linear convergence to a unique sparse local optimum with optimal statistical properties. Moreover, users can choose different regularizers, including L1, MCP, and SCAD regularizers. The computation is memory-optimized using the sparse matrix output.
+License: GPL-2
+Repository: CRAN
+Packaged: 2015-12-18 14:54:05 UTC; xingguo
+NeedsCompilation: yes
+Date/Publication: 2015-12-18 22:40:05
