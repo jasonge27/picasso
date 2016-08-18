@@ -1,10 +1,6 @@
 #include "mymath.h"
-#include <R.h>
 
-void picasso_logit_greedy(double *Y, double * X, double * beta, 
-    double * intcpt, int * nn, int * dd, int * ite_lamb, int * ite_cyc, 
-    int * size_act, double *obj, double *runt, double *lambda, int *nnlambda, 
-    double *ggamma, int *mmax_ite, double *pprec, int *fflag){
+void picasso_logit_greedy(double *Y, double * X, double * beta, double * intcpt, int * nn, int * dd, int * ite_lamb, int * ite_cyc, int * size_act, double *obj, double *runt, double *lambda, int *nnlambda, double *ggamma, int *mmax_ite, double *pprec, int *fflag){
     
     int i, k, m, n, d, max_ite1, max_ite2, nlambda, size_a, size_a1, comb_flag, match, ite1, ite2, c_idx, idx, flag;
     double gamma, w, wn, g, prec1, prec2, ilambda, ilambda0, tmp, dif1, dif2;
@@ -33,13 +29,7 @@ void picasso_logit_greedy(double *Y, double * X, double * beta,
     start = clock();
     size_a = 0;
     
-    double function_value = 0.0;
-    double function_value_change = 0.0;
-    double beta1_backup = 0.0;
-    double a = 0;
-
     for (i=0; i<nlambda; i++) {
-        Rprintf("lambda: %.3f \n", lambda[i]);
         ilambda0 = lambda[i];
         ilambda = lambda[i]/w;
         if(i>0) {
@@ -48,9 +38,7 @@ void picasso_logit_greedy(double *Y, double * X, double * beta,
         prec1 = (1+prec2*10)*ilambda;
         ite1 = 0;
         dif1 = prec1*2;
-       // Rprintf("%f %f %d %d\n", dif1, prec1, ite1, max_ite1);
         while (dif1>prec1 && ite1<max_ite1) {
-           // Rprintf("***outer loop***\n");
             p_update(p,Xb,intcpt[i],n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
             dif_vec(p_Y, p, Y, n); // p_Y = p - Y
             if(flag==1){
@@ -64,11 +52,6 @@ void picasso_logit_greedy(double *Y, double * X, double * beta,
             }
             idx = max_abs_idx(grad, d);
             
-            for (int ii = 0; ii < d; ii++){
-                Rprintf("%.2f ", grad[ii]);
-            }
-            Rprintf("%d \n", idx);
-
             comb_flag = 1;
             if(size_a>0){
                 match = is_match(idx,set_act,size_a);
@@ -82,36 +65,14 @@ void picasso_logit_greedy(double *Y, double * X, double * beta,
             }
             ite2 = 0;
             dif2 = 1;
-
-            Rprintf("%d\n", size_a);
-            // this while loop is IRLS on the fixed support,
-            // cd until convergence (in terms of change of beta)
-            function_value_change = 0.0;
             while (dif2>prec2 && ite2<max_ite2) {
                 intcpt[i] = intcpt[i] - sum_vec_dif(p,Y,n)/wn;
-
-                if (flag == 1){
-                    function_value = get_function_value_l1(p, Y, Xb, beta1, intcpt[i],  n, ilambda); 
-                } else if (flag == 2){
-                    function_value = get_function_value_mcp(p, Y, Xb, beta1, intcpt[i], n, ilambda0, gamma );
-                } else if (flag == 3){
-                    function_value = get_function_value_scad(p, Y, Xb, beta1, intcpt[i], n, ilambda0, gamma);
-                }
-                // Rprintf("fvalue:%f,  size_a:%d\n", function_value, size_a);
-
                 for (m=0; m<size_a; m++) {
                     c_idx = set_act[m];
                     p_update(p,Xb,intcpt[i],n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
                     dif_vec(p_Y, p, Y, n); // p_Y = p - Y
-
-                    a = get_cord_hessian(p, X, c_idx, n);
-                    Rprintf("a: %f\n", a);
-                    if (fabs(a) < 1e-20){
-                        continue;
-                    }
-
                     if(flag==1){
-                        g = get_grad_logit_l1(p_Y, X+c_idx*n, n); // g = <p-Y, X>/n
+                        g = get_grad_logit_l1(p_Y, X+c_idx*n, n); // g = <p-Y, X>
                     }
                     if(flag==2){
                         g = get_grad_logit_mcp(p_Y, X+c_idx*n, beta1[c_idx], ilambda0, gamma, n); // g = <p-Y, X>/n + h_grad(mcp)
@@ -119,25 +80,14 @@ void picasso_logit_greedy(double *Y, double * X, double * beta,
                     if(flag==3){
                         g = get_grad_logit_scad(p_Y, X+c_idx*n, beta1[c_idx], ilambda0, gamma, n); // g = <p-Y, X>/n + h_grad(scad)
                     }
-
-                    beta1_backup = beta1[c_idx];
-                    tmp = g - 2*a*beta1[c_idx];
+                    tmp = beta1[c_idx] - g/w;
                     X_beta_update(Xb, X+c_idx*n, -beta1[c_idx], n); // X*beta = X*beta-X[,c_idx]*beta1[c_idx]
-                    beta1[c_idx] = -(soft_thresh_l1(tmp, ilambda))/(2*a);
+                    beta1[c_idx] = soft_thresh_l1(tmp, ilambda);
                     X_beta_update(Xb, X+c_idx*n, beta1[c_idx], n); // X*beta = X*beta+X[,c_idx]*beta1[c_idx]
-
-                    function_value_change += a*(beta1[c_idx]-beta1_backup)*(beta1[c_idx]-beta1_backup) 
-                                            + g*(beta1[c_idx]-beta1_backup) 
-                                            + ilambda*(fabs(beta1_backup) - fabs(beta1[c_idx]));
                 }
                 ite2++;
                 dif2 = dif_2norm(beta1, beta0, set_act, size_a);
                 vec_copy(beta1, beta0, set_act, size_a);
-
-                if (fabs(function_value_change) < 1e-6 *fabs(function_value)){
-                 //   Rprintf("fv_change:%f  fv:%f\n", function_value_change, function_value);
-                    break;
-                }
             }
             ite_cyc[i] += ite2;
             p_update(p,Xb,intcpt[i],n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
@@ -152,7 +102,6 @@ void picasso_logit_greedy(double *Y, double * X, double * beta,
                 get_grad_logit_scad_vec(grad, p_Y, X, beta1, ilambda0, gamma, n, d); // grad = <p-Y, X>/n + h_grad(scad)
             }
             dif1 = max_abs_vec(grad, d);
-          //  Rprintf("---dif1: %f\n", dif1);
             //dif1 = dif_2norm(beta1, beta2, set_act, size_a);
             //vec_copy(beta1, beta2, set_act, size_a);
             size_a1 = 0;

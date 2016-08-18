@@ -1,9 +1,6 @@
 #include "mymath.h"
 
-void picasso_logit_prox(double *Y, double * X, double * beta, double * intcpt, 
-    int * nn, int * dd, int * ite_lamb, int * ite_cyc, int * size_act, double *obj, 
-    double *runt, double *lambda, int *nnlambda, double *ggamma, int *mmax_ite, 
-    double *pprec, double *LL, int *fflag){
+void picasso_logit_prox(double *Y, double * X, double * beta, double * intcpt, int * nn, int * dd, int * ite_lamb, int * ite_cyc, int * size_act, double *obj, double *runt, double *lambda, int *nnlambda, double *ggamma, int *mmax_ite, double *pprec, double *LL, int *fflag){
     
     int i, k, m, n, d, max_ite1, max_ite2, nlambda, size_a, size_a1, ite1, ite2, c_idx, flag;
     double gamma, w, wn, g, L, prec1, prec2, ilambda, ilambda0, tmp, dif1, dif2;

@@ -808,53 +808,6 @@ void p_update(double *p, double *Xb, double intcpt, int n){
     }
 }
 
-// v = sum_{i=1..n} [(y[i]-1)*(intcpt+Xb[i]) + log(p[i])] + lambda * |beta|
-double get_function_value_l1(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda){
-    int i;
-    double v = 0.0;
-    for (i = 0; i<n; i++){
-        v += (Y[i]-1)*(intcpt+Xb[i]); 
-    }
-    for (i = 0; i<n; i++)
-    if (p[i] > 1e-8) {
-        v += log(p[i]);
-    }
-
-    v = -v /n;
-
-    double penalty = 0.0;
-    for (i = 0; i<n; i++){
-        penalty += fabs(beta[i]);
-    }
-
-    v += lambda * penalty;
-    return(v);
-}
-
-// placeholder
-double get_function_value_mcp(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda, double gamma){
-    return(0);
-}
-
-// placeholder
-double get_function_value_scad(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda, double gamma){
-    return(0);
-}
-
-// w[j] = (1/n)*sum_{i=1,2...n} X[i,j]*X[i,j]*p[j](1-p[j])
-double get_cord_hessian(double *p, double * X, int j, int n){
-    double v = 0.0;
-    int i = 0;
-    for (i =0; i<n; i++){
-        v += X[j*n+i]*X[j*n+i]*p[i]*(1-p[i]);
-    }
-    v = v/n;
-    return(v);
-}
-
 // grad = beta1 - <p-Y, X>/n/w
 void get_grad_logit_lin(double *grad, double *beta1, double *p_Y, double *X, int n, int d, double w){
     int i,j;

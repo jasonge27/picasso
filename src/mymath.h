@@ -70,23 +70,6 @@ double vec_mat_inprod_2norm(double *y, double *x, int n, int p);
 // e-S[act]^T beta[act]
 double res(double e, double *S, double *beta, int * set_act, int size_a, int idx);
 
-
-// v = sum_{i=1..n} [(y[i]-1)*(intcpt+Xb[i]) + log(p[i])] + lambda * |beta|
-double get_function_value_l1(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda);
-
-// placeholder
-double get_function_value_mcp(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda, double gamma);
-
-// placeholder
-double get_function_value_scad(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda, double gamma);
-
-
-// w = sum_{j=1,2...n} X[i,j]*X[i,j]*p[j](1-p[j])
-double get_cord_hessian(double *p, double * X, int i, int n);
-
 int is_match(int idx, int * vec, int n);
 
 double dif_2norm(double *x, double *y, int *xa_idx, int n);
