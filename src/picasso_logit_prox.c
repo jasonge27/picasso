@@ -30,6 +30,9 @@ void picasso_logit_prox(double *Y, double * X, double * beta, double * intcpt, i
     double *Xb = (double *) Calloc(n, double);
     start = clock();
     size_a = 0;
+
+    double function_value = 0.0;
+    double function_value1 = 0.0;
     
     for (i=0; i<nlambda; i++) {
         ilambda0 = lambda[i];
@@ -63,10 +66,13 @@ void picasso_logit_prox(double *Y, double * X, double * beta, double * intcpt, i
             dif2 = 1;
             while (dif2>prec2 && ite2<max_ite2) {
                 intcpt[i] = intcpt[i] - sum_vec_dif(p,Y,n)/wn;
+                 
+                    dif_vec(p_Y, p, Y, n); // p_Y = p - Y
+                     function_value = get_function_value_l1(p, Y, Xb, beta1, intcpt[i],  n, ilambda);
+
                 for (m=0; m<size_a; m++) {
                     c_idx = set_act[m];
-                    p_update(p,Xb,intcpt[i],n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
-                    dif_vec(p_Y, p, Y, n); // p_Y = p - Y
+                 
                     if(flag==1){
                         g = get_grad_logit_l1(p_Y, X+c_idx*n, n); // g = <p-Y, X>
                     }
@@ -84,6 +90,14 @@ void picasso_logit_prox(double *Y, double * X, double * beta, double * intcpt, i
                 ite2++;
                 dif2 = dif_2norm(beta1, beta0, set_act, size_a);
                 vec_copy(beta1, beta0, set_act, size_a);
+
+                p_update(p,Xb,intcpt[i],n);
+                if(ite2>6){
+                      function_value1 = get_function_value_l1(p, Y, Xb, beta1, intcpt[i],  n, ilambda);
+                    if (fabs(function_value1 - function_value) < 1e-6*fabs(function_value)){
+                        break;
+                    }
+                }
             }
             ite_cyc[i] += ite2;
             p_update(p,Xb,intcpt[i],n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
