@@ -32,7 +32,7 @@ void update_residual(double * r, const double *  w,
 // min \frac{1}{2n} \sum_{i=1}^N w_i(r_i - X_i^T \beta + intcept)^2 + \lambda * |\beta|
 void solve_IRLS_with_warmstart(const double* X, 
     const double* w, // w = p * (1-p)
-    const double lambda, 
+    const double* lambda, 
     const int n, const int d,
     const int max_ite, const double prec, const double dev_null,
     double* beta, double* Xb, 
@@ -63,11 +63,11 @@ void solve_IRLS_with_warmstart(const double* X,
         calc_IRLS_coef(w, X, r, beta, k, n, &g, &a);
         
         tmp  = beta[k];
-        if (2*fabs(g) > lambda){
+        if (2*fabs(g) > lambda[k]){
             set_act[size_a] = k;
             size_a += 1;
 
-            beta[k] = soft_thresh_l1(2*g, lambda) / (2*a);
+            beta[k] = soft_thresh_l1(2*g, lambda[k]) / (2*a);
         } else {
             beta[k] = 0.0;
         }
@@ -96,8 +96,8 @@ void solve_IRLS_with_warmstart(const double* X,
 
             tmp  = beta[c_idx];
 
-            if (2*fabs(g) > lambda){
-                beta[c_idx] = soft_thresh_l1(2*g, lambda) / (2*a);                
+            if (2*fabs(g) > lambda[c_idx]){
+                beta[c_idx] = soft_thresh_l1(2*g, lambda[c_idx]) / (2*a);                
             } else{
                 beta[c_idx] = 0.0;
             }
@@ -152,6 +152,18 @@ void solve_IRLS_with_warmstart(const double* X,
     *act_size = size_a;
 }
 
+double penalty_derivative(int method_flag, double x, double lambda, double gamma){
+    // mcp
+    if (method_flag == 2){
+        return(0);
+    }
+    // scad
+    if (method_flag == 3){
+        return(0);
+    }
+    return(0);
+}
+
 void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt, 
     int *nn, int *dd, int *ite_lamb, int *ite_cyc, int *size_act, 
     double *obj, double *runt, double *lambda, int *nnlambda, double *ggamma, 
@@ -171,6 +183,7 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
     int *set_act = (int *) Calloc(d, int);
     
     double *beta_old = (double *) Calloc(d, double);
+    double *stage_beta_old = (double *) Calloc(d, double);
     double *beta1 = (double *) Calloc(d, double);
 
     double *p = (double *) Calloc(n, double);
@@ -178,6 +191,7 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
     double *w = (double *) Calloc(n, double);
     double *r = (double *) Calloc(n, double);
 
+    int method_flag = *fflag;
 
     double dev_null = 0.0;
     double dev_sat = 0.0;
@@ -195,6 +209,11 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
 
     int outer_loop_count;
     double dev_local, dev_change;
+
+    int stage_count;
+    double * stage_lambda = (double *) Calloc(d, double);
+    double * beta_previous_lambda = (double *) Calloc(d, double);
+   // double * stage_beta = (double *) Calloc(d, double);
 
     //max_ite1 = 4;
 
@@ -218,36 +237,96 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
        // prec1 = (1 + prec2 * 10) * ilambda;
         prec1 = prec2;
         
-        outer_loop_count = 0;
-        while (outer_loop_count < max_ite1) {
-            outer_loop_count++;
-
-            p_update(p, Xb, intcpt[i], n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
-            for (j = 0; j < n; j++){
-                w[j] = p[j] * (1 - p[j]);
-                r[j] = Y[j] - p[j];
+        stage_count = 0;
+        // initialize beta1 
+        if ((method_flag>1) &&(i>0)){
+            for (j = 0; j < d; j++){
+                beta1[j] = beta_previous_lambda[j];
             }
+        }
+
+        // initialize lambda
+        for (j = 0; j < d; j++){
+            stage_lambda[j] = lambda[i];
+        }       
+
+        while (stage_count < max_ite1){
+            stage_count++;
 
             for (j = 0; j < d; j++){
-                beta_old[j] = beta1[j];
+                stage_beta_old[j] = beta1[j];
             }
 
-            solve_IRLS_with_warmstart(X, w, lambda[i], 
-                n, d,
-                max_ite2,  
-                prec2, dev_null,
-                beta1, Xb, r,
-                &intcpt[i], 
-                set_act, 
-                &size_act[i], // active set size
-                &runt[i],  // total run time
-                &ite_cyc[i] // innner loop counter
-            ); 
-            
+            outer_loop_count = 0;
+            while (outer_loop_count < max_ite1) {
+                outer_loop_count++;
+
+                p_update(p, Xb, intcpt[i], n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+                for (j = 0; j < n; j++){
+                    w[j] = p[j] * (1 - p[j]);
+                    r[j] = Y[j] - p[j];
+                }
+
+                for (j = 0; j < d; j++){
+                    beta_old[j] = beta1[j];
+                }
+
+                solve_IRLS_with_warmstart(X, w, stage_lambda, 
+                    n, d,
+                    max_ite2,  
+                    prec2, dev_null,
+                    beta1, Xb, r,
+                    &intcpt[i], 
+                    set_act, 
+                    &size_act[i], // active set size
+                    &runt[i],  // total run time
+                    &ite_cyc[i] // innner loop counter
+                ); 
+                
+                dev_change = 0.0;
+                for (s = 0 ; s < size_act[i]; s++){
+                    k = set_act[s];
+                    tmp = (beta1[k]-beta_old[k]);
+                    tmp = tmp*tmp;
+                    dev_local = 0.0;
+                    for (j = 0; j < n; j++){
+                        dev_local += w[i]*X[k*n+j]*X[k*n+j]*tmp;
+                    }
+                    dev_local = dev_local / (2*n);
+                    if (dev_local > dev_change){
+                        dev_change = dev_local;
+                    }        
+                }
+                
+              //  Rprintf("dev_change:%f, dev_null:%f\n", dev_change, dev_null);
+                if (dev_change < prec1 * dev_null){
+                    break;
+                }
+
+            }
+
+            // for lambda = lambda[i]
+            if (stage_count == 1){
+                for (j = 0; j < d; j++){
+                    beta_previous_lambda[j] = beta1[j];
+                }
+            }
+
+            // for convex penalty
+            if (method_flag == 1){
+                ite_lamb[i] = outer_loop_count;
+                break;
+            }
+
+            // for nonconvex penalty
+            // 1. check stopping criterion
+            // 2. update stage_lambda
+
+            // check stopping criterion
             dev_change = 0.0;
             for (s = 0 ; s < size_act[i]; s++){
                 k = set_act[s];
-                tmp = (beta1[k]-beta_old[k]);
+                tmp = (beta1[k]-stage_beta_old[k]);
                 tmp = tmp*tmp;
                 dev_local = 0.0;
                 for (j = 0; j < n; j++){
@@ -258,20 +337,21 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
                     dev_change = dev_local;
                 }        
             }
-            
-          //  Rprintf("dev_change:%f, dev_null:%f\n", dev_change, dev_null);
             if (dev_change < prec1 * dev_null){
                 break;
             }
 
-        }
-        ite_lamb[i] = outer_loop_count;
-
+            // update lambdas
+            for (j = 0; j < d; j++){
+                stage_lambda[j] = lambda[i] * penalty_derivative(method_flag, beta1[j], lambda[i], *ggamma);
+            }
+        }                
         vec_copy(beta1, beta+i*d, set_act, size_act[i]);
     }
     
     Free(beta_old);
     Free(beta1);
+    Free(stage_beta_old);
     Free(set_act);
     Free(p);
     Free(Xb);
