@@ -817,7 +817,7 @@ double sum_vec_dif(double *x, double *y, int n){
 }
 
 // Xb = Xb+X*beta
-void X_beta_update(double *Xb, double *X, double beta, int n){
+void X_beta_update(double *Xb, const double *X, double beta, int n){
     int i;
     
     for (i=0; i<n; i++) {

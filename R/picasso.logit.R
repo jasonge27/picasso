@@ -94,7 +94,8 @@ picasso.logit <- function(X,
     }
     
     if (alg=="cyclic"){
-      out = logit.cyclic(yy, xx, lambda, nlambda, gamma, n, d, max.ite, prec, verbose, method.flag, max.act.in, truncation)
+      out = logit.cyclic(yy, xx, lambda, nlambda, 
+        gamma, n, d, max.ite, prec, verbose, method.flag, max.act.in, truncation)
     }
     if (alg=="greedy")
       out = logit.greedy(yy, xx, lambda, nlambda, gamma, n, d, max.ite, prec, verbose, method.flag)

@@ -170,7 +170,7 @@ double sum_vec(double *x, int n);
 double sum_vec_dif(double *x, double *y, int n);
 
 // Xb = Xb+X*beta
-void X_beta_update(double *Xb, double *X, double beta, int n);
+void X_beta_update(double *Xb, const double *X, double beta, int n);
 
 // Xb = Xb+dif*X[,gr]*beta[gr]
 void X_beta_update_gr(double *Xb, double *X, double *beta, int gr, int gr_size, int n, double dif);
