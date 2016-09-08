@@ -235,6 +235,7 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
     double intcpt_old; 
     double intcpt_previous_lambda;
     double sum_w;
+    double function_value, function_value_old, function_value_null;
     for (i=0; i<nlambda; i++) {
       //  Rprintf("%f\n", lambda[i]);
       //  ilambda0 = lambda[i];
@@ -247,16 +248,19 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
             for (j = 0; j < n; j++){
                 Xb[j] = 0.0;
             }
-        } else {
+           
+        } 
+        //else {
         //    intcpt[i] = intcpt[i-1] - sum_vec_dif(p, Y, n)/wn;
-            stage_intcpt = intcpt_previous_lambda;
-        }
+        //    stage_intcpt = intcpt_previous_lambda;
+        //}
 
        // prec1 = (1 + prec2 * 10) * ilambda;
         prec1 = prec2;
         
         stage_count = 0;
         // initialize beta1 
+        /*
         if ((method_flag>1) &&(i>0)){
             for (j = 0; j < d; j++){
                 beta1[j] = beta_previous_lambda[j];
@@ -266,14 +270,27 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
             }
         }
 
-        // initialize lambda
-        for (j = 0; j < d; j++){
-            stage_lambda[j] = lambda[i];
-        }       
 
-        while (stage_count < max_ite1){
+        
+        */    
+         // initialize lambda
+        for (j = 0; j < d; j++){
+            stage_lambda[j] = lambda[i] * penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma);
+        }   
+
+        function_value_old = get_function_value(method_flag, p, Y, 
+                                                Xb, beta1, stage_intcpt, 
+                                                n, d, lambda[i], *ggamma);
+       // for (j = 0; j < n; j++){
+       //         Rprintf("%f, ", log(p[j]));
+       //     }
+       // Rprintf("\n");
+
+        function_value_null = function_value_old;
+        int max_stage_ite = 1000;
+        while (stage_count < max_stage_ite){
             stage_count++;
-            
+
 
             for (j = 0; j < d; j++){
                 stage_beta_old[j] = beta1[j];
@@ -330,7 +347,9 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
                     dev_change = dev_local;
                 } 
                 
-                Rprintf("--outer loop: %d, dev_change:%f, dev_null:%f\n", outer_loop_count, dev_change, dev_null);
+                Rprintf("--outer loop: %d, dev_change:%f, dev_null:%f\n", 
+                    outer_loop_count, dev_change, dev_null);
+
                 if ((dev_change>=0) && (dev_change < prec1 * dev_null)){
                     break;
                 }
@@ -359,41 +378,26 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
             // 2. update stage_lambda
 
             // check stopping criterion
-            dev_change = -1.0;
-            for (s = 0 ; s < size_act[i]; s++){
-                k = set_act[s];
-                tmp = (beta1[k]-stage_beta_old[k]);
-                tmp = tmp*tmp;
-                dev_local = 0.0;
-                for (j = 0; j < n; j++){
-                    dev_local += w[i]*X[k*n+j]*X[k*n+j]*tmp;
-                }
-                dev_local = dev_local / (2*n);
-                if (dev_local > dev_change){
-                    dev_change = dev_local;
-                }        
-            }
-
-            sum_w = 0.0;
             p_update(p, Xb, stage_intcpt, n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
-            for (j = 0; j < n; j++){
-                w[j] = p[j] * (1 - p[j]);
-                sum_w += w[j];
-            }
-            tmp = (stage_intcpt - stage_intcpt_old);
-            dev_local = sum_w * tmp*tmp / (2*n);
-            if (dev_local > dev_change){
-                dev_change = dev_local;
-            } 
+          //  for (j = 0; j < n; j++){
+           //     Rprintf("%f, ", log(p[j]));
+           // }
+           // Rprintf("\n");
+            function_value = get_function_value(method_flag, p, Y, Xb, 
+                                                beta1, stage_intcpt, n, d,
+                                                lambda[i], *ggamma);
 
-            Rprintf("Stage:%d, for lambda:%f, dev_change:%f\n", stage_count, lambda[i], dev_change);
-            if ((dev_change >=0) && (dev_change < prec1 * dev_null)){
+            Rprintf("Stage:%d, for lambda:%f, fvalue:%f, pre:%f\n", 
+                stage_count, lambda[i], function_value, function_value_old);
+
+            if (fabs(function_value- function_value_old) < 0.01 * fabs(function_value_old)){
                 break;
             }
+            function_value_old = function_value;
 
             // update lambdas
             for (j = 0; j < d; j++){
-                stage_lambda[j] = lambda[i] * penalty_derivative(method_flag, beta1[j], lambda[i], *ggamma);
+                stage_lambda[j] = lambda[i] * penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma);
             }
         }           
         intcpt[i] = stage_intcpt;     

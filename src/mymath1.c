@@ -12,6 +12,51 @@ double get_cord_hessian(double *p, double * X, int j, int n){
 }
 
 
+double get_penalty_value(int method_flag, double x, double lambda, double gamma){
+    // mcp
+    if (method_flag == 2){
+        if (x > gamma * lambda){
+            return(lambda*lambda*gamma/2);
+        } else {
+            return(lambda*(x - x*x/(2*lambda*gamma)));
+        }
+    }
+
+    if (method_flag == 3){
+        if (x > gamma * lambda){
+            return((gamma+1)*lambda*lambda/2);
+        } else if (x > lambda){
+            return(-(x*x - 2*lambda*gamma*x +lambda*lambda)/(2*(gamma-1)));
+        } else {
+            return(lambda*x);
+        }
+    }
+    return(0);
+}
+
+double get_function_value(int method_flag, double *p, double * Y, double * Xb, double * beta, 
+                                double intcpt, int n, int d, double lambda, double gamma){
+    int i;
+    double v = 0.0;
+    for (i = 0; i<n; i++){
+        v += (Y[i]-1)*(intcpt+Xb[i]); 
+    }
+    for (i = 0; i<n; i++)
+    if (p[i] > 1e-8) {
+        v += log(p[i]);
+    }
+
+    v = -v /n;
+
+    double penalty = 0.0;
+    for (i = 0; i<d; i++){
+        penalty += get_penalty_value(method_flag, fabs(beta[i]), lambda, gamma);
+    }
+
+    v += penalty;
+    return(v); 
+}
+
 // v = sum_{i=1..n} [(y[i]-1)*(intcpt+Xb[i]) + log(p[i])] + lambda * |beta|
 double get_function_value_l1(double *p, double * Y, double * Xb, double * beta, 
                                 double intcpt, int n, double lambda){
