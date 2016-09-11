@@ -123,7 +123,7 @@ picasso.lasso <- function(X,
         gamma = 3
       }
     }
-    if(opt=="cov"){
+    #if(opt=="cov"){
       out = lasso.sc.cov(yy, xx, xy, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
                          alg, method.flag, max.act.in, truncation)
       if(out$err==1)
@@ -131,16 +131,19 @@ picasso.lasso <- function(X,
       if(out$err==2){
         cat("Warning! \"df\" may be too small. You may choose larger \"df\". \n")
       }
-    }
-    if(opt=="naive"){
-      out = lasso.sc.naive(yy, xx, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
-                           alg, method.flag, max.act.in, truncation)
-      if(out$err==1)
-        cat("Parameters are too dense. Please choose larger lambdas. \n")
-    }
+    #}
+  #  if(opt=="naive"){
+  #    out =  lasso.sc.cov(yy, xx, xy, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
+  #                       alg, method.flag, max.act.in, truncation)
+  #    if(out$err==1)
+  #      cat("Parameters are too dense. Please choose larger lambdas. \n")
+  #  }
   }
   
-  est$beta = new("dgCMatrix", Dim = as.integer(c(d,nlambda)), x = as.vector(out$beta[1:out$col.cnz[nlambda+1]]), p=as.integer(out$col.cnz),i = as.integer(out$beta.idx[1:out$col.cnz[nlambda+1]]))
+  est$beta = new("dgCMatrix", Dim = as.integer(c(d,nlambda)),
+            x = as.vector(out$beta[1:out$col.cnz[nlambda+1]]),
+             p=as.integer(out$col.cnz),
+             i = as.integer(out$beta.idx[1:out$col.cnz[nlambda+1]]))
   est$df=rep(0,nlambda)
   for(i in 1:nlambda)
     est$df[i] = out$col.cnz[i+1]-out$col.cnz[i]

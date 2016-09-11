@@ -175,10 +175,28 @@ double penalty_derivative(int method_flag, double x, double lambda, double gamma
     return(0);
 }
 
-void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt, 
-    int *nn, int *dd, int *ite_lamb, int *ite_cyc, int *size_act, 
-    double *obj, double *runt, double *lambda, int *nnlambda, double *ggamma, 
-    int *mmax_ite, double *pprec, int *fflag){
+void picasso_logit(
+    double *Y,      // input: 0/1 model response 
+    double *X,      // input: model covariates
+    double *beta,   // output: an nlambda * d dim matrix 
+                    // saving the coefficients for each lambda
+    double *intcpt, // output: an nlambda dim array
+                    // saving the model intercept for each lambda
+    int *nn,        // number of samples
+    int *dd,        // dimension
+    int *ite_lamb,  // 
+    int *ite_cyc,   // 
+    int *size_act,  // output: an array of solution sparsity (model df)
+    double *obj,    // output: objective function value
+    double *runt,   // output: runtime
+    double *lambda, // input: regularization parameter
+    int *nnlambda,  // input: number of lambda on the regularization path
+    double *ggamma, // input: 
+    int *mmax_ite,  //
+    double *pprec,  //
+    int *fflag,      //
+    int *vverbose   // input: 1 for verbose mode
+    ){
     
     int i, j, k, s, n, d, nlambda, size_a;
     double tmp, ilambda, ilambda0;
@@ -190,6 +208,8 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
     double prec1 = *pprec;
     double prec2 = *pprec;
     nlambda = *nnlambda;
+
+    int verbose = *vverbose;
 
     int *set_act = (int *) Calloc(d, int);
     
@@ -215,6 +235,7 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
     for (i = 0; i < n; i++){
         avr_y += Y[i];
     }
+
     avr_y = avr_y / n;
     beta0_null = log(avr_y /(1-avr_y));
     dev_null = -(avr_y * beta0_null + log(1 - avr_y)); // dev_null > 0
@@ -229,17 +250,14 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
     double * beta_previous_lambda = (double *) Calloc(d, double);
    // double * stage_beta = (double *) Calloc(d, double);
 
-    //max_ite1 = 4;
+  
     double stage_intcpt;
     double stage_intcpt_old;
     double intcpt_old; 
     double intcpt_previous_lambda;
     double sum_w;
-    double function_value, function_value_old, function_value_null;
+    double function_value, function_value_old;
     for (i=0; i<nlambda; i++) {
-      //  Rprintf("%f\n", lambda[i]);
-      //  ilambda0 = lambda[i];
-      //  ilambda = lambda[i] / w;
         if(i == 0) {
             stage_intcpt = 0;
             for (j = 0; j < d; j++){
@@ -250,47 +268,28 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
             }
            
         } 
-        //else {
-        //    intcpt[i] = intcpt[i-1] - sum_vec_dif(p, Y, n)/wn;
-        //    stage_intcpt = intcpt_previous_lambda;
-        //}
-
-       // prec1 = (1 + prec2 * 10) * ilambda;
         prec1 = prec2;
         
         stage_count = 0;
-        // initialize beta1 
-        /*
-        if ((method_flag>1) &&(i>0)){
-            for (j = 0; j < d; j++){
-                beta1[j] = beta_previous_lambda[j];
-            }
-            for (j = 0; j < n; j++){
-                Xb[j] = Xb_previous_lambda[j];
-            }
+ 
+        // initialize lambda
+        if(method_flag != 1){   // nonconvex penalty
+            for (j = 0; j < d; j++)
+                stage_lambda[j] = lambda[i] * 
+                            penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma);  
+        } else {                // for convex penalty
+            for (j = 0; j < d; j++)
+                stage_lambda[j] = lambda[i];
         }
-
-
-        
-        */    
-         // initialize lambda
-        for (j = 0; j < d; j++){
-            stage_lambda[j] = lambda[i] * penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma);
-        }   
+          
 
         function_value_old = get_function_value(method_flag, p, Y, 
                                                 Xb, beta1, stage_intcpt, 
                                                 n, d, lambda[i], *ggamma);
-       // for (j = 0; j < n; j++){
-       //         Rprintf("%f, ", log(p[j]));
-       //     }
-       // Rprintf("\n");
 
-        function_value_null = function_value_old;
         int max_stage_ite = 1000;
         while (stage_count < max_stage_ite){
             stage_count++;
-
 
             for (j = 0; j < d; j++){
                 stage_beta_old[j] = beta1[j];
@@ -301,6 +300,7 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
             while (outer_loop_count < max_ite1) {
                 outer_loop_count++;
 
+                // to construct an iterative reweighted LS
                 p_update(p, Xb, stage_intcpt, n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
                 sum_w = 0.0;
                 for (j = 0; j < n; j++){
@@ -309,11 +309,13 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
                     r[j] = Y[j] - p[j];
                 }
 
+                // backup the old coefficients
                 for (j = 0; j < d; j++){
                     beta_old[j] = beta1[j];
                 }
                 intcpt_old = stage_intcpt;
 
+                // to solve the iterative reweighted LS
                 solve_IRLS_with_warmstart(X, w, stage_lambda, 
                     n, d,
                     max_ite2,  
@@ -326,11 +328,13 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
                     &ite_cyc[i] // innner loop counter
                 ); 
                 
+                // compute the change in LS function value
+                // and check stopping criterion
                 dev_change = -1.0;
-                for (s = 0 ; s < size_act[i]; s++){
+                for (s = 0; s < size_act[i]; s++){
                     k = set_act[s];
-                    tmp = (beta1[k]-beta_old[k]);
-                    tmp = tmp*tmp;
+                    tmp = (beta1[k] - beta_old[k]);
+                    tmp = tmp * tmp;
                     dev_local = 0.0;
                     for (j = 0; j < n; j++){
                         dev_local += w[i]*X[k*n+j]*X[k*n+j]*tmp;
@@ -347,10 +351,13 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
                     dev_change = dev_local;
                 } 
                 
-                Rprintf("--outer loop: %d, dev_change:%f, dev_null:%f\n", 
-                    outer_loop_count, dev_change, dev_null);
+                // only for R
+                if (verbose){
+                    Rprintf("--outer loop: %d, dev_change:%f, dev_null:%f\n", 
+                        outer_loop_count, dev_change, dev_null);
+                } 
 
-                if ((dev_change>=0) && (dev_change < prec1 * dev_null)){
+                if ((dev_change >= 0) && (dev_change < prec1 * dev_null)){
                     break;
                 }
 
@@ -367,10 +374,11 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
                 intcpt_previous_lambda = stage_intcpt;
             }
 
-            // for convex penalty
+            // for convex penalty, simply break out of the loop
+            // no need to run multistage convex relaxation
             if (method_flag == 1){
                 ite_lamb[i] = outer_loop_count;
-                break;
+                break;  
             }
 
             // for nonconvex penalty
@@ -379,30 +387,30 @@ void picasso_logit_greedy(double *Y, double *X, double *beta, double *intcpt,
 
             // check stopping criterion
             p_update(p, Xb, stage_intcpt, n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
-          //  for (j = 0; j < n; j++){
-           //     Rprintf("%f, ", log(p[j]));
-           // }
-           // Rprintf("\n");
+          
             function_value = get_function_value(method_flag, p, Y, Xb, 
                                                 beta1, stage_intcpt, n, d,
                                                 lambda[i], *ggamma);
 
-            Rprintf("Stage:%d, for lambda:%f, fvalue:%f, pre:%f\n", 
-                stage_count, lambda[i], function_value, function_value_old);
+            // only for R
+            if (verbose){
+                Rprintf("Stage:%d, for lambda:%f, fvalue:%f, pre:%f\n", 
+                    stage_count, lambda[i], function_value, function_value_old);
+            }
 
             if (fabs(function_value- function_value_old) < 0.01 * fabs(function_value_old)){
                 break;
             }
             function_value_old = function_value;
 
-            // update lambdas
+            // update lambdas using the multistage convex relaxation scheme
             for (j = 0; j < d; j++){
-                stage_lambda[j] = lambda[i] * penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma);
+                stage_lambda[j] = lambda[i] * 
+                    penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma);
             }
         }           
         intcpt[i] = stage_intcpt;     
         vec_copy(beta1, beta+i*d, set_act, size_act[i]);
-        //Rprintf("stage count:%d\n", stage_count);
     }
     
     Free(beta_old);

@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------------#
 # Package: picasso                                                                 #
 # picasso(): The user interface for picasso()                                      #
-# Author: Xingguo Li                                                               #
+# Author: Jian Ge, Xingguo Li                                                      #
 # Email: <xingguo.leo@gmail.com>                                                   #
 # Date: Sep 1st, 2015                                                              #
 # Version: 0.4.5                                                                   #

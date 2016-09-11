@@ -1,8 +1,16 @@
 #include "mymath.h"
 
-void picasso_lasso_sc_cov(double *Y, double * X, double * XY, double * beta, double * intcpt, int * beta_idx, int * cnzz, int * col_cnz, int * ite_lamb, int * ite_cyc, double *obj, double *runt, int * err, double *lambda, int *nnlambda, double * ggamma, int *mmax_ite, double *pprec, int *fflag, double *ttrunc, int * nn, int * dd, int * ddf, int *mmax_act_in, int * aalg, double *LL){
+void picasso_lasso_sc_cov(double *Y, double * X, double * XY, 
+    double * beta, double * intcpt, int * beta_idx, int * cnzz, 
+    int * col_cnz, int * ite_lamb, int * ite_cyc, double *obj, 
+    double *runt, int * err, double *lambda, int *nnlambda, 
+    double * ggamma, int *mmax_ite, double *pprec, int *fflag, 
+    double *ttrunc, int * nn, int * dd, int * ddf, int *mmax_act_in, 
+    int * aalg, double *LL){
     
-    int i, j, idx, n, d, d4, df, df1, max_ite1, max_ite2, nlambda, ite1, ite2, flag, act_in, hybrid, cnz, act_size, act_size1, act_size_all, max_act_in, alg, total_df;
+    int i, j, idx, n, d, d4, df, df1, max_ite1, max_ite2;
+    int nlambda, ite1, ite2, flag, act_in, hybrid, cnz, act_size;
+    int act_size1, act_size_all, max_act_in, alg, total_df;
     double gamma, prec2, ilambda, ilambda1, ilambda2, dif2, dbn, lamb_max, cutoff, trunc, intcpt_tmp, L;
     clock_t start, stop;
     

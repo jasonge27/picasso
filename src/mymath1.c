@@ -13,8 +13,15 @@ double get_cord_hessian(double *p, double * X, int j, int n){
 
 
 double get_penalty_value(int method_flag, double x, double lambda, double gamma){
+    // lasso
+    if (method_flag == 1){
+        x = fabs(x);
+        return(lambda * x);
+    }
+
     // mcp
     if (method_flag == 2){
+        x = fabs(x);
         if (x > gamma * lambda){
             return(lambda*lambda*gamma/2);
         } else {
@@ -22,7 +29,9 @@ double get_penalty_value(int method_flag, double x, double lambda, double gamma)
         }
     }
 
+    // scad
     if (method_flag == 3){
+        x = fabs(x);
         if (x > gamma * lambda){
             return((gamma+1)*lambda*lambda/2);
         } else if (x > lambda){
@@ -46,7 +55,7 @@ double get_function_value(int method_flag, double *p, double * Y, double * Xb, d
         v += log(p[i]);
     }
 
-    v = -v /n;
+    v = -v/n;
 
     double penalty = 0.0;
     for (i = 0; i<d; i++){

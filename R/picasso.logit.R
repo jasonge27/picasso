@@ -14,7 +14,6 @@ picasso.logit <- function(X,
                           lambda.min.ratio = NULL,
                           lambda.min = NULL,
                           method="l1",
-                          alg = "greedy",
                           gamma = 3,
                           standardize = TRUE,
                           max.act.in = 3, 
@@ -37,11 +36,7 @@ picasso.logit <- function(X,
         method,"does not exist. \n")
     return(NULL)
   }
-  if(alg!="cyclic" && alg!="greedy" && alg!="proximal" && alg!="random"){
-    cat(" Wrong \"alg\" input. \n \"alg\" should be one of \"cyclic\", \"greedy\", \"proximal\" and \"random\".\n", 
-        alg,"does not exist. \n")
-    return(NULL)
-  }
+
   if(standardize==TRUE){
     xx = rep(0,n*d)
     xm = rep(0,d)
@@ -77,6 +72,7 @@ picasso.logit <- function(X,
   if(method=="l1"||method=="mcp"||method=="scad") {
     if(method=="l1") {
       method.flag = 1
+      out = logit.convex()
     }
     if(method=="scad") {
       method.flag = 3
@@ -93,16 +89,9 @@ picasso.logit <- function(X,
       }
     }
     
-    if (alg=="cyclic"){
-      out = logit.cyclic(yy, xx, lambda, nlambda, 
-        gamma, n, d, max.ite, prec, verbose, method.flag, max.act.in, truncation)
-    }
-    if (alg=="greedy")
-      out = logit.greedy(yy, xx, lambda, nlambda, gamma, n, d, max.ite, prec, verbose, method.flag)
-    if (alg=="proximal")
-      out = logit.prox(yy, xx, lambda, nlambda, gamma, n, d, max.ite, prec, verbose, method.flag)
-    if (alg=="random")
-      out = logit.stoc(yy, xx, lambda, nlambda, gamma, n, d, max.ite, prec, verbose, method.flag, max.act.in, truncation)
+    out = logit(yy, xx, lambda, nlambda, gamma, 
+                n, d, max.ite, prec, verbose, 
+                method.flag, max.act.in, truncation)
   }
   
   df=rep(0,nlambda)
