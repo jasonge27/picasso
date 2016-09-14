@@ -23,7 +23,7 @@ logit_solver <- function(Y, X, lambda, nlambda, gamma, n, d, max.ite, prec, verb
   ite.cyc = rep(0,nlambda)
   runt = matrix(0,1,nlambda)
   obj = matrix(0,1,nlambda)
-  str=.C("picasso_logit", as.double(Y), as.double(X), 
+  str=.C("picasso_logit_solver", as.double(Y), as.double(X), 
          as.double(beta), as.double(beta.intcpt), as.integer(n), as.integer(d), 
          as.integer(ite.lamb), as.integer(ite.cyc), as.integer(size.act),
          as.double(obj), as.double(runt), as.double(lambda), as.integer(nlambda), as.double(gamma), 

@@ -39,7 +39,7 @@ picasso <- function(X,
     }
     p = ncol(Y)
     if(p==1){
-      out = picasso.lasso(X = X, Y = Y, lambda = lambda, nlambda = nlambda, lambda.min.ratio = lambda.min.ratio,
+      out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, lambda.min.ratio = lambda.min.ratio,
                           lambda.min = lambda.min, method = method, alg = alg, opt = opt, gamma = gamma, df = df, 
                           standardize = standardize, max.act.in = max.act.in, truncation = truncation, prec = prec, 
                           max.ite = max.ite, verbose = verbose)
@@ -50,7 +50,7 @@ picasso <- function(X,
       Y = as.matrix(Y)
     }
     out = picasso.logit(X = X, Y = Y, lambda = lambda, nlambda = nlambda, lambda.min.ratio = lambda.min.ratio,
-                        lambda.min = lambda.min, method = method, alg = alg, gamma = gamma, standardize = standardize, 
+                        lambda.min = lambda.min, method = method,gamma = gamma, standardize = standardize, 
                         max.act.in = max.act.in, truncation = truncation, prec = prec, max.ite = max.ite, 
                         verbose = verbose)
   }

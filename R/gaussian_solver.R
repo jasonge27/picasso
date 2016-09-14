@@ -7,7 +7,7 @@
 # Version: 0.4.5                                                                   #
 #----------------------------------------------------------------------------------#
 
-lasso.sc.cov <- function(Y, X, XY, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
+gaussian_solver <- function(Y, X, XY, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
                          alg, method.flag, max.act.in, truncation)
 {
   if(verbose==TRUE){
@@ -35,7 +35,7 @@ lasso.sc.cov <- function(Y, X, XY, lambda, nlambda, gamma, n, d, df, max.ite, pr
   col.cnz = rep(0,nlambda+1)
   cnz = 0
   err = 0
-  str=.C("picasso_lasso_sc_cov", as.double(Y), as.double(X), as.double(XY), 
+  str=.C("picasso_gaussian_solver", as.double(Y), as.double(X), as.double(XY), 
          as.double(beta), as.double(beta.intcpt), as.integer(beta.idx), 
          as.integer(cnz), as.integer(col.cnz), as.integer(ite.lamb), as.integer(ite.cyc), 
          as.double(obj), as.double(runt), as.integer(err), as.double(lambda), as.integer(nlambda), 

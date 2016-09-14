@@ -19,19 +19,9 @@ double get_cord_hessian(double *p, double * X, int j, int n);
 
 double get_penalty_value(int method_flag, double x, double lambda, double gamma);
 
-double get_function_value(int method_flag, double *p, double * Y, double * Xb, double * beta, 
+double get_penalized_logistic_loss(int method_flag, double *p, double * Y, double * Xb, double * beta, 
                                 double intcpt, int n, int d, double lambda, double gamma);
                                 
-// v = sum_{i=1..n} [(y[i]-1)*(intcpt+Xb[i]) + log(p[i])] + lambda * |beta|
-double get_function_value_l1(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda);
-// placeholder
-double get_function_value_mcp(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda, double gamma);
-
-// placeholder
-double get_function_value_scad(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda, double gamma);
 
 double sign(double x);
 

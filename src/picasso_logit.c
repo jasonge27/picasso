@@ -30,7 +30,7 @@ void update_residual(double * r, const double *  w,
 
 // Iterative reweighted least square solver with warm start \beta0 and intcpt0
 // min \frac{1}{2n} \sum_{i=1}^N w_i(r_i - X_i^T \beta + intcept)^2 + \lambda * |\beta|
-void solve_IRLS_with_warmstart(const double* X, 
+void solve_weighted_lasso_with_naive_update(const double* X, 
     const double* w, // w = p * (1-p)
     const double* lambda, 
     const int n, const int d,
@@ -175,7 +175,7 @@ double penalty_derivative(int method_flag, double x, double lambda, double gamma
     return(0);
 }
 
-void picasso_logit(
+void picasso_logit_solver(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -283,7 +283,7 @@ void picasso_logit(
         }
           
 
-        function_value_old = get_function_value(method_flag, p, Y, 
+        function_value_old = get_penalized_logistic_loss(method_flag, p, Y, 
                                                 Xb, beta1, stage_intcpt, 
                                                 n, d, lambda[i], *ggamma);
 
@@ -316,7 +316,7 @@ void picasso_logit(
                 intcpt_old = stage_intcpt;
 
                 // to solve the iterative reweighted LS
-                solve_IRLS_with_warmstart(X, w, stage_lambda, 
+                solve_weighted_lasso_with_naive_update(X, w, stage_lambda, 
                     n, d,
                     max_ite2,  
                     prec2, dev_null,

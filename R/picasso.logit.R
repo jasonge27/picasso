@@ -72,7 +72,6 @@ picasso.logit <- function(X,
   if(method=="l1"||method=="mcp"||method=="scad") {
     if(method=="l1") {
       method.flag = 1
-      out = logit.convex()
     }
     if(method=="scad") {
       method.flag = 3
@@ -89,9 +88,9 @@ picasso.logit <- function(X,
       }
     }
     
-    out = logit(yy, xx, lambda, nlambda, gamma, 
+    out = logit_solver(yy, xx, lambda, nlambda, gamma, 
                 n, d, max.ite, prec, verbose, 
-                method.flag, max.act.in, truncation)
+                method.flag)
   }
   
   df=rep(0,nlambda)
@@ -125,7 +124,7 @@ picasso.logit <- function(X,
   est$nlambda = nlambda
   est$df = df
   est$method = method
-  est$alg = alg
+ 
   est$ite =out$ite
   est$verbose = verbose
   est$runtime = runt

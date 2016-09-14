@@ -43,7 +43,7 @@ double get_penalty_value(int method_flag, double x, double lambda, double gamma)
     return(0);
 }
 
-double get_function_value(int method_flag, double *p, double * Y, double * Xb, double * beta, 
+double get_penalized_logistic_loss(int method_flag, double *p, double * Y, double * Xb, double * beta, 
                                 double intcpt, int n, int d, double lambda, double gamma){
     int i;
     double v = 0.0;
@@ -64,42 +64,6 @@ double get_function_value(int method_flag, double *p, double * Y, double * Xb, d
 
     v += penalty;
     return(v); 
-}
-
-// v = sum_{i=1..n} [(y[i]-1)*(intcpt+Xb[i]) + log(p[i])] + lambda * |beta|
-double get_function_value_l1(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda){
-    int i;
-    double v = 0.0;
-    for (i = 0; i<n; i++){
-        v += (Y[i]-1)*(intcpt+Xb[i]); 
-    }
-    for (i = 0; i<n; i++)
-    if (p[i] > 1e-8) {
-        v += log(p[i]);
-    }
-
-    v = -v /n;
-
-    double penalty = 0.0;
-    for (i = 0; i<n; i++){
-        penalty += fabs(beta[i]);
-    }
-
-    v += lambda * penalty;
-    return(v);
-}
-
-// placeholder
-double get_function_value_mcp(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda, double gamma){
-    return(0);
-}
-
-// placeholder
-double get_function_value_scad(double *p, double * Y, double * Xb, double * beta, 
-                                double intcpt, int n, double lambda, double gamma){
-    return(0);
 }
 
 
@@ -1980,7 +1944,8 @@ void smooth_svm(double * x, double * y, int n, double gamma){
 }
 
 // update X X^T
-void updateXX(double ** XX, int * XX_act_idx, double * X, int * set_actidx_all, int act_size_all, int n, int df)
+void updateXX(double ** XX, int * XX_act_idx, double * X, 
+    int * set_actidx_all, int act_size_all, int n, int df)
 {
     int i,idx,idx_k,act_x,k;
     

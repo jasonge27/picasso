@@ -7,7 +7,7 @@
 # Version: 0.4.5                                                                   #
 #----------------------------------------------------------------------------------#
 
-picasso.lasso <- function(X, 
+picasso.gaussian <- function(X, 
                           Y, 
                           lambda = NULL,
                           nlambda = NULL,
@@ -124,7 +124,7 @@ picasso.lasso <- function(X,
       }
     }
     #if(opt=="cov"){
-      out = lasso.sc.cov(yy, xx, xy, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
+      out = gaussian_solver(yy, xx, xy, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
                          alg, method.flag, max.act.in, truncation)
       if(out$err==1)
         cat("Error! Parameters are too dense. Please choose larger \"lambda\". \n")
