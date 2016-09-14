@@ -388,7 +388,7 @@ void picasso_logit_solver(
             // check stopping criterion
             p_update(p, Xb, stage_intcpt, n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
           
-            function_value = get_function_value(method_flag, p, Y, Xb, 
+            function_value = get_penalized_logistic_loss(method_flag, p, Y, Xb, 
                                                 beta1, stage_intcpt, n, d,
                                                 lambda[i], *ggamma);
 
