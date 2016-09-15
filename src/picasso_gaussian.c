@@ -19,15 +19,19 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
     L = *LL;
     alg = *aalg; // 1:cyclic 2:greedy 3:proximal 4:random 5:hybrid
     dbn = (double)n;
+
     max_act_in = *mmax_act_in;
+
     trunc = *ttrunc;
     total_df = min_int(d,n)*nlambda;
-    
+
+
     start = clock();
     //double *beta2 = (double *) malloc(d*sizeof(double));
     double *beta1 = (double *) Calloc(d, double);
     double *beta0 = (double *) Calloc(d, double);
     double *beta_tild = (double *) Calloc(d, double);
+    double *old_beta = (double *) Calloc(d, double);
     
     int *set_idx = (int *) Calloc(d, int);
     
@@ -80,6 +84,10 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
     cnz = 0;
     act_size = 0;
     act_size_all = 0;
+    double tmp_change = 0.0;
+    double fchange =  0.0;
+    double beta_cached = 0.0;
+
     for (i=0; i<nlambda; i++) {
         if(alg==4) shuffle(set_idx, d);
         ilambda = lambda[i]*dbn;
@@ -166,10 +174,16 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                     act_size1++;
                 }
             }
+
+            for (j = 0; j < d; j++){
+                old_beta[j] = beta1[j];
+            }
             //printf("ite2=%d act_size1=%d %f %f %f  \n",ite2,act_size1,beta1[1],beta1[4],beta1[6]);
             //printf("ite1=%d, act_size1=%d ", ite1,act_size1);
             // update the active coordinate
-            while (dif2 > prec2 && ite2 < max_ite2) {
+           // while (dif2 > prec2 && ite2 < max_ite2) {
+              while (ite2 < max_ite2)  { 
+
                 intcpt_tmp = cal_intcpt(XX, XX_act_idx, XY[d], set_actidx1, act_size1, beta1, df, dbn);
                 //printf("intcpti=%f ",intcpt[i]);
                 if(intcpt_tmp-intcpt[i] != 0){
@@ -178,9 +192,14 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                 }
                 //printf("intcpttmp=%f ",intcpt_tmp);
                 //printf("ite2=%d intcpt=%f ", ite2,intcpt[i]);
+
+                fchange = -1.0;
                 for (j=0; j<act_size1; j++) {
                     idx = set_actidx1[j];
                     grad_ud(grad, XX, XX_act_idx, -beta1[idx], set_actidx1, act_size1, XX_act_idx[idx]); // grad[] = grad[]+beta1[idx]*XX[idx][] on active set
+                    
+                    beta_cached = beta1[idx];
+
                     if(flag==1) beta1[idx] = soft_thresh_l1(grad[idx]/S[idx], ilambda/S[idx]);
                     if(flag==2) beta1[idx] = soft_thresh_mcp(grad[idx]/S[idx], ilambda/S[idx], gamma);
                     if(flag==3) beta1[idx] = soft_thresh_scad(grad[idx]/S[idx], ilambda/S[idx], gamma);
@@ -191,10 +210,21 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                         set_act1[idx] = 1;
                         grad_ud(grad, XX, XX_act_idx, beta1[idx], set_actidx1, act_size1, XX_act_idx[idx]); // grad[] = grad[]-beta1[idx]*XX[idx][] on active set
                     }
+
+                    tmp_change = S[idx] * (beta_cached - beta1[idx]) * (beta_cached - beta1[idx]);
+                    if (tmp_change > fchange){
+                        fchange = tmp_change;
+                    }
                 }
+
                 ite2++;
+                if ((fchange >=0) && (fchange < prec2)){
+                    break;
+                }
+
+                
                 //dif2 = dif_2norm_dense(beta1, beta0, d);
-                dif2 = max_abs_vec_dif_act(beta1, beta0, set_actidx, act_size);
+               // dif2 = max_abs_vec_dif_act(beta1, beta0, set_actidx, act_size);
                 //printf("act_size=%d, act_size1=%d, dif2=%f, prec2=%f   ",act_size,act_size1, dif2, prec2);
                 vec_copy(beta1, beta0, set_actidx, act_size);
                 act_size1 = 0;
@@ -209,6 +239,7 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                 //printf("ite2=%d act_size1=%d dif=%f  \n",ite2,act_size1,dif2);
                 
             }
+            Rprintf("---ite2=%d\n", ite2);
             //printf("ite1=%d %f %f %f  \n",ite1,beta1[1],beta1[4],beta1[6]);
             //for(j=0;j<d;j++){
             //  if(beta1[j]!=0)
@@ -234,6 +265,22 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
             //    }
             //    printf("\n");
             //}
+
+
+            // check stopping critierion
+            ite1++;
+            fchange = -1.0;
+            for (j = 0; j <d; j++){
+                tmp_change = S[j] * (old_beta[j] - beta1[j])*(old_beta[j] - beta1[j]);
+                if (tmp_change > fchange){
+                    fchange = tmp_change;
+                }
+            }
+            if ((fchange >=0) && (fchange < prec2)){
+                break;
+            }
+
+
             if(alg==1) ud_act_cyclic_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,res,grad,set_act1,gamma,ilambda1,ilambda,flag,&act_in,&act_size_all,df,d4,d,n,err);
             if(alg==2) ud_act_greedy_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,idxmaxgd,setmaxgd,res,grad,set_act1,gamma,ilambda,flag,&act_in,&act_size_all,df,d4,max_act_in,d,n,err);
             if(alg==3) ud_act_prox_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,beta_tild,idxmaxgd,setmaxgd,res,grad,set_act1,gamma,L,ilambda,flag,&act_in,&act_size_all,df,d4,max_act_in,d,n,err);
@@ -251,7 +298,7 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                     act_size++;
                 }
             }
-            ite1++;
+            
             if(alg==5){
                 if(hybrid==1) {
                     if(act_in==0)
@@ -267,7 +314,8 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
             }
             break;
         }
-        //printf("i=%d,ite1=%d,ite2=%d,act_size=%d,act_size_all=%d \n\n",i,ite1,ite2,act_size,act_size_all);
+        Rprintf("-ite1=%d\n", ite1);
+        //Rprintf("i=%d,ite1=%d,ite2=%d,act_size=%d,act_size_all=%d \n\n",i,ite1,ite2,act_size,act_size_all);
         ite_lamb[i] = ite1;
         stop = clock();
         runt[i] = (double)(stop - start)/CLOCKS_PER_SEC;

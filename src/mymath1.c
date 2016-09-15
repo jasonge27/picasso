@@ -2207,7 +2207,12 @@ void ud_act_prox(double *X, double *S, double *beta1, double *beta_tild, int *id
     }
 }
 
-void ud_act_prox_cov(double *X, double **XX, int *XX_act_idx, int *set_actidx_all, double *S, double *beta1, double *beta_tild, int *idx, double *set, double *res, double *grad, int *set_act1, double gamma, double L, double ilambda, int flag, int *act_in, int *act_size_all, int df, int d4, int max_act_in, int d, int n, int *err){
+void ud_act_prox_cov(double *X, double **XX, int *XX_act_idx, int *set_actidx_all, 
+    double *S, double *beta1, double *beta_tild, int *idx, double *set, 
+    double *res, double *grad, int *set_act1, double gamma, 
+    double L, double ilambda, int flag, int *act_in, 
+    int *act_size_all, int df, int d4, int max_act_in, 
+    int d, int n, int *err){
     int j,k,m,tmp_idx;
     
     vec_mat_prod(grad, res, X, n, d); // grad = X^T res
