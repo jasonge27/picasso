@@ -39,7 +39,7 @@ void solve_weighted_lasso_with_naive_update(const double* X,
     double* runt, 
     int* inner_loop_count){
 
-    int i, j, k, m, size_a;
+    int i,  k, m, size_a;
     int c_idx;
 
     double g, tmp;
@@ -283,23 +283,8 @@ void picasso_logit_solver(
         } else {                // for convex penalty
             for (j = 0; j < d; j++)
                 stage_lambda[j] = lambda[i];
-
-/*
-            if (i == 0){
-                tmp = lambda[i];
-            } else {
-                tmp = 2*lambda[i] - lambda[i-1];
-            }
-
-            for (j = 0; j < d; j++){
-                if (rX[j] < tmp){}
-            }
-*/
         }
-          
-
-
-  
+            
 
         int max_stage_ite = 1000;
         while (stage_count < max_stage_ite){

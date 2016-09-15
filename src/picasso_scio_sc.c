@@ -2,7 +2,7 @@
 
 void picasso_scio_sc(double * S, int * ite_lamb, int * ite_cyc, double * x, int *col_cnz, int *row_idx, double *obj, double *runt, int * dd, double *lambda, int *nnlambda, int *mmax_ite, double *pprec, double * ggamma, int *fflag, double *ttrunc, int *mmax_act_in, int * aalg, double *LL){
     
-    int i, j, m, d, d_sq, col, max_ite1, max_ite2, nlambda, act_in, size_a1, size_a2, match, ite1, ite2, cnz, flag, max_act_in, alg, hybrid;
+    int i, j, m, d, d_sq, col, max_ite1, max_ite2, nlambda, act_in, size_a1, size_a2, ite1, ite2, cnz, flag, max_act_in, alg, hybrid;
     double prec2, ilambda, dif2, gamma, ilambda1, ilambda2, lamb_max, dbn, cutoff, trunc, L;
     clock_t start, stop;
     
