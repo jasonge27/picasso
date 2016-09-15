@@ -33,13 +33,13 @@ void solve_weighted_lasso_with_naive_update(const double* X,
     const double* lambda, 
     const int n, const int d,
     const int max_ite, const double prec, const double dev_null,
-    double* beta, double* Xb, 
+    double* beta, double* Xb, int * active_set, 
     double * r, // r = y - p 
     double* intcpt, int* set_act, int* act_size, 
     double* runt, 
     int* inner_loop_count){
 
-    int i,  k, m, size_a;
+    int i, j, k, m, size_a;
     int c_idx;
 
     double g, tmp;
@@ -53,19 +53,26 @@ void solve_weighted_lasso_with_naive_update(const double* X,
     size_a = 0;
   
     double sum_w = 0.0;
+    double thr = 0.0;
     for (i = 0; i < n; i++){
         sum_w += w[i];
     }
 
-    for (k = 0; k < d; k++){
+    for (k = 0; k < d; k++)
+     if (active_set[k] == 1){ // skip inactive set
         calc_IRLS_coef(w, X, r, beta, k, n, &g, &a);
 
         tmp  = beta[k];
-        if (2*fabs(g) > lambda[k]){
+        if (k == 0){ 
+            thr = lambda[k];
+        } else {
+            thr = 2*lambda[k] - lambda[k-1];
+        }
+        if (2*fabs(g) > thr){
             set_act[size_a] = k;
             size_a += 1;
-
-            beta[k] = soft_thresh_l1(2*g, lambda[k]) / (2*a);
+            
+            beta[k] = soft_thresh_l1(2*g, thr) / (2*a);
         } else {
             beta[k] = 0.0;
         }
@@ -220,7 +227,6 @@ void picasso_logit_solver(
 
     double *w = (double *) Calloc(n, double);
     double *r = (double *) Calloc(n, double);
-    int * inactive_set = (int *) Calloc(n, int); // inactive_set[i] = 1 -- i is inactive
 
     int method_flag = *fflag;
 
@@ -245,6 +251,18 @@ void picasso_logit_solver(
     int stage_count;
     double * stage_lambda = (double *) Calloc(d, double);
     double * beta_previous_lambda = (double *) Calloc(d, double);
+
+    int * active_set = (int *) Calloc(d, int);
+    double * gr = (double *)Calloc(d, double);
+    double q0 = 1/(1 + exp(-beta0_null));
+    for (i = 0; i < d; i++){
+        active_set[i] = 0;
+        gr[i] = 0;
+        for (j = 0; j < n; j++){
+            gr[i] += X[i*n+j] * (Y[j] - q0);
+        }
+        gr[i] = fabs(gr[i]);
+    }
   
     double stage_intcpt;
     double stage_intcpt_old;
@@ -252,8 +270,10 @@ void picasso_logit_solver(
     double intcpt_previous_lambda;
     double sum_w;
     double function_value, function_value_old;
+    int new_active_coord;
+    int terminate_loop;
+    double thr;
 
-    for (i = 0; i < d; i++) inactive_set[i] = 0;
 
     for (i=0; i<nlambda; i++) {
         if(i == 0) {
@@ -283,6 +303,18 @@ void picasso_logit_solver(
         } else {                // for convex penalty
             for (j = 0; j < d; j++)
                 stage_lambda[j] = lambda[i];
+
+            if (i > 0){
+                for (j = 0; j < d; j++)
+                if (active_set[j] == 0){
+                    if (gr[j] > 2*lambda[i] - lambda[i-1]) active_set[j] = 1;
+                }
+            } else if (i ==0){
+                for (j = 0; j < d; j++)
+                if (active_set[j] == 0){
+                    if (gr[j] > 2*lambda[i]) active_set[j] = 1;
+                }
+            } 
         }
             
 
@@ -319,7 +351,7 @@ void picasso_logit_solver(
                     n, d,
                     max_ite2,  
                     prec2, dev_null,
-                    beta1, Xb, r, 
+                    beta1, Xb, active_set, r, 
                     &stage_intcpt, 
                     set_act, 
                     &size_act[i], // active set size
@@ -329,7 +361,8 @@ void picasso_logit_solver(
                 
                 // compute the change in LS function value
                 // and check stopping criterion
-                dev_change = -1.0;
+                terminate_loop = 1;
+                thr = prec1 * dev_null;
                 for (s = 0; s < size_act[i]; s++){
                     k = set_act[s];
                     tmp = (beta1[k] - beta_old[k]);
@@ -339,29 +372,50 @@ void picasso_logit_solver(
                         dev_local += w[i]*X[k*n+j]*X[k*n+j]*tmp;
                     }
                     dev_local = dev_local / (2*n);
-                    if (dev_local > dev_change){
-                        dev_change = dev_local;
-                    }        
+                   // if (dev_local > dev_change){
+                    //    dev_change = dev_local;
+                    //}        
+                    if (dev_local > thr) {
+                        terminate_loop = 0;
+                        break;
+                    }
                 }
 
                 tmp = (stage_intcpt - intcpt_old);
                 dev_local = sum_w * tmp*tmp/ (2*n);
-                if (dev_local > dev_change){
-                    dev_change = dev_local;
+                if (dev_local > thr){
+                    terminate_loop = 0;
                 } 
+
+                if (terminate_loop){
+                    break;
+                }
+
+
+                if (method_flag == 1){ // for convex penalty
+                    new_active_coord = 0;
+                    for (s = 0; s < d; s++)
+                        if (active_set[s] == 0){
+                            gr[s] = 0.0;
+                            for (j = 0; j < n; j++){
+                                gr[s] += r[s] * X[s*n+j];
+                            }
+                            gr[s] = fabs(gr[s]);
+                            if (gr[s] > lambda[i]){
+                                new_active_coord = 1;
+                                active_set[s] = 1;
+                            }
+                        }
+                    if (new_active_coord == 0){
+                        break;
+                    }
+                }
                 
                 // only for R
                 if (verbose){
                     Rprintf("--outer loop: %d, dev_change:%f, dev_null:%f\n", 
                         outer_loop_count, dev_change, dev_null);
                 } 
-
-                if ((dev_change >= 0) && (dev_change < prec1 * dev_null)){
-                    break;
-                }
-
-                // update inactive set
-
             }
 
             // for lambda = lambda[i]
@@ -375,7 +429,7 @@ void picasso_logit_solver(
                 intcpt_previous_lambda = stage_intcpt;
             }
 
-            // for convex penalty, simply break out of the loop
+            // for convex penalty, we jump out of the loop.
             // no need to run multistage convex relaxation
             if (method_flag == 1){
                 ite_lamb[i] = outer_loop_count;
@@ -399,7 +453,7 @@ void picasso_logit_solver(
                     stage_count, lambda[i], function_value, function_value_old);
             }
 
-            if (fabs(function_value- function_value_old) < 0.01 * fabs(function_value_old)){
+            if (fabs(function_value- function_value_old) < 0.001 * fabs(function_value_old)){
                 break;
             }
             function_value_old = function_value;
@@ -418,6 +472,8 @@ void picasso_logit_solver(
     Free(beta1);
     Free(stage_beta_old);
     Free(set_act);
+    Free(active_set);
+    Free(gr);
     Free(p);
     Free(Xb);
     Free(w);

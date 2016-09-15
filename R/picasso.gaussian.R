@@ -3,8 +3,8 @@
 # picasso.lasso(): The user interface for lasso()                                  #
 # Author: Jian Ge, Xingguo Li                                                      #
 # Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 1st, 2016                                                              #
-# Version: 0.5.1                                                                   #
+# Date: Sep 13, 2016                                                              #
+# Version: 0.5.2                                                                   #
 #----------------------------------------------------------------------------------#
 
 picasso.gaussian <- function(X, 

@@ -3,8 +3,8 @@
 # scio(): Sparse Column Inverse Operator                                           #
 # Author: Jian Ge, Xingguo Li                                                      #
 # Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 1st, 2016                                                              #
-# Version: 0.5.1                                                                   #
+# Date: Sep 13, 2016                                                              #
+# Version: 0.5.2                                                                   #
 #----------------------------------------------------------------------------------#
 
 scio.sc <- function(S, lambda, nlambda, gamma, d, maxdf, prec, max.ite, verbose, 

@@ -3,8 +3,8 @@
 # lasso(): Lasso                                                                   #
 # Author: Jian Ge, Xingguo Li                                                      #
 # Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 1st, 2016                                                              #
-# Version: 0.5.1                                                                   #
+# Date: Sep 13, 2016                                                              #
+# Version: 0.5.2                                                                   #
 #----------------------------------------------------------------------------------#
 
 gaussian_solver <- function(Y, X, XY, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 

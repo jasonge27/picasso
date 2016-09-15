@@ -3,8 +3,8 @@
 # scio.plot(): graph visualization                                                  #
 # Author: Jian Ge, Xingguo Li                                                       #
 # Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                            #
-# Date: Sep 1st, 2016                                                               #
-# Version: 0.5.1                                                                    #
+# Date: Sep 13, 2016                                                               #
+# Version: 0.5.2                                                                    #
 #-----------------------------------------------------------------------------------#
 
 scio.plot <- function(G, epsflag = FALSE, graph.name = "default", cur.num = 1, location=NULL){
