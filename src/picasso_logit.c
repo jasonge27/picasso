@@ -1,7 +1,7 @@
 #include "mymath.h"
 #include <R.h>
 
-void calc_IRLS_coef( double *  w,  double *  X, 
+void calc_IRLS_coef(const double *  w, const double *  X, 
      double *  r,  double *  beta, 
      int k,  int n, 
     double * g, double * a){
@@ -28,8 +28,6 @@ void update_residual(double * r, const double *  w,
     }
 }
 
-// Iterative reweighted least square solver with warm start \beta0 and intcpt0
-// min \frac{1}{2n} \sum_{i=1}^N w_i(r_i - X_i^T \beta + intcept)^2 + \lambda * |\beta|
 void solve_weighted_lasso_with_naive_update(const double* X, 
     const double* w, // w = p * (1-p)
     const double* lambda, 
@@ -42,7 +40,7 @@ void solve_weighted_lasso_with_naive_update(const double* X,
     int* inner_loop_count){
 
     int i, j, k, m, size_a;
-    int c_idx, idx;
+    int c_idx;
 
     double g, tmp;
     clock_t start, stop;
@@ -61,7 +59,7 @@ void solve_weighted_lasso_with_naive_update(const double* X,
 
     for (k = 0; k < d; k++){
         calc_IRLS_coef(w, X, r, beta, k, n, &g, &a);
-        
+
         tmp  = beta[k];
         if (2*fabs(g) > lambda[k]){
             set_act[size_a] = k;
@@ -86,7 +84,6 @@ void solve_weighted_lasso_with_naive_update(const double* X,
     double dev_local, dev_change;   
     double sum_r; 
     while (loopcnt < max_ite) {  
-       // Rprintf("loopcnt: %d, active set size:%d\n", loopcnt, size_a);
         loopcnt ++;
         dev_change = 0;
         for (m = 0; m < size_a; m++) {
@@ -138,7 +135,6 @@ void solve_weighted_lasso_with_naive_update(const double* X,
             }
         }
         
-      //  Rprintf("inner loop, dev_change:%f, dev_null:%f\n", dev_change, dev_null);
         if (dev_change < prec * dev_null){
             break;
         }           
@@ -198,8 +194,8 @@ void picasso_logit_solver(
     int *vverbose   // input: 1 for verbose mode
     ){
     
-    int i, j, k, s, n, d, nlambda, size_a;
-    double tmp, ilambda, ilambda0;
+    int i, j, k, s, n, d, nlambda;
+    double tmp;
      
     n = *nn;
     d = *dd;
@@ -224,6 +220,7 @@ void picasso_logit_solver(
 
     double *w = (double *) Calloc(n, double);
     double *r = (double *) Calloc(n, double);
+    int * inactive_set = (int *) Calloc(n, int); // inactive_set[i] = 1 -- i is inactive
 
     int method_flag = *fflag;
 
@@ -248,8 +245,6 @@ void picasso_logit_solver(
     int stage_count;
     double * stage_lambda = (double *) Calloc(d, double);
     double * beta_previous_lambda = (double *) Calloc(d, double);
-   // double * stage_beta = (double *) Calloc(d, double);
-
   
     double stage_intcpt;
     double stage_intcpt_old;
@@ -257,6 +252,9 @@ void picasso_logit_solver(
     double intcpt_previous_lambda;
     double sum_w;
     double function_value, function_value_old;
+
+    for (i = 0; i < d; i++) inactive_set[i] = 0;
+
     for (i=0; i<nlambda; i++) {
         if(i == 0) {
             stage_intcpt = 0;
@@ -265,27 +263,43 @@ void picasso_logit_solver(
             }
             for (j = 0; j < n; j++){
                 Xb[j] = 0.0;
-            }
-           
+            }   
         } 
+
         prec1 = prec2;
         
         stage_count = 0;
  
         // initialize lambda
+        function_value_old = 0.0;
         if(method_flag != 1){   // nonconvex penalty
             for (j = 0; j < d; j++)
                 stage_lambda[j] = lambda[i] * 
-                            penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma);  
+                            penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma); 
+
+            function_value_old = get_penalized_logistic_loss(method_flag, p, Y, 
+                                                Xb, beta1, stage_intcpt, 
+                                                n, d, lambda[i], *ggamma); 
         } else {                // for convex penalty
             for (j = 0; j < d; j++)
                 stage_lambda[j] = lambda[i];
+
+/*
+            if (i == 0){
+                tmp = lambda[i];
+            } else {
+                tmp = 2*lambda[i] - lambda[i-1];
+            }
+
+            for (j = 0; j < d; j++){
+                if (rX[j] < tmp){}
+            }
+*/
         }
           
 
-        function_value_old = get_penalized_logistic_loss(method_flag, p, Y, 
-                                                Xb, beta1, stage_intcpt, 
-                                                n, d, lambda[i], *ggamma);
+
+  
 
         int max_stage_ite = 1000;
         while (stage_count < max_stage_ite){
@@ -320,7 +334,7 @@ void picasso_logit_solver(
                     n, d,
                     max_ite2,  
                     prec2, dev_null,
-                    beta1, Xb, r,
+                    beta1, Xb, r, 
                     &stage_intcpt, 
                     set_act, 
                     &size_act[i], // active set size
@@ -360,6 +374,8 @@ void picasso_logit_solver(
                 if ((dev_change >= 0) && (dev_change < prec1 * dev_null)){
                     break;
                 }
+
+                // update inactive set
 
             }
 

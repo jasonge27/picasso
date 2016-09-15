@@ -1,10 +1,10 @@
 #----------------------------------------------------------------------------------#
 # Package: picasso                                                                 #
 # picasso.scio(): The user interface for scio()                                    #
-# Author: Xingguo Li                                                               #
-# Email: <xingguo.leo@gmail.com>                                                   #
-# Date: Aug 2nd, 2014                                                              #
-# Version: 0.1.0                                                                   #
+# Author: Jian Ge, Xingguo Li                                                      #
+# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
+# Date: Sep 1st, 2016                                                              #
+# Version: 0.5.1                                                                   #
 #----------------------------------------------------------------------------------#
 
 picasso.scio <- function(X,

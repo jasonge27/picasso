@@ -1,10 +1,10 @@
 #----------------------------------------------------------------------------------#
-# Package: picasso                                                                  #
+# Package: picasso                                                                 #
 # scio.generator(): Data generator                                                 #
-# Author: Xingguo Li                                                               #
-# Email: <xingguo.leo@gmail.com>                                                   #
-# Date: Aug 10th, 2014                                                             #
-# Version: 0.1.0                                                                   #
+# Author: Jian Ge, Xingguo Li                                                      #
+# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
+# Date: Sep 1st, 2016                                                              #
+# Version: 0.5.1                                                                   #
 #----------------------------------------------------------------------------------#
 
 ## Main function

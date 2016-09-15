@@ -1,0 +1,2 @@
+PKG_CFLAGS = -O3 -Wall -pipe -pedantic -std=gnu99 -mtune=core2 -g 
+PKG_CXXFLAGS =  -O3 -Wall -pipe -Wno-unused -pedantic -mtune=core2 -g

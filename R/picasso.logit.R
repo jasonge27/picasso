@@ -1,10 +1,10 @@
 #----------------------------------------------------------------------------------#
 # Package: picasso                                                                 #
 # picasso.logit(): The user interface for lasso()                                  #
-# Author: Xingguo Li                                                               #
-# Email: <xingguo.leo@gmail.com>                                                   #
-# Date: Jul 26th, 2014                                                             #
-# Version: 0.1.0                                                                   #
+# Author: Jian Ge, Xingguo Li                                                      #
+# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
+# Date: Sep 1st, 2016                                                              #
+# Version: 0.5.1                                                                   #
 #----------------------------------------------------------------------------------#
 
 picasso.logit <- function(X, 

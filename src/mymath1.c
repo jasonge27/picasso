@@ -2086,7 +2086,6 @@ void ud_act_greedy(double *X, double *S, double *beta1, int *idx, double *set, d
     int j,cur_idx;
     
     vec_mat_prod(grad, res, X, n, d); // grad = X^T res
-    //printf("3 %f,%f,%f,%f,%f,%f,%f \n",grad[0],grad[1],grad[2],grad[3],grad[4],grad[5],grad[6]);
     max_abs_kidx(grad, idx, set, d, max_act_in);
     for(j=0; j<max_act_in; j++){
         cur_idx = idx[j];
@@ -2144,7 +2143,6 @@ void ud_act_greedy_cov(double *X, double **XX, int *XX_act_idx, int *set_actidx_
 void ud_act_greedy_scio(double *S, double *beta1, int *idx, double *set, double *grad, int *set_act1, double gamma, double ilambda, int flag, int *act_in, int max_act_in, int d){
     int j,cur_idx;
     
-    //printf("3 %f,%f,%f,%f,%f,%f,%f \n",grad[0],grad[1],grad[2],grad[3],grad[4],grad[5],grad[6]);
     max_abs_kidx(grad, idx, set, d, max_act_in);
     for(j=0; j<max_act_in; j++){
         cur_idx = idx[j];
