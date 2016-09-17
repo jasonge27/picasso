@@ -39,7 +39,7 @@ void solve_weighted_lasso_with_naive_update(const double* X,
     double* runt, 
     int* inner_loop_count){
 
-    int i, j, k, m, size_a;
+    int i,  k, m, size_a;
     int c_idx;
 
     double g, tmp;
@@ -88,11 +88,13 @@ void solve_weighted_lasso_with_naive_update(const double* X,
 
 
 
-    double dev_local, dev_change;   
+    double dev_local;
+    int terminate_loop;   
     double sum_r; 
+    double dev_thr = prec * dev_null;
     while (loopcnt < max_ite) {  
         loopcnt ++;
-        dev_change = 0;
+        terminate_loop = 1;
         for (m = 0; m < size_a; m++) {
             c_idx = set_act[m];
                 
@@ -120,8 +122,8 @@ void solve_weighted_lasso_with_naive_update(const double* X,
                 dev_local += w[i]*X[c_idx*n+i]*X[c_idx*n+i];
             }
             dev_local = dev_local * tmp / (2*n);
-            if (dev_local > dev_change){
-                dev_change = dev_local;
+            if (dev_local > dev_thr){
+                terminate_loop = 0;
             }
         }
        
@@ -137,12 +139,12 @@ void solve_weighted_lasso_with_naive_update(const double* X,
             }
             (*intcpt) += tmp;
             dev_local = sum_w * tmp*tmp/ (2*n);
-            if (dev_local > dev_change){
-                dev_change = dev_local;
+            if (dev_local > dev_thr){
+                terminate_loop = 0;
             }
         }
         
-        if (dev_change < prec * dev_null){
+        if (terminate_loop){
             break;
         }           
     }
@@ -246,7 +248,7 @@ void picasso_logit_solver(
     dev_sat = dev_null; 
 
     int outer_loop_count;
-    double dev_local, dev_change;
+    double dev_local;
 
     int stage_count;
     double * stage_lambda = (double *) Calloc(d, double);
@@ -413,8 +415,8 @@ void picasso_logit_solver(
                 
                 // only for R
                 if (verbose){
-                    Rprintf("--outer loop: %d, dev_change:%f, dev_null:%f\n", 
-                        outer_loop_count, dev_change, dev_null);
+                    Rprintf("--outer loop: %d, dev_null:%f\n", 
+                        outer_loop_count, dev_null);
                 } 
             }
 

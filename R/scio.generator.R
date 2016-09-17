@@ -3,7 +3,7 @@
 # scio.generator(): Data generator                                                 #
 # Author: Jian Ge, Xingguo Li                                                      #
 # Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 13, 2016                                                              #
+# Date: Sep 2nd, 2016                                                              #
 # Version: 0.5.2                                                                   #
 #----------------------------------------------------------------------------------#
 
