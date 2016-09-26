@@ -19,8 +19,8 @@ picasso <- function(X,
                     max.ite = 1e3,
                     verbose = TRUE)
 {
-  if(family!="gaussian" && family!="binomial" && family!="graph" && family != "poisson"){
-    cat(" Wrong \"family\" input. \n \"family\" should be one of \"gaussian\", \"binomial\", \"poisson\" and \"graph\".\n", 
+  if(family!="gaussian" && family!="binomial" &&  family != "poisson"){
+    cat(" Wrong \"family\" input. \n \"family\" should be one of \"gaussian\", \"binomial\" and \"poisson\".\n", 
         family,"does not exist. \n")
     return(NULL)
   }
@@ -36,6 +36,7 @@ picasso <- function(X,
                           max.ite = max.ite, verbose = verbose)
     }
   }
+  
   if(family=="binomial"){
     if(is.matrix(Y)==FALSE) {
       Y = as.matrix(Y)
@@ -45,14 +46,8 @@ picasso <- function(X,
                         max.act.in = max.act.in, truncation = truncation, prec = prec, max.ite = max.ite, 
                         verbose = verbose)
   }
-  if(family=="graph"){
-    out = picasso.scio(X = X, lambda = lambda, nlambda = nlambda, lambda.min.ratio = lambda.min.ratio,
-                       lambda.min = lambda.min, method = method, alg = alg, opt = opt, gamma = gamma, sym = sym, 
-                       max.act.in = max.act.in, truncation = truncation, prec = prec, max.ite = max.ite, 
-                       standardize = standardize, perturb = perturb, verbose = verbose)
-  }
 
-   if(family=="poisson"){
+  if(family=="poisson"){
     out = picasso.poisson(X = X, Y=Y, lambda = lambda, nlambda = nlambda, 
                         lambda.min.ratio = lambda.min.ratio,
                        lambda.min = lambda.min, method = method, gamma = gamma, 

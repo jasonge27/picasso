@@ -340,48 +340,5 @@ void smooth_svm(double * x, double * y, int n, double gamma);
 // update X X^T
 void updateXX(double ** XX, int * XX_act_idx, double * X, int * set_actidx_all, int act_size_all, int n, int df);
 
-// covariance update for intcpt
-double cal_intcpt(double **XX, int * XX_act_idx, double sumy, int * set_actidx, int act_size, double * beta, int df, double dbn);
-
-// grad[] = grad[]-coef*XX[coef_idx][] on active set
-void grad_ud(double * grad, double ** XX, int * XX_act_idx, double coef, int * set_actidx, int act_size, int coef_idx);
-
-// res = Y-X*beta
-void res_ud(double * res, double * Y, double * X, double * beta, double intcpt, int * set_act, int act_size, int n);
-
-void ud_act_cyclic(double *X, double *S, double *beta1, double *res, double *grad, int *set_act1, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int d, int n);
-
-void ud_act_cyclic_cov(double *X, double **XX, int *XX_act_idx, int *set_actidx_all, double *S, double *beta1, double *res, double *grad, int *set_act1, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int *act_size_all, int df, int d4, int d, int n, int *err);
-
-void ud_act_cyclic_scio(double *S, double *beta1, double *grad, int *set_act1, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int d);
-
-void ud_act_greedy(double *X, double *S, double *beta1, int *idx, double *set, double *res, double *grad, int *set_act1, double gamma, double ilambda, int flag, int *act_in, int max_act_in, int d, int n);
-
-void ud_act_greedy_cov(double *X, double **XX, int *XX_act_idx, int *set_actidx_all, double *S, double *beta1, int *idx, double *set, double *res, double *grad, int *set_act1, double gamma, double ilambda, int flag, int *act_in, int *act_size_all, int df, int d4, int max_act_in, int d, int n, int *err);
-
-void ud_act_greedy_scio(double *S, double *beta1, int *idx, double *set, double *grad, int *set_act1, double gamma, double ilambda, int flag, int *act_in, int max_act_in, int d);
-
-void ud_act_prox(double *X, double *S, double *beta1, double *beta_tild, int *idx, double *set, double *res, double *grad, int *set_act1, double gamma, double L, double ilambda, int flag, int *act_in, int max_act_in, int d, int n);
-
-void ud_act_prox_cov(double *X, double **XX, int *XX_act_idx, int *set_actidx_all, double *S, double *beta1, double *beta_tild, int *idx, double *set, double *res, double *grad, int *set_act1, double gamma, double L, double ilambda, int flag, int *act_in, int *act_size_all, int df, int d4, int max_act_in, int d, int n, int *err);
-
-void ud_act_prox_scio(double *S, double *beta1, double *beta_tild, int *idx, double *set, double *grad, int *set_act1, double gamma, double L, double ilambda, int flag, int *act_in, int max_act_in, int d);
-
-void ud_act_stoc(double *X, double *S, double *beta1, double *res, double *grad, int *set_act1, int *set_idx, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int d, int n);
-
-void ud_act_stoc_cov(double *X, double **XX, int *XX_act_idx, int *set_actidx_all, double *S, double *beta1, double *res, double *grad, int *set_act1, int *set_idx, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int *act_size_all, int df, int d4, int d, int n, int *err);
-
-void ud_act_stoc_scio(double *S, double *beta1, double *grad, int *set_act1, int *set_idx, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int d);
-
-void ud_act_hybrid(double *X, double *S, double *beta1, int *idx, double *set, double *res, double *grad, int *set_act1, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int max_act_in, int hybrid, int d, int n);
-
-void ud_act_hybrid_cov(double *X, double **XX, int *XX_act_idx, int *set_actidx_all, double *S, double *beta1, int *idx, double *set, double *res, double *grad, int *set_act1, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int *act_size_all, int df, int d4, int max_act_in, int hybrid, int d, int n, int *err);
-
-void ud_act_hybrid_scio(double *S, double *beta1, int *idx, double *set, double *grad, int *set_act1, double gamma, double ilambda1, double ilambda, int flag, int *act_in, int max_act_in, int hybrid, int d);
-
-void dantzig_mfista_scr(double *b0, double *A0, double *b, double *A, int *idx_scr, int num_scr, int dim, double *beta, double mu, double *L, int *ite, int *ite2, int *ite3, double lambda, int max_ite, double prec, int intercept, int flag, int nlamb);
-
-
-void dantzig_mfista_scr2(double *b0, double *A0, double *b, double *A, int *idx_scr, int num_scr, int dim, double *beta, double mu, double *L, int *ite, int *ite2, int *ite3, double lambda, int max_ite, double prec, int intercept, int flag, int nlamb);
 
 #endif

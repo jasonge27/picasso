@@ -1,7 +1,6 @@
 useDynLib("picasso")
 import("MASS","igraph","Matrix","lattice")
 export("picasso",
-       "scio.generator",
        "print.gaussian",
        "plot.gaussian",
        "coef.gaussian",
@@ -13,12 +12,7 @@ export("picasso",
        "print.poisson",
        "plot.poisson",
        "coef.poisson",
-       "predict.poisson",
-       "print.scio",
-       "plot.scio",
-       "scio.plot",
-       "print.sim",
-       "plot.sim"
+       "predict.poisson"
       )
 importFrom("grDevices", "dev.off", "gray.colors", "postscript")
 importFrom("graphics", "lines", "matplot", "par", "plot")
@@ -36,7 +30,3 @@ S3method("print", "poisson")
 S3method("plot", "poisson")
 S3method("coef", "poisson")
 S3method("predict", "poisson")
-S3method("print", "scio")
-S3method("plot", "scio")
-S3method("print", "sim")
-S3method("plot", "sim")
