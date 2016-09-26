@@ -1,13 +1,3 @@
-#----------------------------------------------------------------------------------#
-# Package: picasso                                                                 #
-# scio.generator(): Data generator                                                 #
-# Author: Jian Ge, Xingguo Li                                                      #
-# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 2nd, 2016                                                              #
-# Version: 0.5.2                                                                   #
-#----------------------------------------------------------------------------------#
-
-## Main function
 scio.generator <- function(n = 200, d = 50, graph = "random", v = NULL, u = NULL, g = NULL, 
                             prob = NULL, seed = NULL, vis = FALSE, verbose = TRUE){	
   gcinfo(FALSE)

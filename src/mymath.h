@@ -14,6 +14,10 @@
 #include "R_ext/Rdynload.h"
 #include <R_ext/Applic.h>
 
+double truncate(double x, double a);
+
+double penalty_derivative(int method_flag, double x, double lambda, double gamma);
+
 // w[j] = (1/n)*sum_{i=1,2...n} X[i,j]*X[i,j]*p[j](1-p[j])
 double get_cord_hessian(double *p, double * X, int j, int n);
 
@@ -22,6 +26,8 @@ double get_penalty_value(int method_flag, double x, double lambda, double gamma)
 double get_penalized_logistic_loss(int method_flag, double *p, double * Y, double * Xb, double * beta, 
                                 double intcpt, int n, int d, double lambda, double gamma);
                                 
+double get_penalized_poisson_loss(int method_flag, double *p, double * Y, double * Xb, double * beta, 
+                                double intcpt, int n, int d, double lambda, double gamma);
 
 double sign(double x);
 

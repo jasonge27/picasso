@@ -1,4 +1,4 @@
-picasso.logit <- function(X, 
+picasso.poisson <- function(X, 
                           Y, 
                           lambda = NULL,
                           nlambda = NULL,
@@ -8,7 +8,6 @@ picasso.logit <- function(X,
                           gamma = 3,
                           standardize = TRUE,
                           max.act.in = 3, 
-                          truncation = 0, 
                           prec = 1e-4,
                           max.ite = 1e4,
                           verbose = TRUE)
@@ -17,7 +16,7 @@ picasso.logit <- function(X,
   n = nrow(X)
   d = ncol(X)
   if(verbose)
-    cat("Sparse logistic regression. \n")
+    cat("Sparse poisson regression. \n")
   if(n==0 || d==0) {
     cat("No data input.\n")
     return(NULL)
@@ -42,13 +41,14 @@ picasso.logit <- function(X,
     xx = X
   }
   yy = Y
+  avr_y = mean(yy)
   
   if(!is.null(lambda)) nlambda = length(lambda)
   if(is.null(lambda)){
     if(is.null(nlambda))
       nlambda = 100
 
-    lambda.max = max(abs(crossprod(xx,yy/n)))
+    lambda.max = max(abs(crossprod(xx,(yy-avr_y)/n)))
     #lambda.max = 0;
     #lmax_calc = .C("lambda_max_calculation", as.double(xx), as.double(yy), 
     #  as.double(lambda.max), as.integer(n));
@@ -86,7 +86,7 @@ picasso.logit <- function(X,
       }
     }
     
-    out = logit_solver(yy, xx, lambda, nlambda, gamma, 
+    out = poisson_solver(yy, xx, lambda, nlambda, gamma, 
                 n, d, max.ite, prec, verbose, 
                 method.flag)
   }
@@ -115,8 +115,6 @@ picasso.logit <- function(X,
   est$obj = out$obj
   est$runt = out$runt
   est$beta = Matrix(beta1)
-  res = X%*%beta1+matrix(rep(intcpt,n),nrow=n,byrow=TRUE)
-  est$p = exp(res)/(1+exp(res))
   est$intercept = intcpt
   est$lambda = lambda
   est$nlambda = nlambda
@@ -126,17 +124,16 @@ picasso.logit <- function(X,
   est$ite =out$ite
   est$verbose = verbose
   est$runtime = runt
-  class(est) = "logit"
+  class(est) = "poisson"
   return(est)
 }
 
-print.logit <- function(x, ...)
+print.poisson <- function(x, ...)
 {  
-  cat("\n Logit options summary: \n")
+  cat("\n Poisson regression options summary: \n")
   cat(x$nlambda, " lambdas used:\n")
   print(signif(x$lambda,digits=3))
-  cat("Method =", x$method, "\n")
-  cat("Alg =", x$alg, "\n")
+  cat("Regularization =", x$method, "\n")
   cat("Degree of freedom:",min(x$df),"----->",max(x$df),"\n")
   if(units.difftime(x$runtime)=="secs") unit="secs"
   if(units.difftime(x$runtime)=="mins") unit="mins"
@@ -144,13 +141,13 @@ print.logit <- function(x, ...)
   cat("Runtime:",x$runtime," ",unit,"\n")
 }
 
-plot.logit <- function(x, ...)
+plot.poisson <- function(x, ...)
 {
   matplot(x$lambda, t(x$beta), type="l", main="Regularization Path",
           xlab="Regularization Parameter", ylab="Coefficient")
 }
 
-coef.logit <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
+coef.poisson <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
 {
   lambda.n = length(lambda.idx)
   beta.n = length(beta.idx)
@@ -179,7 +176,7 @@ coef.logit <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
   }
 }
 
-predict.logit <- function(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1:5), ...)
+predict.poisson <- function(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1:5), ...)
 {
   pred.n = nrow(newdata)
   lambda.n = length(lambda.idx)
@@ -187,8 +184,9 @@ predict.logit <- function(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1
   intcpt = matrix(rep(object$intercept[,lambda.idx],pred.n),nrow=pred.n,
                   ncol=lambda.n,byrow=T)
   res = newdata%*%object$beta[,lambda.idx] + intcpt
-  p.pred = exp(res)/(1+exp(res))
-  cat("\n Values of predicted Bernoulli parameter: \n")
+
+  p.pred = res
+  cat("\n Values of predicted Poisson parameter: \n")
   cat("   index   ")
   for(i in 1:lambda.n){
     cat("",formatC(lambda.idx[i],digits=5,width=10),"")

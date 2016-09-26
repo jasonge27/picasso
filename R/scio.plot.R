@@ -1,12 +1,3 @@
-#-----------------------------------------------------------------------------------#
-# Package: picasso                                                                  #
-# scio.plot(): graph visualization                                                  #
-# Author: Jian Ge, Xingguo Li                                                       #
-# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                            #
-# Date: Sep 2nd, 2016                                                               #
-# Version: 0.5.2                                                                    #
-#-----------------------------------------------------------------------------------#
-
 scio.plot <- function(G, epsflag = FALSE, graph.name = "default", cur.num = 1, location=NULL){
   gcinfo(FALSE)
   if(missing(location))	location = getwd()

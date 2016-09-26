@@ -1,29 +1,15 @@
-#----------------------------------------------------------------------------------#
-# Package: picasso                                                                 #
-# lasso(): Lasso                                                                   #
-# Author: Jian Ge, Xingguo Li                                                      #
-# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 2nd, 2016                                                              #
-# Version: 0.5.2                                                                   #
-#----------------------------------------------------------------------------------#
-
-gaussian_solver <- function(Y, X, XY, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
-                         alg, method.flag, max.act.in, truncation)
+gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, prec, 
+                    verbose, standardize, method.flag, max.act.in, opt)
 {
   if(verbose==TRUE){
     if(method.flag==1)
-      cat("L1 regularization via",alg,"active set identification and coordinate descent\n")
+      cat("L1 regularization via active set identification and coordinate descent\n")
     if(method.flag==2)
-      cat("MCP regularization via",alg,"active set identification and coordinate descent\n")
+      cat("MCP regularization via active set identification and coordinate descent\n")
     if(method.flag==3)
-      cat("SCAD regularization via",alg,"active set identification and coordinate descent\n")
+      cat("SCAD regularization via active set identification and coordinate descent\n")
   }
-  if(alg=="cyclic") alg.flag=1
-  if(alg=="greedy") alg.flag=2
-  if(alg=="proximal") alg.flag=3
-  if(alg=="random") alg.flag=4 
-  if(alg=="hybrid") alg.flag=5
-  L = d*n
+ 
   maxdf = min(n,d)
   beta = rep(0,maxdf*nlambda)
   beta.intcpt = rep(0,nlambda)
@@ -35,22 +21,37 @@ gaussian_solver <- function(Y, X, XY, lambda, nlambda, gamma, n, d, df, max.ite,
   col.cnz = rep(0,nlambda+1)
   cnz = 0
   err = 0
-  str=.C("picasso_gaussian_solver", as.double(Y), as.double(X), as.double(XY), 
+
+
+ 
+  if (opt == "cov"){
+     str=.C("picasso_gaussian_cov", as.double(Y), as.double(X),
          as.double(beta), as.double(beta.intcpt), as.integer(beta.idx), 
          as.integer(cnz), as.integer(col.cnz), as.integer(ite.lamb), as.integer(ite.cyc), 
          as.double(obj), as.double(runt), as.integer(err), as.double(lambda), as.integer(nlambda), 
          as.double(gamma), as.integer(max.ite), as.double(prec), as.integer(method.flag), 
-         as.double(truncation), as.integer(n), as.integer(d), as.integer(df), 
-         as.integer(max.act.in), as.integer(alg.flag), as.double(L), PACKAGE="picasso")
+          as.integer(n), as.integer(d), as.integer(df), 
+         as.integer(max.act.in),  as.integer(verbose), as.integer(standardize), PACKAGE="picasso")
+   } else {
+     str=.C("picasso_gaussian_naive", as.double(Y), as.double(X), 
+         as.double(beta), as.double(beta.intcpt), as.integer(beta.idx), 
+         as.integer(cnz), as.integer(col.cnz), as.integer(ite.lamb), as.integer(ite.cyc), 
+         as.double(obj), as.double(runt), as.integer(err), as.double(lambda), as.integer(nlambda), 
+         as.double(gamma), as.integer(max.ite), as.double(prec), as.integer(method.flag), 
+          as.integer(n), as.integer(d), as.integer(df), 
+         as.integer(max.act.in),  as.integer(verbose), as.integer(standardize), PACKAGE="picasso")
+   }
+  
+ 
   ite = list()
-  ite[[1]] = unlist(str[9])
-  ite[[2]] = unlist(str[10])
-  obj = matrix(unlist(str[11]),ncol=nlambda,byrow = FALSE)
-  runt = matrix(unlist(str[12]),ncol=nlambda,byrow = FALSE)
+  ite[[1]] = unlist(str[8])
+  ite[[2]] = unlist(str[9])
+  obj = matrix(unlist(str[10]),ncol=nlambda,byrow = FALSE)
+  runt = matrix(unlist(str[11]),ncol=nlambda,byrow = FALSE)
 #   
 #   if(err==1)
 #     cat("Parameters are too dense")
-  return(list(beta=unlist(str[4]), intcpt=unlist(str[5]), beta.idx=unlist(str[6]),
-              ite=ite, obj = obj, runt = runt, cnz = unlist(str[7]),
-              col.cnz = unlist(str[8]), err = unlist(str[13])))
+  return(list(beta=unlist(str[3]), intcpt=unlist(str[4]), beta.idx=unlist(str[5]),
+              ite=ite, obj = obj, runt = runt, cnz = unlist(str[6]),
+              col.cnz = unlist(str[7]), err = unlist(str[12])))
 }

@@ -1,11 +1,3 @@
-#----------------------------------------------------------------------------------#
-# Package: picasso                                                                 #
-# logit(): Logistic regression                                                     #
-# Author: Jian Ge, Xingguo Li                                                      #
-# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 2nd, 2016                                                              #
-# Version: 0.5.2                                                                  #
-#----------------------------------------------------------------------------------#
 logit_solver <- function(Y, X, lambda, nlambda, gamma, n, d, max.ite, prec, verbose, method.flag)
 {
   if(verbose==TRUE){

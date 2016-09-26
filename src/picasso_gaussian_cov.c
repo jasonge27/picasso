@@ -1,9 +1,17 @@
 #include "mymath.h"
 
-void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, double * intcpt, int * beta_idx, int * cnzz, int * col_cnz, int * ite_lamb, int * ite_cyc, double *obj, double *runt, int * err, double *lambda, int *nnlambda, double * ggamma, int *mmax_ite, double *pprec, int *fflag, double *ttrunc, int * nn, int * dd, int * ddf, int *mmax_act_in, int * aalg, double *LL){
+void picasso_gaussian_cov(double *Y, double * X, double * beta,
+    double * intcpt, int * beta_idx, int * cnzz, int * col_cnz,
+    int * ite_lamb, int * ite_cyc, double *obj, double *runt, int * err,
+    double *lambda, int *nnlambda, double * ggamma, int *mmax_ite, double *pprec,
+    int *fflag, int * nn, int * dd, int * ddf, int *mmax_act_in, 
+    int *vverbose, int * sstandardized){
     int i, j, idx, n, d, d4, df, df1, max_ite1, max_ite2, nlambda, ite1, ite2, flag, act_in, hybrid, cnz, act_size, act_size1,  max_act_in, alg, total_df;
     double gamma, prec2, ilambda, ilambda1, ilambda2, dif2, dbn, lamb_max, cutoff, trunc, intcpt_tmp, L;
     clock_t start, stop;
+    int verbose = (*vverbose);
+
+   
     
     n = *nn;
     d = *dd;
@@ -16,13 +24,13 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
     nlambda = *nnlambda;
     gamma = *ggamma;
     flag = *fflag;
-    L = *LL;
-    alg = *aalg; // 1:cyclic 2:greedy 3:proximal 4:random 5:hybrid
+    L = n;
+    alg = 1; // 1:cyclic 2:greedy 3:proximal 4:random 5:hybrid
     dbn = (double)n;
 
     max_act_in = *mmax_act_in;
 
-    trunc = *ttrunc;
+    trunc = 0;
     total_df = min_int(d,n)*nlambda;
 
 
@@ -53,6 +61,7 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
 
     
     double S[d];
+    double XY[d];
     // double XX[df1][df1];
     // XX: set of xx^T values
     // XX_act_idx: the value of j is the index of jth coef in XX
@@ -65,6 +74,7 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
         grad[i] = XY[i];
         XX_act_idx[i] = d4;
         S[i] = vec_inprod(X+i*n,X+i*n,n);
+        XY[i] = vec_inprod(Y, X+i*n, n); // XY[i] = <Y, X[,i]>
     }
     
     for(i=0;i<df1;i++){
@@ -84,14 +94,9 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
     double beta_cached = 0.0;
 
     for (i=0; i<nlambda; i++) {
-        if(alg==4) shuffle(set_idx, d);
+      
         ilambda = lambda[i]*dbn;
-        if(alg==5){
-            ilambda1 = ilambda*(1+sqrt(trunc));
-            ilambda2 = ilambda*(1+trunc);
-        }
-        else
-            ilambda1 = ilambda*(1+trunc);
+       
         cutoff = 0;
         if (i != 0) {
             // Determine eligible set
@@ -139,14 +144,15 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                     }
                 }
             }
+
         ite1 = 0;
         prec2 = lambda[i]*(*pprec)*1e2;
-        hybrid = 1;
+        // outer loop begins here
         while (ite1 < max_ite1) {
             ite2 = 0;
-            dif2 = 1e3;
             act_size1 = 0;
-            for(j=0;j<act_size;j++){
+
+            for(j=0; j < act_size; j++){
                 idx = set_actidx[j];
                 if(set_act1[idx] == 1){
                     set_actidx1[act_size1] = idx;
@@ -157,8 +163,9 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
             for (j = 0; j < d; j++){
                 old_beta[j] = beta1[j];
             }
-              while (ite2 < max_ite2)  { 
+            
 
+            while (ite2 < max_ite2)  { 
                 intcpt_tmp = cal_intcpt(XX, XX_act_idx, XY[d], set_actidx1, act_size1, beta1, df, dbn);
                 if(intcpt_tmp-intcpt[i] != 0){
                     grad_ud(grad, XX, XX_act_idx, intcpt_tmp-intcpt[i], set_actidx1, act_size1, df); // grad[j] = grad[j]-intcpt[i]*sum(X_:j) on active set
@@ -204,7 +211,9 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                 }
                 
             }
-            Rprintf("---ite2=%d\n", ite2);
+
+            if (verbose)
+                Rprintf("---ite2=%d\n", ite2);
             ite_cyc[i] += ite2;
             
             // update the active set
@@ -225,13 +234,10 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                 break;
             }
 
+            //ud_act_greedy_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,
+            //    idxmaxgd,setmaxgd,res,grad,set_act1,gamma,ilambda,flag,
+            //    &act_in,&act_size_all,df,d4,max_act_in,d,n,err);
 
-            if(alg==1) ud_act_cyclic_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,res,grad,set_act1,gamma,ilambda1,ilambda,flag,&act_in,&act_size_all,df,d4,d,n,err);
-            if(alg==2) ud_act_greedy_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,idxmaxgd,setmaxgd,res,grad,set_act1,gamma,ilambda,flag,&act_in,&act_size_all,df,d4,max_act_in,d,n,err);
-            if(alg==3) ud_act_prox_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,beta_tild,idxmaxgd,setmaxgd,res,grad,set_act1,gamma,L,ilambda,flag,&act_in,&act_size_all,df,d4,max_act_in,d,n,err);
-            if(alg==4) ud_act_stoc_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,res,grad,set_act1,set_idx,gamma,ilambda1,ilambda,flag,&act_in,&act_size_all,df,d4,d,n,err);
-            if(alg==5) ud_act_hybrid_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,idxmaxgd,setmaxgd,res,grad,set_act1,gamma,ilambda1,ilambda,flag,&act_in,&act_size_all,df,d4,max_act_in,hybrid,d,n,err);
-            
             act_size = 0;
             for(j=0;j<d;j++){
                 if(set_act1[j] == 1){
@@ -239,23 +245,9 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
                     act_size++;
                 }
             }
-            
-            if(alg==5){
-                if(hybrid==1) {
-                    if(act_in==0)
-                        hybrid = 2;
-                }
-                if(hybrid==2){
-                    if(act_in==0)
-                        break;
-                }
-            }
-            else{
-                if(act_in==0) break;
-            }
-            break;
+           
+            if(act_in==0) break;
         }
-        Rprintf("-ite1=%d\n", ite1);
         ite_lamb[i] = ite1;
         stop = clock();
         runt[i] = (double)(stop - start)/CLOCKS_PER_SEC;
@@ -272,6 +264,8 @@ void picasso_gaussian_solver(double *Y, double * X, double * XY, double * beta, 
         col_cnz[i+1] = cnz;
         if(*err==1) break;
     }
+    if (verbose)
+        Rprintf("-ite1=%d\n", ite1);
     *cnzz = cnz;
     Free(beta1);
     Free(beta0);

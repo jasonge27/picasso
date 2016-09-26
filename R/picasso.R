@@ -1,12 +1,3 @@
-#----------------------------------------------------------------------------------#
-# Package: picasso                                                                 #
-# picasso(): The user interface for picasso()                                      #
-# Author: Jian Ge, Xingguo Li                                                      #
-# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 2nd, 2016                                                              #
-# Version: 0.5.2                                                                   #
-#----------------------------------------------------------------------------------#
-
 picasso <- function(X, 
                     Y, 
                     lambda = NULL,
@@ -16,7 +7,7 @@ picasso <- function(X,
                     family = "gaussian",
                     method = "l1",
                     alg = "greedy",
-                    opt = "naive",
+                    opt = NULL,
                     gamma = 3,
                     df = NULL,
                     sym = "or",
@@ -28,8 +19,8 @@ picasso <- function(X,
                     max.ite = 1e3,
                     verbose = TRUE)
 {
-  if(family!="gaussian" && family!="binomial" && family!="graph"){
-    cat(" Wrong \"family\" input. \n \"family\" should be one of \"gaussian\", \"binomial\" and \"graph\".\n", 
+  if(family!="gaussian" && family!="binomial" && family!="graph" && family != "poisson"){
+    cat(" Wrong \"family\" input. \n \"family\" should be one of \"gaussian\", \"binomial\", \"poisson\" and \"graph\".\n", 
         family,"does not exist. \n")
     return(NULL)
   }
@@ -40,8 +31,8 @@ picasso <- function(X,
     p = ncol(Y)
     if(p==1){
       out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, lambda.min.ratio = lambda.min.ratio,
-                          lambda.min = lambda.min, method = method, alg = alg, opt = opt, gamma = gamma, df = df, 
-                          standardize = standardize, max.act.in = max.act.in, truncation = truncation, prec = prec, 
+                          lambda.min = lambda.min, method = method, opt = opt, gamma = gamma, df = df, 
+                          standardize = standardize, max.act.in = max.act.in,  prec = prec, 
                           max.ite = max.ite, verbose = verbose)
     }
   }
@@ -59,6 +50,14 @@ picasso <- function(X,
                        lambda.min = lambda.min, method = method, alg = alg, opt = opt, gamma = gamma, sym = sym, 
                        max.act.in = max.act.in, truncation = truncation, prec = prec, max.ite = max.ite, 
                        standardize = standardize, perturb = perturb, verbose = verbose)
+  }
+
+   if(family=="poisson"){
+    out = picasso.poisson(X = X, Y=Y, lambda = lambda, nlambda = nlambda, 
+                        lambda.min.ratio = lambda.min.ratio,
+                       lambda.min = lambda.min, method = method, gamma = gamma, 
+                       max.act.in = max.act.in, prec = prec, max.ite = max.ite, 
+                       standardize = standardize, verbose = verbose)
   }
   out$family = family
   return(out)

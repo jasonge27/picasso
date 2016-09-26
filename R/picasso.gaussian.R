@@ -1,35 +1,33 @@
-#----------------------------------------------------------------------------------#
-# Package: picasso                                                                 #
-# picasso.lasso(): The user interface for lasso()                                  #
-# Author: Jian Ge, Xingguo Li                                                      #
-# Email: <jiange@princeton.edu>, <xingguo.leo@gmail.com>                           #
-# Date: Sep 2nd, 2016                                                              #
-# Version: 0.5.2                                                                   #
-#----------------------------------------------------------------------------------#
-
 picasso.gaussian <- function(X, 
                           Y, 
                           lambda = NULL,
                           nlambda = NULL,
                           lambda.min.ratio = NULL,
                           lambda.min = NULL,
-                          method="l1",
-                          alg = "greedy",
-                          opt = "naive",
+                          method = "l1",
+                          opt = NULL,
                           gamma = 3,
                           df = NULL,
                           standardize = TRUE,
                           max.act.in = 3, 
-                          truncation = 0, 
                           prec = 1e-4,
                           max.ite = 1e4,
-                          verbose = TRUE)
+                          verbose = FALSE)
 {
   begt=Sys.time()
   n = nrow(X)
   d = ncol(X)
   if(verbose)
     cat("Sparse linear regression. \n")
+
+  if (is.null(opt)){
+    if (n < 500){
+      opt = "cov"
+    } else {
+      opt = "naive" 
+    }
+  }
+
   if(n==0 || d==0) {
     cat("No data input.\n")
     return(NULL)
@@ -39,17 +37,14 @@ picasso.gaussian <- function(X,
         method,"does not exist. \n")
     return(NULL)
   }
-  if(alg!="cyclic" && alg!="greedy" && alg!="proximal" && alg!="random" && alg!="hybrid"){
-    cat(" Wrong \"alg\" input. \n \"alg\" should be one of \"cyclic\", \"greedy\", \"proximal\", \"random\" and \"hybrid\".\n", 
-        alg,"does not exist. \n")
-    return(NULL)
-  }
+ 
   if(opt!="naive" && opt!="cov"){
     cat(" Wrong \"opt\" input. \n \"opt\" should be one of \"naive\" and \"cov\".\n", 
         opt,"does not exist. \n")
     return(NULL)
   }
   res.sd = FALSE
+
   if(standardize){
     xx = rep(0,n*d)
     xm = rep(0,d)
@@ -83,11 +78,14 @@ picasso.gaussian <- function(X,
   
   est = list()
   if(!is.null(lambda)) nlambda = length(lambda)
+
   if(is.null(lambda)){
     if(is.null(nlambda))
       nlambda = 100
+
     xy = crossprod(xx,yy)
     lambda.max = max(abs(xy/n))
+
     if(is.null(lambda.min)){
       if(is.null(lambda.min.ratio)){
         lambda.min = 0.05*lambda.max
@@ -95,16 +93,18 @@ picasso.gaussian <- function(X,
         lambda.min = min(lambda.min.ratio*lambda.max, lambda.max)
       }
     }
-    if(lambda.min>=lambda.max) cat("\"lambda.min\" is too small. \n")
+    if(lambda.min>=lambda.max) 
+      cat("\"lambda.min\" is too small. \n")
     lambda = exp(seq(log(lambda.max), log(lambda.min), length = nlambda))
-    xy[d+1]=sum(yy)
+    #xy[d+1]=sum(yy)
     # rm(lambda.max,lambda.min,lambda.min.ratio)
     # gc()
   }
-  else{
-    xy = crossprod(xx,yy)
-    xy[d+1]=sum(yy)
-  }
+  #else{
+    #xy = crossprod(xx,yy)
+    #xy[d+1]=sum(yy)
+  #}
+
   if(method=="l1"||method=="mcp"||method=="scad") {
     if(method=="l1") {
       method.flag = 1
@@ -123,31 +123,28 @@ picasso.gaussian <- function(X,
         gamma = 3
       }
     }
-    #if(opt=="cov"){
-      out = gaussian_solver(yy, xx, xy, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
-                         alg, method.flag, max.act.in, truncation)
+
+      out = gaussian_solver(yy, xx, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
+                         standardize, method.flag, max.act.in, opt)
       if(out$err==1)
         cat("Error! Parameters are too dense. Please choose larger \"lambda\". \n")
       if(out$err==2){
         cat("Warning! \"df\" may be too small. You may choose larger \"df\". \n")
       }
-    #}
-  #  if(opt=="naive"){
-  #    out =  lasso.sc.cov(yy, xx, xy, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
-  #                       alg, method.flag, max.act.in, truncation)
-  #    if(out$err==1)
-  #      cat("Parameters are too dense. Please choose larger lambdas. \n")
-  #  }
+   
   }
   
   est$beta = new("dgCMatrix", Dim = as.integer(c(d,nlambda)),
             x = as.vector(out$beta[1:out$col.cnz[nlambda+1]]),
              p=as.integer(out$col.cnz),
              i = as.integer(out$beta.idx[1:out$col.cnz[nlambda+1]]))
+
   est$df=rep(0,nlambda)
   for(i in 1:nlambda)
     est$df[i] = out$col.cnz[i+1]-out$col.cnz[i]
+
   est$intercept=matrix(0,nrow=1,ncol=nlambda)
+
   if(standardize){
     for(k in 1:nlambda){
       #est$beta[[k]] = G[((k-1)*d+1):(k*d)]
@@ -159,6 +156,7 @@ picasso.gaussian <- function(X,
       est$intercept[k] = out$intcpt[k]
     }
   }
+
   est$ite =out$ite
   est$runt = out$runt
   
@@ -167,14 +165,13 @@ picasso.gaussian <- function(X,
   est$nlambda = nlambda
   est$gamma = gamma
   est$method = method
-  est$alg = alg
   est$verbose = verbose
   est$runtime = runt
   class(est) = "lasso"
   return(est)
 }
 
-print.lasso <- function(x, ...)
+print.gaussian <- function(x, ...)
 {  
   cat("\n Lasso options summary: \n")
   cat(x$nlambda, " lambdas used:\n")
@@ -188,13 +185,13 @@ print.lasso <- function(x, ...)
   cat("Runtime:",x$runtime," ",unit,"\n")
 }
 
-plot.lasso <- function(x, ...)
+plot.gaussian <- function(x, ...)
 {
   matplot(x$lambda, t(x$beta), type="l", main="Regularization Path",
           xlab="Regularization Parameter", ylab="Coefficient")
 }
 
-coef.lasso <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
+coef.gaussian <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
 {
   lambda.n = length(lambda.idx)
   beta.n = length(beta.idx)
@@ -223,7 +220,7 @@ coef.lasso <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
   }
 }
 
-predict.lasso <- function(object, newdata, lambda.idx = c(1:3), Y.pred.idx = c(1:5), ...)
+predict.gaussian <- function(object, newdata, lambda.idx = c(1:3), Y.pred.idx = c(1:5), ...)
 {
   pred.n = nrow(newdata)
   lambda.n = length(lambda.idx)

@@ -1,5 +1,42 @@
 #include "mymath.h"
 
+double truncate(double x, double a){
+    double t = fabs(x);
+
+    if (t > a){
+        if (x > 0)
+            return(a);
+        else
+            return(-a);
+    } else {
+        return(x);
+    }
+}
+
+
+double penalty_derivative(int method_flag, double x, double lambda, double gamma){
+    // mcp
+    if (method_flag == 2){
+        if (x > lambda * gamma){
+            return(0);
+        } else{
+            return(1 - x/(lambda*gamma));
+        }
+    }
+    // scad
+    if (method_flag == 3){
+        if (x > lambda * gamma){
+            return(0);
+        } else if ( x > lambda){
+            return((lambda*gamma-x)/(gamma-1));
+        } else {
+            return(1.0);
+        }
+    }
+
+    return(0);
+}
+
 // w[j] = (1/n)*sum_{i=1,2...n} X[i,j]*X[i,j]*p[j](1-p[j])
 double get_cord_hessian(double *p, double * X, int j, int n){
     double v = 0.0;
@@ -66,6 +103,29 @@ double get_penalized_logistic_loss(int method_flag, double *p, double * Y, doubl
     return(v); 
 }
 
+
+double get_penalized_poisson_loss(int method_flag, double *p, double * Y, double * Xb, double * beta, 
+                                double intcpt, int n, int d, double lambda, double gamma){
+    int i;
+    double v = 0.0;
+    for (i = 0; i<n; i++){
+        v += Y[i]*(intcpt+Xb[i]); 
+    }
+    for (i = 0; i<n; i++)
+    if (p[i] > 1e-8) {
+        v += p[i];
+    }
+
+    v = -v/n;
+
+    double penalty = 0.0;
+    for (i = 0; i<d; i++){
+        penalty += get_penalty_value(method_flag, fabs(beta[i]), lambda, gamma);
+    }
+
+    v += penalty;
+    return(v); 
+}
 
 
 double sign(double x){

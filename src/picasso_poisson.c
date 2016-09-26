@@ -2,7 +2,7 @@
 #include "IRLS_solver.h"
 #include <R.h>
 
-void picasso_logit_solver(
+void picasso_poisson_solver(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -24,7 +24,6 @@ void picasso_logit_solver(
     int *fflag,      //
     int *vverbose   // input: 1 for verbose mode
     ){
-    
     int i, j, k, s, n, d, nlambda;
     double tmp;
      
@@ -56,18 +55,34 @@ void picasso_logit_solver(
 
     double dev_null = 0.0;
     double dev_sat = 0.0;
+    double dev = 0.0;
+
+    double BIG_EXPONENT = log(1.6e+300);
 
     double beta0_null = 0.0;
+    double stage_intcpt;
     double avr_y = 0.0;
     for (i = 0; i < n; i++){
         avr_y += Y[i];
     }
-
     avr_y = avr_y / n;
-    beta0_null = log(avr_y /(1-avr_y));
-    dev_null = -(avr_y * beta0_null + log(1 - avr_y)); // dev_null > 0
 
-    dev_sat = dev_null; 
+    for (i = 0; i < n; i++){
+        p[i] = avr_y;
+    }
+    
+    stage_intcpt = log(avr_y);
+    dev_null = avr_y -avr_y * log(avr_y); 
+
+    dev_sat = 0;
+    for (i = 0; i < n; i++)
+        if (Y[i] > 0) {
+            dev_sat += Y[i] * log(Y[i]);
+        }
+       
+    dev_sat = avr_y - dev_sat / n;
+
+    dev = fabs(dev_sat - dev_null);
 
     int outer_loop_count;
     double dev_local;
@@ -78,17 +93,16 @@ void picasso_logit_solver(
 
     int * active_set = (int *) Calloc(d, int);
     double * gr = (double *)Calloc(d, double);
-    double q0 = 1/(1 + exp(-beta0_null));
     for (i = 0; i < d; i++){
         active_set[i] = 0;
         gr[i] = 0;
         for (j = 0; j < n; j++){
-            gr[i] += X[i*n+j] * (Y[j] - q0);
+            gr[i] += X[i*n+j] * (Y[j] - avr_y);
         }
         gr[i] = fabs(gr[i]);
     }
   
-    double stage_intcpt;
+    
     double stage_intcpt_old;
     double intcpt_old; 
     double intcpt_previous_lambda;
@@ -96,12 +110,11 @@ void picasso_logit_solver(
     double function_value, function_value_old;
     int new_active_coord;
     int terminate_loop;
-    double thr;
-
+    double thr = prec1 * dev;
 
     for (i=0; i<nlambda; i++) {
         if(i == 0) {
-            stage_intcpt = 0;
+            //stage_intcpt = 0;
             for (j = 0; j < d; j++){
                 beta1[j] = 0.0;
             }
@@ -133,16 +146,13 @@ void picasso_logit_solver(
                 stage_lambda[j] = lambda[i] * 
                             penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma); 
 
-            function_value_old = get_penalized_logistic_loss(method_flag, p, Y, 
+            function_value_old = get_penalized_poisson_loss(method_flag, p, Y, 
                                                 Xb, beta1, stage_intcpt, 
                                                 n, d, lambda[i], *ggamma); 
         } else {                // for convex penalty
             for (j = 0; j < d; j++)
                 stage_lambda[j] = lambda[i];
         }
-
-
-
 
         int max_stage_ite = 1000;
         while (stage_count < max_stage_ite){
@@ -155,13 +165,21 @@ void picasso_logit_solver(
 
             outer_loop_count = 0;
             while (outer_loop_count < max_ite1) {
+                // only for R
+                if (verbose){
+                    Rprintf("--outer loop: %d\n", 
+                        outer_loop_count);
+                } 
+
                 outer_loop_count++;
 
                 // to construct an iterative reweighted LS
-                p_update(p, Xb, stage_intcpt, n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+                for (j = 0; j < n; j++)
+                    p[j] = exp(truncate(stage_intcpt + Xb[j], BIG_EXPONENT));
+
                 sum_w = 0.0;
                 for (j = 0; j < n; j++){
-                    w[j] = p[j] * (1 - p[j]);
+                    w[j] = p[j];
                     sum_w += w[j];
                     r[j] = Y[j] - p[j];
                 }
@@ -176,7 +194,7 @@ void picasso_logit_solver(
                 solve_weighted_lasso_with_naive_update(X, w, stage_lambda, 
                     n, d,
                     max_ite2,  
-                    prec2, dev_null,
+                    prec2, dev,
                     beta1, Xb, active_set, r, 
                     &stage_intcpt, 
                     set_act, 
@@ -189,7 +207,6 @@ void picasso_logit_solver(
                 // compute the change in LS function value
                 // and check stopping criterion
                 terminate_loop = 1;
-                thr = prec1 * dev_null;
                 for (s = 0; s < size_act[i]; s++){
                     k = set_act[s];
                     tmp = (beta1[k] - beta_old[k]);
@@ -238,11 +255,7 @@ void picasso_logit_solver(
                     }
                 }
                 
-                // only for R
-                if (verbose){
-                    Rprintf("--outer loop: %d, dev_null:%f\n", 
-                        outer_loop_count, dev_null);
-                } 
+                
             }
 
             // for lambda = lambda[i]
@@ -268,9 +281,11 @@ void picasso_logit_solver(
             // 2. update stage_lambda
 
             // check stopping criterion
-            p_update(p, Xb, stage_intcpt, n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+            for (j = 0; j < n; j++)
+                p[j] = exp(truncate(stage_intcpt + Xb[j], BIG_EXPONENT));
+
           
-            function_value = get_penalized_logistic_loss(method_flag, p, Y, Xb, 
+            function_value = get_penalized_poisson_loss(method_flag, p, Y, Xb, 
                                                 beta1, stage_intcpt, n, d,
                                                 lambda[i], *ggamma);
 
