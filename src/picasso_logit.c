@@ -1,4 +1,4 @@
-#include "mymath.h"
+#include "mathutils.h"
 #include "IRLS_solver.h"
 #include <R.h>
 

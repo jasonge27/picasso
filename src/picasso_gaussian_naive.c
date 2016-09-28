@@ -1,4 +1,4 @@
-#include "mymath.h"
+#include "mathutils.h"
 
 void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcpt,
     int * beta_idx, int * cnzz, int * col_cnz, int * ite_lamb, int * ite_cyc, double *obj,
@@ -7,8 +7,8 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
       int* vverbose, int * sstandardized){
     int i, j, k, n, s, d, df, nlambda;
     int max_ite1, max_ite2, ite1, ite2, flag;
-    int act_in, hybrid, cnz, max_act_in, alg, total_df;
-    double gamma, prec, ilambda, ilambda1, ilambda2, lamb_max, trunc;
+    int cnz, max_act_in, total_df;
+    double gamma, prec;
     clock_t start, stop;
     int verbose = (*vverbose);
     int standardized = (*sstandardized);
@@ -28,8 +28,6 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
     
     start = clock();
     double *beta1 = (double *) Calloc(d, double);
-    //double *old_beta = (double *) Calloc(d, double);
-
     int *set_idx = (int *) Calloc(d, int);
     
     int *set_act = (int *) Calloc(d, int);
@@ -50,10 +48,9 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
     for (i=0; i<n; i++){
         res[i] = Y[i];
     }
-    vec_mat_prod(grad, res, X, n, d); 
 
     for (i = 0; i < d; i++)
-        grad[i] = grad[i]/n;
+        grad[i] = vec_inprod(res, X+i*n, n)/n;
 
     for (i=0; i<d; i++){
         set_act[i] = 0;
@@ -113,28 +110,11 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
                 for (j = 0; j < d; j++){
                     if (active_set[j] == 0)
                         continue;
-
-                    // gr = <res, X[,j]> / n
-                    gr = 0;
-                    for (k = 0; k < n; k++)
-                        gr += res[k] * X[j*n+k];
-                    gr = gr / n;
-                    if (standardized)
-                        tmp = gr + beta1[j];
-                    else
-                        tmp = gr + beta1[j] * S[j];
-
                     beta_cached = beta1[j];
-                    if (flag==1)
-                        beta1[j] = soft_thresh_l1(tmp, lambda[i]);
-                    if (flag==2)
-                        beta1[j] = soft_thresh_mcp(tmp, lambda[i], gamma);
-                    if (flag==3)
-                        beta1[j] = soft_thresh_scad(tmp, lambda[i], gamma);
-                    
-                    if (standardized == 0)
-                        beta1[j] = beta1[j] / S[j];
-
+                    // gr = <res, X[,j]> / n
+                    gr = vec_inprod(res, X+j*n, n)/n;
+                    coordinate_update(&beta1[j], gr, S[j], standardized, lambda[i], gamma, flag); 
+                   
                     if (beta1[j] == beta_cached)
                         continue;
 
@@ -169,10 +149,7 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
                 new_active_idx = 0;
                 for (j = 0; j < d; j++)
                     if (active_set[j] == 0){
-                        grad[j] = 0;
-                        for (k = 0; k < n; k++)
-                            grad[j] += res[k] * X[j*n+k];
-                        grad[j] = fabs(grad[j])/n;
+                        grad[j] = fabs(vec_inprod(res, X+j*n, n))/n;
                         if (flag == 1)
                             tmp = soft_thresh_l1(grad[j], lambda[i]);
                         if (flag == 2)
@@ -211,27 +188,11 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
                 terminate_loop = 1;
                 for (k=0; k<act_size; k++) {
                     j = set_act[k];
-                           
-                     gr = 0;
-                    for (s = 0; s < n; s++)
-                        gr += res[s] * X[j*n+s]; // gr = <res, X[,j]> / n
-                    gr = gr / n;
-                    if (standardized)
-                        tmp = gr + beta1[j];
-                    else
-                        tmp = gr + beta1[j] * S[j];
-                            
+                    
                     beta_cached = beta1[j];
-                    if (flag==1)
-                        beta1[j] = soft_thresh_l1(tmp, lambda[i]);
-                    if (flag==2) 
-                        beta1[j] = soft_thresh_mcp(tmp, lambda[i], gamma);
-                    if (flag==3) 
-                        beta1[j] = soft_thresh_scad(tmp, lambda[i], gamma);
-                            
-                    if (standardized == 0)
-                        beta1[j] = beta1[j] / S[j];
-
+                    gr = vec_inprod(res, X+j*n, n)/n;
+                    coordinate_update(&beta1[j], gr, S[j], standardized, lambda[i], gamma, flag); 
+                           
                     if (beta1[j] == beta_cached)
                         continue;
                                 
@@ -264,11 +225,16 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
             Rprintf("-ite1=%d\n", ite1);
         ite_lamb[i] = ite1;
 
+        intcpt[i] = 0.0;
+        for (j = 0; j < n; j++)
+            intcpt[i] += res[j];
+        intcpt[i] = intcpt[i] / n;
+
         stop = clock();
         runt[i] = (double)(stop - start)/CLOCKS_PER_SEC;
-        for(j=0;j<d;j++){
-            if (set_act[j]!=0){
-                if(cnz==total_df){
+        for (j = 0; j < d;  j++){
+            if (set_idx[j] != 0){
+                if (cnz == total_df){
                     *err = 1;
                     break;
                 }
@@ -278,7 +244,7 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
             }
         }
         col_cnz[i+1] = cnz;
-        if(*err==1) break;
+        if (*err==1) break;
     }
     *cnzz = cnz;
     

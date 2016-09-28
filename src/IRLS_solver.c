@@ -1,4 +1,4 @@
-#include "mymath.h"
+#include "mathutils.h"
 #include "IRLS_solver.h"
 
 void calc_IRLS_coef(const double *  w, const double *  X, 

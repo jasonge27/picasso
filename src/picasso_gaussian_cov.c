@@ -1,4 +1,4 @@
-#include "mymath.h"
+#include "mathutils.h"
 
 void picasso_gaussian_cov(double *Y, double * X, double * beta,
     double * intcpt, int * beta_idx, int * cnzz, int * col_cnz,
@@ -6,282 +6,244 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     double *lambda, int *nnlambda, double * ggamma, int *mmax_ite, double *pprec,
     int *fflag, int * nn, int * dd, int * ddf, int *mmax_act_in, 
     int *vverbose, int * sstandardized){
-    int i, j, idx, n, d, d4, df, df1, max_ite1, max_ite2, nlambda, ite1, ite2, flag, act_in, hybrid, cnz, act_size, act_size1,  max_act_in, alg, total_df;
-    double gamma, prec2, ilambda, ilambda1, ilambda2, dif2, dbn, lamb_max, cutoff, trunc, intcpt_tmp, L;
+    int i, j, k, l, s, idx, n, d, df, max_ite, nlambda;
+    int ite1, ite2, flag, act_in, cnz, max_act_in, total_df;
+    double gamma, prec;
     clock_t start, stop;
     int verbose = (*vverbose);
-
+    int standardized = (*sstandardized);
    
-    
     n = *nn;
     d = *dd;
-    d4 = 4*d;
     df = *ddf;
-    df1 = df+1;
-    max_ite1 = *mmax_ite;
-    max_ite2 = *mmax_ite;
-    prec2 = *pprec;
+    max_ite = *mmax_ite;
+    prec = *pprec;
+  
     nlambda = *nnlambda;
     gamma = *ggamma;
     flag = *fflag;
-    L = n;
-    alg = 1; // 1:cyclic 2:greedy 3:proximal 4:random 5:hybrid
-    dbn = (double)n;
 
     max_act_in = *mmax_act_in;
 
-    trunc = 0;
     total_df = min_int(d,n)*nlambda;
-
 
     start = clock();
     double *beta1 = (double *) Calloc(d, double);
-    double *beta0 = (double *) Calloc(d, double);
-    double *beta_tild = (double *) Calloc(d, double);
-    double *old_beta = (double *) Calloc(d, double);
-    
-    int *set_idx = (int *) Calloc(d, int);
-    
-    int *set_act1 = (int *) Calloc(d, int);
-    int *set_actidx = (int *) Calloc(df1, int);
-    int *set_actidx1 = (int *) Calloc(df1, int);
-    
-    double *res = (double *) Calloc(n, double);
-    
-    int *idxmaxgd = (int *) Calloc(max_act_in, int);
-    
-    double *setmaxgd = (double *) Calloc(max_act_in, double);
-    
-    double *grad = (double *) Calloc(d, double);
-    
-    double **XX = (double **) Calloc(df1, double *);
-    int *XX_act_idx = (int *) Calloc(d, int);
-    int *set_actidx_all = (int *) Calloc(df1, int);
-    int act_size_all;
+    double *beta_old = (double *) Calloc(d, double);
 
-    
-    double S[d];
-    double XY[d];
-    // double XX[df1][df1];
-    // XX: set of xx^T values
-    // XX_act_idx: the value of j is the index of jth coef in XX
-    // set_actidx_all: the overall active coef
-    // act_size_all: the overall number of active coef
-    for(i=0;i<d;i++){
-        set_act1[i] = 0;
+    int *set_act = (int *) Calloc(d, int); 
+    int *set_idx = (int *) Calloc(d, int); 
+    int *set_idx_covmat = (int *) Calloc(d, int); 
+    int act_size = 0;
+    int act_size_covmat = 0;
+
+    double *res = (double *) Calloc(n, double);
+    double *gr = (double *) Calloc(d, double);
+    double **covmat = (double **) Calloc(df, double *);
+    double *S = (double *) Calloc(d, double);
+
+
+    for (i = 0; i < d; i++){
+        set_idx[i] = 0; // i is not in the active set yet
         beta1[i] = 0;
-        beta0[i] = 0;
-        grad[i] = XY[i];
-        XX_act_idx[i] = d4;
-        S[i] = vec_inprod(X+i*n,X+i*n,n);
-        XY[i] = vec_inprod(Y, X+i*n, n); // XY[i] = <Y, X[,i]>
+        set_idx_covmat[i] = -1; // j = act_idx_covmat[i]>0 is the position of i in covmat
+        if (!standardized)
+            S[i] = vec_inprod(X+i*n, X+i*n, n)/n;
+        else
+            S[i] = 1.0;
+        // gr[i] = <Y-ymean, X[,i]>/n
+        gr[i] = vec_inprod(Y, X+i*n,n)/n;
     }
-    
-    for(i=0;i<df1;i++){
-        set_actidx[i] = d4;
-        XX[i] = (double *) Calloc(df1, double);
-        for(j=0;j<df1;j++){
-            XX[i][j] = 0;
-        }
-    }
-    if(alg==4) for(i=0;i<d;i++) set_idx[i] = i;
+
+    for (i = 0; i < n; i++)
+        res[i] = Y[i];
     
     cnz = 0;
     act_size = 0;
-    act_size_all = 0;
-    double tmp_change = 0.0;
-    double fchange =  0.0;
+    act_size_covmat = 0;
+
     double beta_cached = 0.0;
-
-    for (i=0; i<nlambda; i++) {
-      
-        ilambda = lambda[i]*dbn;
-       
-        cutoff = 0;
-        if (i != 0) {
-            // Determine eligible set
-            if (flag==1) cutoff = (2*lambda[i] - lambda[i-1])*dbn;
-            if (flag==2) cutoff = (lambda[i] + gamma/(gamma-1)*(lambda[i] - lambda[i-1]))*dbn;
-            if (flag==3) cutoff = (lambda[i] + gamma/(gamma-2)*(lambda[i] - lambda[i-1]))*dbn;
-            intcpt[i] = intcpt[i-1];
-        } else {
-            // Determine eligible set
-            lamb_max = 0;
-            for (j=0; j<d; j++) if (fabs(grad[j]) > lamb_max) lamb_max = fabs(grad[j]);
-            lamb_max = lamb_max/dbn;
-            if (flag==1) cutoff = (2*lambda[i] - lamb_max)*dbn;
-            if (flag==2) cutoff = (lambda[i] + gamma/(gamma-1)*(lambda[i] - lamb_max))*dbn;
-            if (flag==3) cutoff = (lambda[i] + gamma/(gamma-2)*(lambda[i] - lamb_max))*dbn;
-        }
-        act_in=0;
-        for (j=0; j<d; j++)
-            if (fabs(grad[j]) > cutoff) {
-                if(set_act1[j] == 0){
-                    if(XX_act_idx[j]==d4){
-                        if(act_size_all==df){
-                            *err = 2;
-                        }
-                        if(act_size_all<df){
-                            set_act1[j] = 1;
-                            set_actidx[act_size] = j;
-                            
-                            act_size++;
-                            act_in++;
-                            
-                            XX_act_idx[j] = act_size_all;
-                            set_actidx_all[act_size_all] = j;
-                            
-                            updateXX(XX,XX_act_idx,X,set_actidx_all,act_size_all,n,df);
-                            XX[act_size_all][act_size_all] = S[j];
-                            act_size_all++;
-                        }
-                    }
-                    else{
-                        set_act1[j] = 1;
-                        set_actidx[act_size] = j;
-                        act_size++;
-                        act_in++;
-                    }
-                }
-            }
-
+    int terminate_loop;
+    double tmp, tmp_change;
+    int flag1 = 0;
+    int flag2 = 1;
+    for (i = 0; i < nlambda; i++) {
         ite1 = 0;
-        prec2 = lambda[i]*(*pprec)*1e2;
-        // outer loop begins here
-        while (ite1 < max_ite1) {
-            ite2 = 0;
-            act_size1 = 0;
+        flag2 = 1;
+        while (ite1 < max_ite) {
+            ite1 += 1;
 
-            for(j=0; j < act_size; j++){
-                idx = set_actidx[j];
-                if(set_act1[idx] == 1){
-                    set_actidx1[act_size1] = idx;
-                    act_size1++;
+            // STEP1: one pass through the coordinates 
+            // and select the active sets
+            act_in=0;
+            terminate_loop = 1;
+
+            if (flag1 * flag2 == 0)
+            {
+                for (j = 0; j < d; j++){
+                    beta_cached = beta1[j];
+
+                    coordinate_update(&beta1[j], gr[j], S[j], 
+                                    standardized, lambda[i], gamma, flag);
+
+                    if (fabs(beta1[j] - beta_cached) < 1e-6)
+                        continue;
+
+                    if (set_idx[j] == 0){ 
+                        set_idx[j] = 1;
+                        set_act[act_size] = j;
+                        act_size += 1;
+                        act_in += 1;
+
+                        // update the XX matrix if needed
+                        if (set_idx_covmat[j] < 0){ // the j-th coord was not in XX before
+                            set_idx_covmat[j] = act_size_covmat;
+                           
+                            covmat[act_size_covmat] = (double *) Calloc(d, double);
+
+                            for (k = 0; k < d; k++)
+                                covmat[act_size_covmat][k] = vec_inprod(X+j*n, X+k*n, n)/n; 
+
+                            act_size_covmat += 1;
+                        }
+                    }
+
+                    tmp = beta1[j] - beta_cached;
+                    tmp_change = tmp*tmp;
+                    if (standardized == 0)
+                        tmp_change = tmp_change * S[j];
+
+                    if (tmp_change > prec){
+                        terminate_loop = 0;
+                    }
+
+                    idx = set_idx_covmat[j];
+                    for (k = 0; k < d; k++)
+                        gr[k] -= covmat[idx][k]*tmp;
+                    
+
+                    for (k = 0; k < n; k++)
+                        res[k] = res[k] - tmp*X[j*n+k];
                 }
-            }
-
-            for (j = 0; j < d; j++){
-                old_beta[j] = beta1[j];
+            } else {
+                terminate_loop = 0;
+                act_in = 1;
             }
             
+            flag1 = 1;
 
-            while (ite2 < max_ite2)  { 
-                intcpt_tmp = cal_intcpt(XX, XX_act_idx, XY[d], set_actidx1, act_size1, beta1, df, dbn);
-                if(intcpt_tmp-intcpt[i] != 0){
-                    grad_ud(grad, XX, XX_act_idx, intcpt_tmp-intcpt[i], set_actidx1, act_size1, df); // grad[j] = grad[j]-intcpt[i]*sum(X_:j) on active set
-                    intcpt[i] = intcpt_tmp;
-                }
+            if (terminate_loop)
+                break;
 
-                fchange = -1.0;
-                for (j=0; j<act_size1; j++) {
-                    idx = set_actidx1[j];
-                    grad_ud(grad, XX, XX_act_idx, -beta1[idx], set_actidx1, act_size1, XX_act_idx[idx]); // grad[] = grad[]+beta1[idx]*XX[idx][] on active set
+            if (act_in == 0) 
+                break;
+           
+            // STEP2: begin active set minimization
+            // update the active coordinate
+            ite2 = 0;
+            terminate_loop = 1;
+
+            for (k = 0; k < d; k++)
+                beta_old[k] = beta1[k];
+
+            while ( ite2 < max_ite) {
+                ite2 += 1;
+                        
+                terminate_loop = 1;
+                for (k = 0; k < act_size; k++) {
+                    j = set_act[k];
                     
-                    beta_cached = beta1[idx];
+                    beta_cached = beta1[j];
+                    coordinate_update(&beta1[j], gr[j], S[j], 
+                                standardized, lambda[i], gamma, flag); 
+                           
+                    if (fabs(beta1[j]-beta_cached)< 1e-6)
+                        continue;
+                                
+                    tmp = beta1[j] - beta_cached;
 
-                    if(flag==1) beta1[idx] = soft_thresh_l1(grad[idx]/S[idx], ilambda/S[idx]);
-                    if(flag==2) beta1[idx] = soft_thresh_mcp(grad[idx]/S[idx], ilambda/S[idx], gamma);
-                    if(flag==3) beta1[idx] = soft_thresh_scad(grad[idx]/S[idx], ilambda/S[idx], gamma);
-                    if(beta1[idx]==0) set_act1[idx] = 0;
-                    else {
-                        set_act1[idx] = 1;
-                        grad_ud(grad, XX, XX_act_idx, beta1[idx], set_actidx1, act_size1, XX_act_idx[idx]); // grad[] = grad[]-beta1[idx]*XX[idx][] on active set
+                    tmp_change = tmp*tmp;
+                    if (standardized == 0)
+                        tmp_change = tmp_change * S[j];
+
+                    if (tmp_change > prec){
+                        terminate_loop = 0;
                     }
 
-                    tmp_change = S[idx] * (beta_cached - beta1[idx]) * (beta_cached - beta1[idx]);
-                    if (tmp_change > fchange){
-                        fchange = tmp_change;
-                    }
+                    idx = set_idx_covmat[j];
+                    for (l = 0; l < act_size; l++)
+                        gr[set_act[l]] -= tmp * covmat[idx][set_act[l]];
+                    
+
+                    for (l = 0; l < n; l++)
+                        res[l] = res[l] - tmp*X[j*n+l];
                 }
-
-                ite2++;
-                if ((fchange >=0) && (fchange < prec2)){
+                        
+                if (terminate_loop){
+                    flag2 = 0;
                     break;
                 }
-
-                
-                vec_copy(beta1, beta0, set_actidx, act_size);
-                act_size1 = 0;
-                for(j=0;j<act_size;j++){
-                    idx = set_actidx[j];
-                    if(set_act1[idx] == 1){
-                        set_actidx1[act_size1] = idx;
-                        act_size1++;
-                    }
-                }
-                
             }
 
+            for (k = 0; k < d; k++){
+                if (set_idx[k])
+                    continue;
+
+                for (l = 0; l < act_size; l++){
+                    s = set_act[l];
+                    idx = set_idx_covmat[s];
+                    gr[k] -= (beta1[s]-beta_old[s])*covmat[idx][k]; 
+                }
+            }
+            
             if (verbose)
                 Rprintf("---ite2=%d\n", ite2);
-            ite_cyc[i] += ite2;
-            
-            // update the active set
-            intcpt[i] = cal_intcpt(XX, XX_act_idx, XY[d], set_actidx1, act_size1, beta1, df, dbn);
-            res_ud(res, Y, X, beta1, intcpt[i], set_actidx1, act_size1, n); // res = Y-X*beta1-intcpt
-            act_in = 0;
-
-            // check stopping critierion
-            ite1++;
-            fchange = -1.0;
-            for (j = 0; j <d; j++){
-                tmp_change = S[j] * (old_beta[j] - beta1[j])*(old_beta[j] - beta1[j]);
-                if (tmp_change > fchange){
-                    fchange = tmp_change;
-                }
-            }
-            if ((fchange >=0) && (fchange < prec2)){
-                break;
-            }
-
-            //ud_act_greedy_cov(X,XX,XX_act_idx,set_actidx_all,S,beta1,
-            //    idxmaxgd,setmaxgd,res,grad,set_act1,gamma,ilambda,flag,
-            //    &act_in,&act_size_all,df,d4,max_act_in,d,n,err);
-
-            act_size = 0;
-            for(j=0;j<d;j++){
-                if(set_act1[j] == 1){
-                    set_actidx[act_size] = j;
-                    act_size++;
-                }
-            }
-           
-            if(act_in==0) break;
+            ite_cyc[i] += ite2; 
         }
+
         ite_lamb[i] = ite1;
         stop = clock();
         runt[i] = (double)(stop - start)/CLOCKS_PER_SEC;
-        for(j=0;j<act_size;j++){
-            if(cnz==total_df){
-                *err = 1;
-                break;
+
+        intcpt[i] = 0.0;
+        for (j = 0; j < n; j++)
+            intcpt[i] += res[j];
+        intcpt[i] = intcpt[i] / n;
+
+
+        
+        for (j = 0; j < d;  j++){
+            if (set_idx[j] != 0){
+                if (cnz == total_df){
+                    *err = 1;
+                    break;
+                }
+                beta[cnz] = beta1[j];
+                beta_idx[cnz] = j;
+                cnz++;
             }
-            idx = set_actidx[j];
-            beta[cnz] = beta1[idx];
-            beta_idx[cnz] = idx;//i*d+idx;
-            cnz++;
         }
+        
+      
         col_cnz[i+1] = cnz;
         if(*err==1) break;
     }
+
     if (verbose)
         Rprintf("-ite1=%d\n", ite1);
     *cnzz = cnz;
+    
     Free(beta1);
-    Free(beta0);
-    Free(beta_tild);
+    Free(beta_old);
     Free(set_idx);
-    Free(set_act1);
-    Free(set_actidx);
-    Free(set_actidx1);
-    Free(set_actidx_all);
-    Free(idxmaxgd);
-    Free(setmaxgd);
+    Free(set_act);
+    Free(set_idx_covmat);
+    Free(S);
     Free(res);
-    Free(grad);
-    Free(XX_act_idx);
-    for(i=1;i<df1;i++){
-        Free(XX[i]);
+    Free(gr);
+
+    for (i = 0; i < df; i++){
+        Free(covmat[i]);
     }
-    Free(XX);
+    Free(covmat);
 }

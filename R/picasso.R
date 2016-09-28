@@ -19,32 +19,33 @@ picasso <- function(X,
                     max.ite = 1e3,
                     verbose = TRUE)
 {
-  if(family!="gaussian" && family!="binomial" &&  family != "poisson"){
-    cat(" Wrong \"family\" input. \n \"family\" should be one of \"gaussian\", \"binomial\" and \"poisson\".\n", 
-        family,"does not exist. \n")
+  if (family != "gaussian" && family != "binomial" &&  family != "poisson"){
+    cat(" Wrong \"family\" input. \n \"family\" should be 
+           one of \"gaussian\", \"binomial\" and \"poisson\".\n", 
+        family," is not supported in this version. \n")
     return(NULL)
   }
-  if(family=="gaussian"){
-    if(is.matrix(Y)==FALSE) {
+  if (family == "gaussian") {
+    if (!is.matrix(Y)) 
       Y = as.matrix(Y)
-    }
     p = ncol(Y)
-    if(p==1){
-      out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, lambda.min.ratio = lambda.min.ratio,
-                          lambda.min = lambda.min, method = method, opt = opt, gamma = gamma, df = df, 
+    if (p == 1)
+      out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
+                          lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
+                          method = method, opt = opt, gamma = gamma, df = df, 
                           standardize = standardize, max.act.in = max.act.in,  prec = prec, 
                           max.ite = max.ite, verbose = verbose)
-    }
   }
   
-  if(family=="binomial"){
-    if(is.matrix(Y)==FALSE) {
+  if (family == "binomial") {
+    if(!is.matrix(Y))
       Y = as.matrix(Y)
-    }
-    out = picasso.logit(X = X, Y = Y, lambda = lambda, nlambda = nlambda, lambda.min.ratio = lambda.min.ratio,
-                        lambda.min = lambda.min, method = method,gamma = gamma, standardize = standardize, 
-                        max.act.in = max.act.in, truncation = truncation, prec = prec, max.ite = max.ite, 
-                        verbose = verbose)
+    
+    out = picasso.logit(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
+                        lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
+                        method = method,gamma = gamma, standardize = standardize, 
+                        max.act.in = max.act.in, truncation = truncation, prec = prec, 
+                        max.ite = max.ite, verbose = verbose)
   }
 
   if(family=="poisson"){

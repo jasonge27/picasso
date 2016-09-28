@@ -1,4 +1,4 @@
-#include "mymath.h"
+#include "mathutils.h"
 #include "IRLS_solver.h"
 #include <R.h>
 
@@ -59,7 +59,6 @@ void picasso_poisson_solver(
 
     double BIG_EXPONENT = log(1.6e+300);
 
-    double beta0_null = 0.0;
     double stage_intcpt;
     double avr_y = 0.0;
     for (i = 0; i < n; i++){
