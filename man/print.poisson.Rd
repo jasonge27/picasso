@@ -2,25 +2,25 @@
 \alias{print.scio}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Print Function for an object with S3 class \code{"scio"}
+Print Function for an object with S3 class \code{poisson}
 }
 \description{
-Print a summary of the information about an object with S3 class \code{"slim"}.
+Print a summary of the information about an object with S3 class \code{"poisson"}.
 }
 \usage{
-\method{print}{scio}(x, ...)
+\method{print}{poisson}(x, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-  An object with S3 class \code{"scio"}.
+  An object with S3 class \code{"poisson"}.
   }
   \item{\dots}{
   Arguments to be passed to methods.
   }
 }
 \details{
-This call simply outlines the options used for computing a scio object.
+This call simply outlines the options used for computing a sparse poisson regression object.
 }
 %\value{
 %}
@@ -28,8 +28,8 @@ This call simply outlines the options used for computing a scio object.
 %}
 
 \author{
-Xingguo Li, Tuo Zhao, Tong Zhang and Han Liu \cr
-Maintainer: Xingguo Li <xingguo.leo@gmail.com>
+Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Maintainer: Jason Ge <jiange@princeton.edu>
 }
 %\note{
 %}

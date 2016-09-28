@@ -7,15 +7,22 @@ picasso.logit <- function(X,
                           method="l1",
                           gamma = 3,
                           standardize = TRUE,
-                          max.act.in = 3, 
-                          truncation = 0, 
                           prec = 1e-4,
                           max.ite = 1e4,
-                          verbose = TRUE)
+                          verbose = FALSE)
 {
-  begt = Sys.time()
   n = nrow(X)
   d = ncol(X)
+  Y = as.factor(Y)
+  if (length(levels(Y)) != 2){
+    cat("Response vector should contain at most 2 levels. ",length(levels(Y))," levels found here.\n")
+    return(NULL)
+  }
+  Yb = rep(0, n)
+  Yb[which(Y == levels(Y)[2])] = 1
+
+  begt = Sys.time()
+
   if (verbose)
     cat("Sparse logistic regression. \n")
   if (n == 0 || d == 0) {
@@ -42,7 +49,7 @@ picasso.logit <- function(X,
     xinvc.vec = rep(1,d)
     xx = X
   }
-  yy = Y
+  yy = Yb
   
   if (!is.null(lambda)) nlambda = length(lambda)
   if (is.null(lambda)){
@@ -50,11 +57,6 @@ picasso.logit <- function(X,
       nlambda = 100
 
     lambda.max = max(abs(crossprod(xx,yy/n)))
-    #lambda.max = 0;
-    #lmax_calc = .C("lambda_max_calculation", as.double(xx), as.double(yy), 
-    #  as.double(lambda.max), as.integer(n));
-   
-    #lambda.max = unlist(lmax_calc[3]);
 
     if (is.null(lambda.min)){
       if (is.null(lambda.min.ratio)){
@@ -67,8 +69,6 @@ picasso.logit <- function(X,
     if (lambda.min >= lambda.max) 
       cat("lambda.min is too small. \n")
     lambda = exp(seq(log(lambda.max), log(lambda.min), length = nlambda))
-    # rm(lambda.max,lambda.min,lambda.min.ratio)
-    # gc()
   }
   if (method == "l1" || method == "mcp" || method == "scad") {
     if(method == "l1") {

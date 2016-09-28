@@ -2,26 +2,26 @@
 \alias{picasso-package}
 \docType{package}
 \title{
-picasso: Pathwise Calibrated Sparse Shooting Algorithm
+PICASSO: PathwIse CAlibrated Sparse Shooting algOrithm
 }
 \description{
-This package implements the pathwise calibrated sparse shooting algorithm (PICASSO) for high dimensional regularized sparse linear regression, sparse logistic regression, and sparse undirected graphical model estimation. As a pathwise coordinate optimization algorithm, PICASSO exploits warm start initialization, active set updating, and strong rule for coordinate preselection to boost computation, and attains a linear convergence to a unique sparse local optimum with optimal statistical properties. Moreover, users can choose different regularizers, including L1, MCP, and SCAD regularizers. The computation is memory-optimized using the sparse matrix output.
+This package provides computationally efficient tools for fitting generalized linear model with convex and non-convex penalty. Users can enjoy the superior statistical property of non-convex penalty such as SCAD and MCP which has significantly less estimation error and overfitting compared to convex penalty such as l1 and ridge. Computation is handled by multi-stage convex relaxation and the PathwIse CAlibrated Sparse Shooting algOrithm (PICASSO) which exploits warm start initialization, active set updating, and strong rule for coordinate preselection to boost computation, and attains a linear convergence to a unique sparse local optimum with optimal statistical properties. The computation is memory-optimized using the sparse matrix output.
 }
 \details{
 \tabular{ll}{
 Package: \tab picasso\cr
 Type: \tab Package\cr
-Version: \tab 0.5.0\cr
-Date: \tab 2015-12-15\cr
+Version: \tab 0.5.4\cr
+Date: \tab 2016-09-20\cr
 License: \tab GPL-2\cr
 }
 }
 
 \author{
-Xingguo Li, Tuo Zhao, Tong Zhang and Han Liu \cr
-Maintainer: Xingguo Li <xingguo.leo@gmail.com>
+Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Maintainer: Jason Ge <jiange@princeton.edu>
 }
 
 \seealso{
-\code{\link{picasso}} and \code{\link{scio.generator}}.
+\code{\link{picasso}}.
 }

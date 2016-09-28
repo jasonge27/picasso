@@ -1,17 +1,17 @@
-\name{coef.lasso}
-\alias{coef.lasso}
+\name{coef.poisson}
+\alias{coef.poisson}
 \title{
-Extract Model Coefficients for an object with S3 class \code{"lasso"}
+Extract Model Coefficients for an object with S3 class \code{"poisson"}
 }
 \description{
 Extract estimated regression coefficient vectors from the solution path.
 }
 \usage{
-\method{coef}{lasso}(object, lambda.idx = c(1:3), beta.idx = c(1:3), \dots)
+\method{coef}{poisson}(object, lambda.idx = c(1:3), beta.idx = c(1:3), \dots)
 }
 \arguments{
   \item{object}{
-  An object with S3 class \code{"lasso"} 
+  An object with S3 class \code{"poisson"} 
   }
   \item{lambda.idx}{
   The indices of the regularizaiton parameters in the solution path to be displayed. The default values are \code{c(1:3)}.
@@ -25,8 +25,8 @@ Extract estimated regression coefficient vectors from the solution path.
 }
 
 \author{
-Xingguo Li, Tuo Zhao, Tong Zhang and Han Liu \cr
-Maintainer: Xingguo Li <xingguo.leo@gmail.com>
+Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Maintainer: Jason Ge <jiange@princeton.edu>
 }
 
 \seealso{

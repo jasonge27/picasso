@@ -1,5 +1,5 @@
 gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, prec, 
-                    verbose, standardize, method.flag, max.act.in, opt)
+                    verbose, standardize, method.flag, type.gaussian)
 {
   if (verbose){
     if (method.flag == 1)
@@ -22,14 +22,14 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
   cnz = 0
   err = 0
 
-  if (opt == "cov"){
+  if (type.gaussian == "cov"){
      str=.C("picasso_gaussian_cov", as.double(Y), as.double(X),
          as.double(beta), as.double(beta.intcpt), as.integer(beta.idx), 
          as.integer(cnz), as.integer(col.cnz), as.integer(ite.lamb), as.integer(ite.cyc), 
          as.double(obj), as.double(runt), as.integer(err), as.double(lambda), as.integer(nlambda), 
          as.double(gamma), as.integer(max.ite), as.double(prec), as.integer(method.flag), 
           as.integer(n), as.integer(d), as.integer(df), 
-         as.integer(max.act.in),  as.integer(verbose), as.integer(standardize), PACKAGE="picasso")
+          as.integer(verbose), as.integer(standardize), PACKAGE="picasso")
    } else {
      str=.C("picasso_gaussian_naive", as.double(Y), as.double(X), 
          as.double(beta), as.double(beta.intcpt), as.integer(beta.idx), 
@@ -37,7 +37,7 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
          as.double(obj), as.double(runt), as.integer(err), as.double(lambda), as.integer(nlambda), 
          as.double(gamma), as.integer(max.ite), as.double(prec), as.integer(method.flag), 
           as.integer(n), as.integer(d), as.integer(df), 
-         as.integer(max.act.in),  as.integer(verbose), as.integer(standardize), PACKAGE="picasso")
+          as.integer(verbose), as.integer(standardize), PACKAGE="picasso")
    }
   
  

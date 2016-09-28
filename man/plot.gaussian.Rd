@@ -1,17 +1,17 @@
-\name{plot.lasso}
-\alias{plot.lasso}
+\name{plot.gaussian}
+\alias{plot.gaussian}
 \title{
-Plot Function for "lasso"
+Plot Function for "gaussian"
 }
 \description{
 Visualize the solution path of regression estimate corresponding to regularization paramters.
 }
 \usage{
-\method{plot}{lasso}(x, ...)
+\method{plot}{gaussian}(x, ...)
 }
 \arguments{
   \item{x}{
-  An object with S3 class \code{"lasso"}.
+  An object with S3 class \code{"gaussian"}.
   }
   \item{\dots}{
   Arguments to be passed to methods.
@@ -19,8 +19,8 @@ Visualize the solution path of regression estimate corresponding to regularizati
 }
 
 \author{
-Xingguo Li, Tuo Zhao, Tong Zhang and Han Liu \cr
-Maintainer: Xingguo Li <xingguo.leo@gmail.com>
+Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Maintainer: Jason Ge <jiange@princeton.edu>
 }
 
 \seealso{

@@ -28,8 +28,8 @@ This call simply outlines the options used for computing a logit object.
 %}
 
 \author{
-Xingguo Li, Tuo Zhao, Tong Zhang and Han Liu \cr
-Maintainer: Xingguo Li <xingguo.leo@gmail.com>
+Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Maintainer: Jason Ge <jiange@princeton.edu>
 }
 %\note{
 %}

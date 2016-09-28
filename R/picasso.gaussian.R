@@ -5,11 +5,10 @@ picasso.gaussian <- function(X,
                           lambda.min.ratio = NULL,
                           lambda.min = NULL,
                           method = "l1",
-                          opt = NULL,
+                          type.gaussian = NULL,
                           gamma = 3,
                           df = NULL,
                           standardize = TRUE,
-                          max.act.in = 3, 
                           prec = 1e-4,
                           max.ite = 1e4,
                           verbose = FALSE)
@@ -20,11 +19,11 @@ picasso.gaussian <- function(X,
   if (verbose)
     cat("Sparse linear regression. \n")
 
-  if (is.null(opt)) {
+  if (is.null(type.gaussian)) {
     if (n < 500) {
-      opt = "cov"
+      type.gaussian = "cov"
     } else {
-      opt = "naive" 
+      type.gaussian = "naive" 
     }
   }
 
@@ -40,10 +39,10 @@ picasso.gaussian <- function(X,
     return(NULL)
   }
  
-  if (opt!="naive" && opt!="cov") {
-    cat(" Wrong \"opt\" input. \n \"opt\" should 
+  if (type.gaussian!="naive" && type.gaussian!="cov") {
+    cat(" Wrong \"type.gaussian\" input. \n \"type.gaussian\" should 
           be one of \"naive\" and \"cov\".\n", 
-        opt," is not supported in this version. \n")
+        type.gaussian," is not supported in this version. \n")
     return(NULL)
   }
 
@@ -124,7 +123,7 @@ picasso.gaussian <- function(X,
     }
 
     out = gaussian_solver(yy, xx, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
-                         standardize, method.flag, max.act.in, opt)
+                         standardize, method.flag, type.gaussian)
 
     if (out$err == 1)
       cat("Error! Parameters are too dense. Please choose larger \"lambda\". \n")
@@ -166,7 +165,7 @@ picasso.gaussian <- function(X,
   est$method = method
   est$verbose = verbose
   est$runtime = runt
-  class(est) = "lasso"
+  class(est) = "gaussian"
   return(est)
 }
 

@@ -1,17 +1,17 @@
-\name{plot.logit}
-\alias{plot.logit}
+\name{plot.poisson}
+\alias{plot.poisson}
 \title{
-Plot Function for "logit"
+Plot Function for "poisson"
 }
 \description{
 Visualize the solution path of regression estimate corresponding to regularization paramters.
 }
 \usage{
-\method{plot}{logit}(x, ...)
+\method{plot}{poisson}(x, ...)
 }
 \arguments{
   \item{x}{
-  An object with S3 class \code{"logit"}.
+  An object with S3 class \code{"poisson"}.
   }
   \item{\dots}{
   Arguments to be passed to methods.

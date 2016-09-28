@@ -7,14 +7,19 @@ picasso.poisson <- function(X,
                           method = "l1",
                           gamma = 3,
                           standardize = TRUE,
-                          max.act.in = 3, 
                           prec = 1e-4,
                           max.ite = 1e4,
-                          verbose = TRUE)
+                          verbose = FALSE)
 {
-  begt = Sys.time()
   n = nrow(X)
   d = ncol(X)
+  if (!isTRUE(all(Y == floor(Y))) || !isTRUE(all(Y >= 0))) 
+    stop("The response must only contain non-negative integer values for poisson regression")
+
+  if (sum(Y) <= 0)
+    stop("The response vector is an all-zero vector. The problem is ill-conditioned.")
+
+  begt = Sys.time()
   if (verbose)
     cat("Sparse poisson regression. \n")
   if (n == 0 || d == 0) {
@@ -52,11 +57,6 @@ picasso.poisson <- function(X,
       nlambda = 100
 
     lambda.max = max(abs(crossprod(xx,(yy-avr_y)/n)))
-    #lambda.max = 0;
-    #lmax_calc = .C("lambda_max_calculation", as.double(xx), as.double(yy), 
-    #  as.double(lambda.max), as.integer(n));
-   
-    #lambda.max = unlist(lmax_calc[3]);
 
     if (is.null(lambda.min)){
       if (is.null(lambda.min.ratio)){
@@ -68,8 +68,6 @@ picasso.poisson <- function(X,
     if (lambda.min>=lambda.max) 
       cat("lambda.min is too small. \n")
     lambda = exp(seq(log(lambda.max), log(lambda.min), length = nlambda))
-    # rm(lambda.max,lambda.min,lambda.min.ratio)
-    # gc()
   }
   if (method == "l1" || method == "mcp" || method == "scad") {
     if (method=="l1") {

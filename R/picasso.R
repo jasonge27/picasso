@@ -1,23 +1,18 @@
 picasso <- function(X, 
                     Y, 
                     lambda = NULL,
-                    nlambda = NULL,
-                    lambda.min.ratio = NULL,
+                    nlambda = 100,
+                    lambda.min.ratio = 0.01,
                     lambda.min = NULL,
                     family = "gaussian",
                     method = "l1",
-                    alg = "greedy",
-                    opt = NULL,
+                    type.gaussian = NULL,
                     gamma = 3,
                     df = NULL,
-                    sym = "or",
                     standardize = TRUE,
-                    perturb = TRUE,
-                    max.act.in = 3,
-                    truncation = 1e-2, 
                     prec = 1e-4,
                     max.ite = 1e3,
-                    verbose = TRUE)
+                    verbose = FALSE)
 {
   if (family != "gaussian" && family != "binomial" &&  family != "poisson"){
     cat(" Wrong \"family\" input. \n \"family\" should be 
@@ -32,8 +27,8 @@ picasso <- function(X,
     if (p == 1)
       out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
                           lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
-                          method = method, opt = opt, gamma = gamma, df = df, 
-                          standardize = standardize, max.act.in = max.act.in,  prec = prec, 
+                          method = method, type.gaussian = type.gaussian, gamma = gamma, df = df, 
+                          standardize = standardize,  prec = prec, 
                           max.ite = max.ite, verbose = verbose)
   }
   
@@ -43,16 +38,15 @@ picasso <- function(X,
     
     out = picasso.logit(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
                         lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
-                        method = method,gamma = gamma, standardize = standardize, 
-                        max.act.in = max.act.in, truncation = truncation, prec = prec, 
-                        max.ite = max.ite, verbose = verbose)
+                        method = method, gamma = gamma, standardize = standardize, 
+                        prec = prec, max.ite = max.ite, verbose = verbose)
   }
 
   if(family=="poisson"){
     out = picasso.poisson(X = X, Y=Y, lambda = lambda, nlambda = nlambda, 
                         lambda.min.ratio = lambda.min.ratio,
                        lambda.min = lambda.min, method = method, gamma = gamma, 
-                       max.act.in = max.act.in, prec = prec, max.ite = max.ite, 
+                       prec = prec, max.ite = max.ite, 
                        standardize = standardize, verbose = verbose)
   }
   out$family = family

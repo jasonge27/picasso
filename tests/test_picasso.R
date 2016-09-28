@@ -47,7 +47,7 @@ test_elnet_naive <- function(n = 10000, p = 5000, c = 0.5, nlambda = 200){
   
  
   cat("picasso timing:\n")
-  print(system.time(fitp<-picasso(X,Y,family="gaussian", opt = 'naive',
+  print(system.time(fitp<-picasso(X,Y,family="gaussian", type.gaussian = 'naive',
                                   lambda.min.ratio=0.05,standardize=FALSE,
                                   verbose=FALSE,prec=1e-7,nlambda=nlambda)))
   
@@ -81,7 +81,7 @@ test_elnet_cov <- function(n = 300, p = 100, c = 0.5, nlambda = 100){
   
   
   cat("picasso timing:\n")
-  print(system.time(fitp<-picasso(X, Y, family="gaussian", opt = 'cov',
+  print(system.time(fitp<-picasso(X, Y, family="gaussian", type.gaussian = 'cov',
                                   lambda.min.ratio=0.05, standardize=FALSE,
                                   verbose=FALSE, prec=1e-7, nlambda=nlambda)))
   
@@ -108,7 +108,7 @@ test_lognet <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100){
   library(picasso)
   set.seed(111)
   
-  X=scale(matrix(rnorm(n*p),n,p)+ c*rnorm(n))
+  X=scale(matrix(rnorm(n*p),n,p)+ c*rnorm(n))/sqrt(n-1)*sqrt(n)
   Y=X[,1:20]%*%runif(20)+rnorm(n)>.5
   
   cat("glmnet timing:\n")
@@ -145,12 +145,12 @@ test_elnet_naive_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 1
   Y = X[,1:20] %*% true_beta + rnorm(n)
   
   cat("picasso timing for mcp penalty:\n")
-  print(system.time(fitp.mcp<-picasso(X,Y,family="gaussian", opt='naive', method="mcp",
+  print(system.time(fitp.mcp<-picasso(X,Y,family="gaussian", type.gaussian='naive', method="mcp",
                                   lambda.min.ratio=0.001, standardize=FALSE,verbose=verb,
                                   prec=1e-7,nlambda=nlambda)))
   
   cat("picasso timing for scad penalty:\n")
-  print(system.time(fitp.scad<-picasso(X,Y,family="gaussian", opt='naive', method="scad",
+  print(system.time(fitp.scad<-picasso(X,Y,family="gaussian", type.gaussian='naive', method="scad",
                                   lambda.min.ratio=0.001, standardize=FALSE,verbose=verb,
                                   prec=1e-7,nlambda=nlambda)))
 }
@@ -164,12 +164,12 @@ test_elnet_cov_nonlinear <- function(n = 400, p = 1000, c = 1.0, nlambda = 100, 
   Y = X[,1:20] %*% true_beta + rnorm(n)
   
   cat("picasso timing for mcp penalty:\n")
-  print(system.time(fitp.mcp<-picasso(X,Y,family="gaussian", opt='cov', method="mcp",
+  print(system.time(fitp.mcp<-picasso(X,Y,family="gaussian", type.gaussian='cov', method="mcp",
                                       lambda.min.ratio=0.001, standardize=FALSE,
                                       verbose=verb,prec=1e-7,nlambda=nlambda)))
   
   cat("picasso timing for scad penalty:\n")
-  print(system.time(fitp.scad<-picasso(X,Y,family="gaussian", opt='cov', method="scad",
+  print(system.time(fitp.scad<-picasso(X,Y,family="gaussian", type.gaussian='cov', method="scad",
                                        lambda.min.ratio=0.001, standardize=FALSE,verbose=verb,
                                        prec=1e-7,nlambda=nlambda)))
 }

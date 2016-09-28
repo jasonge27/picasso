@@ -1,17 +1,17 @@
-\name{coef.logit}
-\alias{coef.logit}
+\name{coef.guassian}
+\alias{coef.guassian}
 \title{
-Extract Model Coefficients for an object with S3 class \code{"logit"}
+Extract Model Coefficients for an object with S3 class \code{"guassian"}
 }
 \description{
 Extract estimated regression coefficient vectors from the solution path.
 }
 \usage{
-\method{coef}{logit}(object, lambda.idx = c(1:3), beta.idx = c(1:3), \dots)
+\method{coef}{gaussian}(object, lambda.idx = c(1:3), beta.idx = c(1:3), \dots)
 }
 \arguments{
   \item{object}{
-  An object with S3 class \code{"logit"} 
+  An object with S3 class \code{"gaussian"} 
   }
   \item{lambda.idx}{
   The indices of the regularizaiton parameters in the solution path to be displayed. The default values are \code{c(1:3)}.
