@@ -31,13 +31,13 @@ L1 penalized linear regression (LASSO) is great for feature selection in linear 
 
 Nonconvex penalties such as SCAD and MCP are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but unfortunately there hasn't been any reliable solver for people to use so far.
 
-The PICASSO package solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Let's see PICASSO in action — the estimation error drops to **3.3%** from **10.57%** error produced by LASSO.
+The PICASSO package solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Let's see PICASSO in action — the estimation error drops to **3.4%** using SCAD penalty from **10.57%** error produced by LASSO.
 
 ```R
 > library(picasso)
-> fitp <- picasso(X, Y, family="gaussian", method="mcp")
+> fitp <- picasso(X, Y, family="gaussian", method="scad")
 > min(apply(abs(fitp$beta-true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
-[1] 0.03276
+[1] 0.03392717
 ```
 
 
