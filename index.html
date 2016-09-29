@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Picasso by jasonge27</title>
+    <title>Picasso: from LASSO to SCAD and beyond  by jasonge27</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -11,8 +11,8 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">Picasso</h1>
-      <h2 class="project-tagline">From LASSO to SCAD and beyond </h2>
+      <h1 class="project-name">Picasso: from LASSO to SCAD and beyond </h1>
+      <h2 class="project-tagline">Unleash The Power of Nonconvex Penalty</h2>
       <a href="https://github.com/jasonge27/picasso" class="btn">View on GitHub</a>
       <a href="https://github.com/jasonge27/picasso/zipball/master" class="btn">Download .zip</a>
       <a href="https://github.com/jasonge27/picasso/tarball/master" class="btn">Download .tar.gz</a>
@@ -23,20 +23,46 @@
 <a id="picasso" class="anchor" href="#picasso" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>PICASSO</h1>
 
 <h2>
-<a id="unleash-the-power-of-nonconvex-penalty" class="anchor" href="#unleash-the-power-of-nonconvex-penalty" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Unleash the power of nonconvex penalty</h2>
+<a id="installation-in-r" class="anchor" href="#installation-in-r" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation in R</h2>
 
-<p>L1 penalized linear regression (LASSO) has been one of the most popular tools for feature selection in linear regression. What's the caveats for using LASSO? Unstableness in multi-colinearity and estimation bais due to the penalty term. </p>
-
-<p>Nonconvex penalties such as SCAD and MCP are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but unfortunately there hasn't been any reliable solver for people to use so far.</p>
-
-<p>The PICASSO package solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimu.</p>
+<div class="highlight highlight-source-r"><pre><span class="pl-k">&gt;</span> library(<span class="pl-smi">devtools</span>)
+<span class="pl-k">&gt;</span> <span class="pl-e">devtools</span><span class="pl-k">::</span>install_github(<span class="pl-s"><span class="pl-pds">"</span>jasonge27/picasso<span class="pl-pds">"</span></span>)</pre></div>
 
 <h2>
-<a id="fast-and-stable" class="anchor" href="#fast-and-stable" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fast and stable</h2>
+<a id="unleash-the-power-of-nonconvex-penalty" class="anchor" href="#unleash-the-power-of-nonconvex-penalty" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Unleash the power of nonconvex penalty</h2>
 
-<p>As a traditional LASSO solver, our package is as fast as the state-of-the-art glmnet solver. For SCAD regularzied linear/logistic regression, it can be shown that our package is much faster and more stable than the alternative ncvreg.</p>
+<p>L1 penalized linear regression (LASSO) is great for feature selection in linear regression. However when you use LASSO in very noisy setting, when some columns in your data has strong colinearity or they are just useless noise, it's easy to see that LASSO actually gives biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as <strong>10.589%</strong>.</p>
 
-<p>For the experiments, we use sample number n = 2000 and sample dimension d = 1000. The parameter c is used to control the column-wise correlation of the desgin matrix X.</p>
+<div class="highlight highlight-source-r"><pre><span class="pl-k">&gt;</span> set.seed(<span class="pl-c1">2016</span>)
+<span class="pl-k">&gt;</span> library(<span class="pl-smi">glmnet</span>)
+<span class="pl-k">&gt;</span> <span class="pl-smi">n</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">2000</span>; <span class="pl-smi">p</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">1000</span>; <span class="pl-smi">c</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">0.1</span>
+<span class="pl-k">&gt;</span> <span class="pl-c"># n sample number, p dimension, c correlation parameter</span>
+<span class="pl-k">&gt;</span> <span class="pl-smi">X</span> <span class="pl-k">&lt;-</span> scale(<span class="pl-k">matrix</span>(rnorm(<span class="pl-smi">n</span><span class="pl-k">*</span><span class="pl-smi">p</span>),<span class="pl-smi">n</span>,<span class="pl-smi">p</span>)<span class="pl-k">+</span><span class="pl-smi">c</span><span class="pl-k">*</span>rnorm(<span class="pl-smi">n</span>)) <span class="pl-c"># n is smaple number, </span>
+<span class="pl-k">&gt;</span> <span class="pl-smi">s</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">20</span>  <span class="pl-c"># sparsity level</span>
+<span class="pl-k">&gt;</span> <span class="pl-smi">true_beta</span> <span class="pl-k">&lt;-</span> c(runif(<span class="pl-smi">s</span>), rep(<span class="pl-c1">0</span>, <span class="pl-smi">p</span><span class="pl-k">-</span><span class="pl-smi">s</span>))
+<span class="pl-k">&gt;</span> <span class="pl-smi">Y</span> <span class="pl-k">&lt;-</span> <span class="pl-smi">X</span><span class="pl-k">%*%</span><span class="pl-smi">true_beta</span> <span class="pl-k">+</span> rnorm(<span class="pl-smi">n</span>)
+<span class="pl-k">&gt;</span> <span class="pl-smi">fitg</span><span class="pl-k">&lt;-</span>glmnet(<span class="pl-smi">X</span>,<span class="pl-smi">Y</span>,<span class="pl-v">family</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>gaussian<span class="pl-pds">"</span></span>)
+<span class="pl-k">&gt;</span> <span class="pl-c"># the minimal estimation error |\hat{beta}-beta| / |beta|</span>
+<span class="pl-k">&gt;</span> min(apply(abs(<span class="pl-smi">fitg</span><span class="pl-k">$</span><span class="pl-smi">beta</span> <span class="pl-k">-</span> <span class="pl-smi">true_beta</span>), <span class="pl-v">MARGIN</span><span class="pl-k">=</span><span class="pl-c1">2</span>, <span class="pl-v">FUN</span><span class="pl-k">=</span><span class="pl-smi">sum</span>))<span class="pl-k">/</span>sum(abs(<span class="pl-smi">true_beta</span>))
+[<span class="pl-c1">1</span>] <span class="pl-c1">0.10589</span></pre></div>
+
+<p>Nonconvex penalties such as SCAD and MCP are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum. </p>
+
+<p>The PICASSO package solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). </p>
+
+<p>Let's see PICASSO in action — the estimation error drops to <strong>3.4%</strong> using SCAD penalty from <strong>10.57%</strong> error produced by LASSO.</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-k">&gt;</span> library(<span class="pl-smi">picasso</span>)
+<span class="pl-k">&gt;</span> <span class="pl-smi">fitp</span> <span class="pl-k">&lt;-</span> picasso(<span class="pl-smi">X</span>, <span class="pl-smi">Y</span>, <span class="pl-v">family</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>gaussian<span class="pl-pds">"</span></span>, <span class="pl-v">method</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>scad<span class="pl-pds">"</span></span>)
+<span class="pl-k">&gt;</span> min(apply(abs(<span class="pl-smi">fitp</span><span class="pl-k">$</span><span class="pl-smi">beta</span><span class="pl-k">-</span><span class="pl-smi">true_beta</span>), <span class="pl-v">MARGIN</span><span class="pl-k">=</span><span class="pl-c1">2</span>, <span class="pl-v">FUN</span><span class="pl-k">=</span><span class="pl-smi">sum</span>))<span class="pl-k">/</span>sum(abs(<span class="pl-smi">true_beta</span>))
+[<span class="pl-c1">1</span>] <span class="pl-c1">0.03392717</span></pre></div>
+
+<h2>
+<a id="fast-and-stable" class="anchor" href="#fast-and-stable" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fast and Stable</h2>
+
+<p>As a traditional LASSO solver, our package is as fast as the state-of-the-art glmnet solver. For SCAD regularzied linear/logistic regression, it can be shown that our package is much faster and more stable than the alternative ncvreg. (The experiments can also be done with MCP penalty.)</p>
+
+<p>For the experiments, we use sample number n = 2000 and sample dimension p = 1000. The parameter c is used to control the column-wise correlation of the desgin matrix X as before.</p>
 
 <p>Timing for L1 regularized linear regression.</p>
 
@@ -44,9 +70,9 @@
 <thead>
 <tr>
 <th align="center"></th>
-<th align="center">c=0.1</th>
-<th align="center">c=0.5</th>
-<th align="center">c= 1.0</th>
+<th align="center">c = 0.1</th>
+<th align="center">c = 0.5</th>
+<th align="center">c = 1.0</th>
 </tr>
 </thead>
 <tbody>
@@ -118,7 +144,7 @@
 <td align="center">PICASSO</td>
 <td align="center">1.016(s)</td>
 <td align="center">0.528(s)</td>
-<td align="center">0.503</td>
+<td align="center">0.603</td>
 </tr>
 <tr>
 <td align="center">ncvreg</td>
@@ -132,7 +158,7 @@
 <p>'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.</p>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/jasonge27/picasso">Picasso</a> is maintained by <a href="https://github.com/jasonge27">jasonge27</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/jasonge27/picasso">Picasso: from LASSO to SCAD and beyond </a> is maintained by <a href="https://github.com/jasonge27">jasonge27</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
