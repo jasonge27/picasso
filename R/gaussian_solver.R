@@ -22,7 +22,7 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
   cnz = 0
   err = 0
 
-  if (type.gaussian == "cov"){
+  if (type.gaussian == "covariance"){
      str=.C("picasso_gaussian_cov", as.double(Y), as.double(X),
          as.double(beta), as.double(beta.intcpt), as.integer(beta.idx), 
          as.integer(cnz), as.integer(col.cnz), as.integer(ite.lamb), as.integer(ite.cyc), 

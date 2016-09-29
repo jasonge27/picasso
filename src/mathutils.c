@@ -1,5 +1,7 @@
 #include "mathutils.h"
 
+#define BIG_EXPONENT (690) 
+
 void coordinate_update(double * beta, double gr, double S, 
                         int standardized, double lambda, double gamma, int flag){
     double tmp = 0;
@@ -100,21 +102,19 @@ double get_penalized_logistic_loss(int method_flag, double *p, double * Y, doubl
     int i;
     double v = 0.0;
     for (i = 0; i<n; i++){
-        v += (Y[i]-1)*(intcpt+Xb[i]); 
+        v -= Y[i]*(intcpt+Xb[i]); 
     }
     for (i = 0; i<n; i++)
     if (p[i] > 1e-8) {
         v += log(p[i]);
     }
 
-    v = -v/n;
-
-    double penalty = 0.0;
+    v = v/n;
+    
     for (i = 0; i<d; i++){
-        penalty += get_penalty_value(method_flag, fabs(beta[i]), lambda, gamma);
+        v += get_penalty_value(method_flag, fabs(beta[i]), lambda, gamma);
     }
 
-    v += penalty;
     return(v); 
 }
 
@@ -124,21 +124,18 @@ double get_penalized_poisson_loss(int method_flag, double *p, double * Y, double
     int i;
     double v = 0.0;
     for (i = 0; i<n; i++){
-        v += Y[i]*(intcpt+Xb[i]); 
+        v -= Y[i]*(intcpt+Xb[i]); 
     }
     for (i = 0; i<n; i++)
-    if (p[i] > 1e-8) {
         v += p[i];
-    }
+    
 
-    v = -v/n;
+    v = v/n;
 
-    double penalty = 0.0;
     for (i = 0; i<d; i++){
-        penalty += get_penalty_value(method_flag, fabs(beta[i]), lambda, gamma);
+        v += get_penalty_value(method_flag, fabs(beta[i]), lambda, gamma);
     }
 
-    v += penalty;
     return(v); 
 }
 
@@ -255,11 +252,9 @@ void X_beta_update(double *Xb, const double *X, double beta, int n){
 
 // p[i] = 1/(1+exp(-intcpt-Xb[i]))
 void p_update(double *p, double *Xb, double intcpt, int n){
-    int i;
-    double neg_intcpt = -intcpt;
-    
+    int i;    
     for (i = 0; i < n; i++) {
-        p[i] = 1/(1+exp(neg_intcpt-Xb[i]));
+        p[i] = 1/(1+exp(truncate(-intcpt-Xb[i], BIG_EXPONENT)));
         if (p[i] > 0.999) p[i] = 1;
         if (p[i] < 0.001) p[i] = 0;
     }

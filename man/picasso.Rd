@@ -10,7 +10,7 @@ The function "picasso" implements the user interface.
 }
 
 \usage{
-picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.01,
+picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
         lambda.min = NULL, family = "gaussian", method="l1", 
         type.gaussian = "naive", gamma = 3, df = NULL, standardize = TRUE, 
         prec = 1e-7, verbose = FALSE)
@@ -25,7 +25,7 @@ picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.01,
   
   \item{nlambda}{The number of values used in \code{lambda}. Default value is 100.}
 
-  \item{lambda.min.ratio}{The smallest value for \code{lambda}, as a fraction of the uppperbound (\code{MAX}) of the regularization parameter. The program can automatically generate \code{lambda} as a sequence of length = \code{nlambda} starting from \code{MAX} to \code{lambda.min.ratio*MAX} in log scale. The default value is \code{0.01}.}
+  \item{lambda.min.ratio}{The smallest value for \code{lambda}, as a fraction of the uppperbound (\code{MAX}) of the regularization parameter. The program can automatically generate \code{lambda} as a sequence of length = \code{nlambda} starting from \code{MAX} to \code{lambda.min.ratio*MAX} in log scale. The default value is \code{0.05}.} Caution: logistic and poisson regression can be ill-conditioned if lambda is too small for nonconvex penalty. We suggest the user to avoid using any lambda.min.raito smaller than 0.05 for logistic/poisson regression under nonconvex penalty.
   
   \item{lambda.min}{The smallest value for \code{lambda}. If $\code{lambda.min.ratio} is provided, then it is set to \code{lambda.min.ratio*MAX}, where \code{MAX} is the uppperbound of the regularization parameter. The default value is \code{0.1*MAX}.}
   
@@ -135,7 +135,7 @@ d = 800 # sample dimension
 c = 0.5 # correlation parameter
 s = 20  # support size of coefficient
 set.seed(2016)
-X = scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
+X = scale(matrix(rnorm(n*d),n,d)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
 beta = c(runif(s), rep(0, d-s))
 
 ## Generate response using Gaussian noise, and fit sparse linear models
@@ -143,10 +143,10 @@ noise = rnorm(n)
 Y = X\%*\%beta + noise
 
 ## l1 regularization solved with naive update
-fitted.l1.naive = picasso(X, Y, nlambda=100, opt="naive")
+fitted.l1.naive = picasso(X, Y, nlambda=100, type.gaussian="naive")
 
 ## l1 regularization solved with covariance update
-fitted.l1.covariance  = picasso(X, Y, nlambda=100, opt="covariance")
+fitted.l1.covariance  = picasso(X, Y, nlambda=100, type.gaussian="covariance")
 
 ## mcp regularization
 fitted.mcp = picasso(X, Y, nlambda=100, method="mcp")
@@ -162,9 +162,9 @@ print(fitted.l1$df)
 
 ## coefficients and intercept for the i-th lambda
 i = 30
-print(fitted.l1$lambda[i])
-print(fitted.l1$beta[,i])
-print(fitted.l1$intercept[i])
+print(fitted.l1.naive$lambda[i])
+print(fitted.l1.naive$beta[,i])
+print(fitted.l1.naive$intercept[i])
 
 ## Visualize the solution path
 plot(fitted.l1.naive)
@@ -186,16 +186,16 @@ beta <- c(runif(s), rep(0, d-s))
 
 ## Generate response and fit sparse logistic models
 p = 1/(1+exp(-X\%*\%beta))
-Y = rbinom(n,rep(1,n),p)
+Y = rbinom(n, rep(1,n), p)
 
 ## l1 regularization
-fitted.l1 = picasso(X, Y, nlambda=100, family=``binomial'', method=``l1'')
+fitted.l1 = picasso(X, Y, nlambda=100, family="binomial", method="l1")
 
 ## mcp regularization
-fitted.mcp = picasso(X, Y, nlambda=100, family=``binomial'', method="mcp")
+fitted.mcp = picasso(X, Y, nlambda=100, family="binomial", method="mcp")
 
 ## scad regularization
-fitted.scad = picasso(X, Y, nlambda=100, family=``binomial'', method="scad")
+fitted.scad = picasso(X, Y, nlambda=100, family="binomial", method="scad")
 
 ## lambdas used 
 print(fitted.l1$lambda)
@@ -228,17 +228,17 @@ X <- scale(matrix(rnorm(n*d),n,d)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
 beta <- c(runif(s), rep(0, d-s))/sqrt(s)
 
 ## Generate response and fit sparse poisson models
-p = X[,1:s]\%*\%beta+rnorm(n)
+p = X\%*\%beta+rnorm(n)
 Y = rpois(n, exp(p))
 
 ## l1 regularization
-fitted.l1 = picasso(X, Y, nlambda=100, family=``poisson'', method=``l1'')
+fitted.l1 = picasso(X, Y, nlambda=100, family="poisson", method="l1")
 
 ## mcp regularization
-fitted.mcp = picasso(X, Y, nlambda=100, family=``poisson'', method="mcp")
+fitted.mcp = picasso(X, Y, nlambda=100, family="poisson", method="mcp")
 
 ## scad regularization
-fitted.scad = picasso(X, Y, nlambda=100, family=``poisson'', method="scad")
+fitted.scad = picasso(X, Y, nlambda=100, family="poisson", method="scad")
 
 ## lambdas used 
 print(fitted.l1$lambda)

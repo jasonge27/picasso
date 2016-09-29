@@ -113,7 +113,6 @@ void picasso_poisson_solver(
 
     for (i=0; i<nlambda; i++) {
         if(i == 0) {
-            //stage_intcpt = 0;
             for (j = 0; j < d; j++){
                 beta1[j] = 0.0;
             }
@@ -215,9 +214,6 @@ void picasso_poisson_solver(
                         dev_local += w[i]*X[k*n+j]*X[k*n+j]*tmp;
                     }
                     dev_local = dev_local / (2*n);
-                   // if (dev_local > dev_change){
-                    //    dev_change = dev_local;
-                    //}        
                     if (dev_local > thr) {
                         terminate_loop = 0;
                         break;
@@ -294,7 +290,7 @@ void picasso_poisson_solver(
                     stage_count, lambda[i], function_value, function_value_old);
             }
 
-            if (fabs(function_value- function_value_old) < 0.001 * fabs(function_value_old)){
+            if (fabs(function_value- function_value_old) < 0.001 * fabs(dev)){
                 break;
             }
             function_value_old = function_value;

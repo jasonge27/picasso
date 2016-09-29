@@ -256,4 +256,5 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
 
     Free(res);
     Free(grad);
+    Free(S);
 }

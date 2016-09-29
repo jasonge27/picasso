@@ -21,7 +21,7 @@ picasso.gaussian <- function(X,
 
   if (is.null(type.gaussian)) {
     if (n < 500) {
-      type.gaussian = "cov"
+      type.gaussian = "covariance"
     } else {
       type.gaussian = "naive" 
     }
@@ -39,9 +39,9 @@ picasso.gaussian <- function(X,
     return(NULL)
   }
  
-  if (type.gaussian!="naive" && type.gaussian!="cov") {
+  if (type.gaussian!="naive" && type.gaussian!="covariance") {
     cat(" Wrong \"type.gaussian\" input. \n \"type.gaussian\" should 
-          be one of \"naive\" and \"cov\".\n", 
+          be one of \"naive\" and \"covariance\".\n", 
         type.gaussian," is not supported in this version. \n")
     return(NULL)
   }

@@ -142,8 +142,6 @@ void picasso_logit_solver(
         }
 
 
-
-
         int max_stage_ite = 1000;
         while (stage_count < max_stage_ite){
             stage_count++;
@@ -158,7 +156,8 @@ void picasso_logit_solver(
                 outer_loop_count++;
 
                 // to construct an iterative reweighted LS
-                p_update(p, Xb, stage_intcpt, n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+                // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+                p_update(p, Xb, stage_intcpt, n); 
                 sum_w = 0.0;
                 for (j = 0; j < n; j++){
                     w[j] = p[j] * (1 - p[j]);
@@ -199,9 +198,6 @@ void picasso_logit_solver(
                         dev_local += w[i]*X[k*n+j]*X[k*n+j]*tmp;
                     }
                     dev_local = dev_local / (2*n);
-                   // if (dev_local > dev_change){
-                    //    dev_change = dev_local;
-                    //}        
                     if (dev_local > thr) {
                         terminate_loop = 0;
                         break;
@@ -218,8 +214,7 @@ void picasso_logit_solver(
                     break;
                 }
 
-
-                if (method_flag == 1){ // for convex penalty
+                if (method_flag){ // for convex penalty
                     new_active_coord = 0;
                     for (s = 0; s < d; s++)
                         if (active_set[s] == 0){
@@ -233,7 +228,7 @@ void picasso_logit_solver(
                                 active_set[s] = 1;
                             }
                         }
-                    if (new_active_coord == 0){
+                    if (!new_active_coord){
                         break;
                     }
                 }
@@ -258,7 +253,7 @@ void picasso_logit_solver(
 
             // for convex penalty, we jump out of the loop.
             // no need to run multistage convex relaxation
-            if (method_flag == 1){
+            if (method_flag){
                 ite_lamb[i] = outer_loop_count;
                 break;  
             }
@@ -268,7 +263,8 @@ void picasso_logit_solver(
             // 2. update stage_lambda
 
             // check stopping criterion
-            p_update(p, Xb, stage_intcpt, n); // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+            // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+            p_update(p, Xb, stage_intcpt, n); 
           
             function_value = get_penalized_logistic_loss(method_flag, p, Y, Xb, 
                                                 beta1, stage_intcpt, n, d,
@@ -280,7 +276,7 @@ void picasso_logit_solver(
                     stage_count, lambda[i], function_value, function_value_old);
             }
 
-            if (fabs(function_value- function_value_old) < 0.001 * fabs(function_value_old)){
+            if (fabs(function_value- function_value_old) < 0.001 * fabs(dev_null)){
                 break;
             }
             function_value_old = function_value;
