@@ -1,13 +1,48 @@
 # PICASSO
+## Installation in R
+
+```R
+> library(devtools)
+> devtools::install_github("jasonge27/picasso")
+```
+
+
+
 ## Unleash the power of nonconvex penalty
 
-L1 penalized linear regression (LASSO) has been one of the most popular tools for feature selection in linear regression. What's the caveats for using LASSO? Unstableness in multi-colinearity and estimation bais due to the penalty term. 
+L1 penalized linear regression (LASSO) is great for feature selection in linear regression. However when you use LASSO in very noisy setting, when some columns in your data has strong colinearity or they are just useless noise, it's easy to see that LASSO actually gives biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **10.589%**.
+
+```R
+> set.seed(2016)
+> library(glmnet)
+> n <- 2000; p <- 1000; c <- 0.1
+> # n sample number, p dimension, c correlation parameter
+> X <- scale(matrix(rnorm(n*p),n,p)+c*rnorm(n)) # n is smaple number, 
+> s <- 20  # sparsity level
+> true_beta <- c(runif(s), rep(0, p-s))
+> Y <- X%*%true_beta + rnorm(n)
+> fitg<-glmnet(X,Y,family="gaussian")
+> # the minimal estimation error |\hat{beta}-beta| / |beta|
+> min(apply(abs(fitg$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
+[1] 0.10589
+```
+
+
 
 Nonconvex penalties such as SCAD and MCP are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but unfortunately there hasn't been any reliable solver for people to use so far.
 
-The PICASSO package solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimu.
+The PICASSO package solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Let's see PICASSO in action — the estimation error drops to **3.3%** from **10.57%** error produced by LASSO.
 
-## Fast and stable
+```R
+> library(picasso)
+> fitp <- picasso(X, Y, family="gaussian", method="mcp")
+> min(apply(abs(fitp$beta-true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
+[1] 0.03276
+```
+
+
+
+## Fast and Stable
 
 As a traditional LASSO solver, our package is as fast as the state-of-the-art glmnet solver. For SCAD regularzied linear/logistic regression, it can be shown that our package is much faster and more stable than the alternative ncvreg.
 
