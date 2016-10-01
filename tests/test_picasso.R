@@ -97,20 +97,25 @@ test_elnet_cov <- function(n = 300, p = 100, c = 0.5, nlambda = 100){
   
   X = scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
   cor(X[,1],X[,2])
-  true_beta = runif(20)
-  Y = X[,1:20]%*%true_beta + rnorm(n)
+  s = 20
+  true_beta = c(runif(s), rep(0, p-s)) 
+  Y = X%*%true_beta + rnorm(n)
   
   
   cat("picasso timing:\n")
-  print(system.time(fitp<-picasso(X, Y, family="gaussian", type.gaussian = 'cov',
+  print(system.time(fitp<-picasso(X, Y, family="gaussian", type.gaussian = 'covariance',
                                   lambda.min.ratio=0.05, standardize=FALSE,
                                   verbose=FALSE, prec=1e-7, nlambda=nlambda)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitp$beta))
   
     cat("glmnet timing:\n")
     print(system.time(fitg<-glmnet(X,Y,family="gaussian", type.gaussian = "covariance",
                                    lambda = fitp$lambda,
                                    standardize = FALSE, thresh = 1e-7)))
-  
+    cat("best estimation error along the path:\n")
+    print(esterror(true_beta, fitg$beta))
+    
   cat("compare obj function values:\n")
   objg = rep(0,nlambda)
   objp = rep(0,nlambda)

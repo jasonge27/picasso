@@ -83,9 +83,8 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
                 if (flag == 3)
                     tmp = soft_thresh_scad(grad[j], lambda[i], gamma);
 
-                if (fabs(tmp) > 1e-8) {
+                if (fabs(tmp) > 1e-8)
                     active_set[j] = 1;
-                }
             }
         ite1 = 0;
         flag2 = 1;
@@ -112,7 +111,8 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
                     beta_cached = beta1[j];
                     // gr = <res, X[,j]> / n
                     gr = vec_inprod(res, X+j*n, n)/n;
-                    coordinate_update(&beta1[j], gr, S[j], standardized, lambda[i], gamma, flag); 
+                    coordinate_update(&beta1[j], gr, S[j], 
+                        standardized, lambda[i], gamma, flag); 
                    
                     if (beta1[j] == beta_cached)
                         continue;
@@ -232,7 +232,7 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
         stop = clock();
         runt[i] = (double)(stop - start)/CLOCKS_PER_SEC;
         for (j = 0; j < d;  j++){
-            if (set_idx[j] != 0){
+            if ((set_idx[j] != 0) && (fabs(beta1[j])>1e-6)){
                 if (cnz == total_df){
                     *err = 1;
                     break;

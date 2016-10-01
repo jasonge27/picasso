@@ -211,7 +211,7 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
 
         
         for (j = 0; j < d;  j++){
-            if (set_idx[j] != 0){
+            if ((set_idx[j] != 0) && (fabs(beta1[j])>1e-6)){
                 if (cnz == total_df){
                     *err = 1;
                     break;

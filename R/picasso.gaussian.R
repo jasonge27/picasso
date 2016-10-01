@@ -76,9 +76,7 @@ picasso.gaussian <- function(X,
   }
 
   if (is.null(df)) {
-    df = min(n,d)
-    if (df == n) df = 1*n
-    else df = d
+    df = d
   }
   
   est = list()
