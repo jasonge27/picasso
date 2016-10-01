@@ -143,6 +143,8 @@ void picasso_logit_solver(
 
 
         int max_stage_ite = 100;
+        // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+        p_update(p, Xb, stage_intcpt, n); 
         while (stage_count < max_stage_ite){
             stage_count++;
 
@@ -155,9 +157,7 @@ void picasso_logit_solver(
             while (outer_loop_count < max_ite1) {
                 outer_loop_count++;
 
-                // to construct an iterative reweighted LS
-                // p[i] = 1/(1+exp(-intcpt-Xb[i]))
-                p_update(p, Xb, stage_intcpt, n); 
+                
                 sum_w = 0.0;
                 for (j = 0; j < n; j++){
                     w[j] = p[j] * (1 - p[j]);
@@ -214,16 +214,20 @@ void picasso_logit_solver(
                     break;
                 }
 
-                if (method_flag){ // for convex penalty
+                // to construct an iterative reweighted LS
+                // p[i] = 1/(1+exp(-intcpt-Xb[i]))
+                p_update(p, Xb, stage_intcpt, n); 
+
+                if (method_flag == 1){ // for convex penalty
                     new_active_coord = 0;
                     for (s = 0; s < d; s++)
                         if (active_set[s] == 0){
                             gr[s] = 0.0;
                             for (j = 0; j < n; j++){
-                                gr[s] += r[s] * X[s*n+j];
+                                gr[s] += (Y[j] - p[j]) * X[s*n+j];
                             }
-                            gr[s] = fabs(gr[s]);
-                            if (gr[s] > lambda[i]){
+                            gr[s] = fabs(gr[s])/n;
+                            if (gr[s] > stage_lambda[s]){
                                 new_active_coord = 1;
                                 active_set[s] = 1;
                             }
@@ -233,12 +237,13 @@ void picasso_logit_solver(
                     }
                 }
                 
-                // only for R
-                if (verbose){
-                    Rprintf("--outer loop: %d, dev_null:%f\n", 
-                        outer_loop_count, dev_null);
-                } 
+               
             }
+             // only for R
+            if (verbose){
+                Rprintf("--outer loop: %d, dev_null:%f\n", 
+                        outer_loop_count, dev_null);
+            } 
 
             // for lambda = lambda[i]
             if (stage_count == 1){
