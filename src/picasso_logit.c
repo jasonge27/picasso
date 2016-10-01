@@ -298,9 +298,10 @@ void picasso_logit_solver(
                     stage_count, lambda[i], function_value, function_value_old);
             }
 
-            if (fabs(function_value- function_value_old) < 0.001 * fabs(function_value_old)){
+            if (fabs(function_value- function_value_old) < 0.0001 * fabs(function_value_old)){
                 break;
             }
+       
             function_value_old = function_value;
 
             // update lambdas using the multistage convex relaxation scheme
