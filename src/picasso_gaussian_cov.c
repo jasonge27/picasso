@@ -155,7 +155,7 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
                     coordinate_update(&beta1[j], gr[j], S[j], 
                                 standardized, lambda[i], gamma, flag); 
                            
-                    if (fabs(beta1[j]-beta_cached)< 1e-6)
+                    if (fabs(beta1[j]-beta_cached)< 1e-8)
                         continue;
                                 
                     tmp = beta1[j] - beta_cached;

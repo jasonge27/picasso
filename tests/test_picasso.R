@@ -90,7 +90,7 @@ test_elnet_naive <- function(n = 10000, p = 5000, c = 0.5, nlambda = 200){
   print(mean((objp-objg)/abs(objg)))
 }
 
-test_elnet_cov <- function(n = 300, p = 100, c = 0.5, nlambda = 100){
+test_elnet_cov <- function(n = 300, p = 100, c = 0.5, nlambda = 100, ratio = 0.01){
   library(picasso)
   library(glmnet)
   set.seed(111)
@@ -104,17 +104,17 @@ test_elnet_cov <- function(n = 300, p = 100, c = 0.5, nlambda = 100){
   
   cat("picasso timing:\n")
   print(system.time(fitp<-picasso(X, Y, family="gaussian", type.gaussian = 'covariance',
-                                  lambda.min.ratio=0.05, standardize=FALSE,
+                                  lambda.min.ratio=ratio, standardize=FALSE,
                                   verbose=FALSE, prec=1e-7, nlambda=nlambda)))
   cat("best estimation error along the path:\n")
   print(esterror(true_beta, fitp$beta))
   
-    cat("glmnet timing:\n")
-    print(system.time(fitg<-glmnet(X,Y,family="gaussian", type.gaussian = "covariance",
+  cat("glmnet timing:\n")
+  print(system.time(fitg<-glmnet(X,Y,family="gaussian", type.gaussian = "covariance",
                                    lambda = fitp$lambda,
                                    standardize = FALSE, thresh = 1e-7)))
-    cat("best estimation error along the path:\n")
-    print(esterror(true_beta, fitg$beta))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitg$beta))
     
   cat("compare obj function values:\n")
   objg = rep(0,nlambda)
@@ -129,20 +129,34 @@ test_elnet_cov <- function(n = 300, p = 100, c = 0.5, nlambda = 100){
   print(mean((objp-objg)/abs(objg)))
 }
 
-test_lognet <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100){
+test_lognet <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, ratio=0.01){
   library(glmnet)
   library(picasso)
+  library(ncvreg)
   set.seed(111)
   
   X=scale(matrix(rnorm(n*p),n,p)+ c*rnorm(n))/sqrt(n-1)*sqrt(n)
-  Y=X[,1:20]%*%runif(20)+rnorm(n)>.5
+  s = 20
+  true_beta = c(runif(s), rep(0, p-s)) 
+  Y=X%*%true_beta+rnorm(n)>.5
+  
+  cat("picasso timing:\n")
+  print(system.time(fitp<-picasso(X,Y,family="binomial",
+                                  lambda.min.ratio=ratio,standardize=FALSE,verbose=FALSE,prec=1e-7,nlambda=nlambda)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitp$beta))
   
   cat("glmnet timing:\n")
   print(system.time(fitg<-glmnet(X,Y,family="binomial",
-                                 lambda.min.ratio=0.05,standardize=FALSE,thresh=1e-7,nlambda=nlambda)))
-  cat("picasso timing:\n")
-  print(system.time(fitp<-picasso(X,Y,family="binomial",
-                                  lambda.min.ratio=0.05,standardize=FALSE,verbose=FALSE,prec=1e-7,nlambda=nlambda)))
+                                 lambda=fitp$lambda, standardize=FALSE,thresh=1e-7)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitg$beta))
+  
+  cat('ncvreg timing:\n')
+  print(system.time(fitncv<-ncvreg(X,Y,family="binomial",
+                                 lambda=fitp$lambda, standardize=FALSE,thresh=1e-7)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitp$beta[2:(p+1),])) 
   
   cat("---------------------------------------\n")
   cat("comparisons of objective fuction values\n")
@@ -220,7 +234,7 @@ test_elnet_cov_nonlinear <- function(n = 400, p = 1000, c = 1.0, nlambda = 100, 
                                        prec=1e-7,nlambda=nlambda)))
 }
 
-test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, verb=FALSE){
+test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, ratio = 0.01, verb=FALSE){
   library(picasso)
   set.seed(111)
   
@@ -231,7 +245,7 @@ test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, v
   
   cat("picasso timing for mcp penalty:\n")
   print(system.time(fitp.mcp<-picasso(X,Y,family="binomial", method="mcp",
-                                  lambda.min.ratio=0.05,prec=1e-7, gamma =3,
+                                  lambda.min.ratio=ratio,prec=1e-7, gamma =3,
                                   nlambda=nlambda)))
   cat("best estimation error along the path:\n")
   print(esterror(true_beta, fitp.mcp$beta))
@@ -245,7 +259,7 @@ test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, v
   
   cat("picasso timing for scad penalty:\n")
   print(system.time(fitp.scad<-picasso(X,Y,family="binomial", method="scad",
-                                  lambda.min.ratio=0.05, gamma = 3,
+                                  lambda.min.ratio=ratio, gamma = 3,
                                   prec=1e-7,nlambda=nlambda)))
   cat("best estimation error along the path:\n")
   print(esterror(true_beta, fitp.scad$beta))
