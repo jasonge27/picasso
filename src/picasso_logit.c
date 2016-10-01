@@ -163,7 +163,7 @@ void picasso_logit_solver(
         }
 
 
-        int max_stage_ite = 5;
+        int max_stage_ite = 3;
         // p[i] = 1/(1+exp(-intcpt-Xb[i]))
         p_update(p, Xb, stage_intcpt, n); 
         while (stage_count < max_stage_ite){
