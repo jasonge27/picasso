@@ -106,7 +106,7 @@ double get_penalized_logistic_loss(int method_flag, double *p, double * Y, doubl
     }
     for (i = 0; i<n; i++)
     if (p[i] > 1e-8) {
-        v += log(p[i]);
+        v += (log(p[i]) - intcpt - Xb[i]);
     }
 
     v = v/n;
