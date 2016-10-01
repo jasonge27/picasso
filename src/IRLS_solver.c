@@ -1,33 +1,6 @@
 #include "mathutils.h"
 #include "IRLS_solver.h"
 
-void calc_IRLS_coef(const double *  w, const double *  X, 
-     double *  r,  double *  beta, 
-     int k,  int n, 
-    double * g, double * a){
-    (*g) = 0.0;
-    (*a) = 0.0;
-
-    int i;
-    double tmp;
-    for (i = 0; i < n; i++){
-        tmp = w[i]*X[k*n+i]*X[k*n+i];
-        (*g) += tmp*beta[k] + r[i]*X[k*n+i];
-        (*a) += tmp;
-    }
-    (*g) = (*g) / (2*n);
-    (*a) = (*a) / (2*n);
-}
-
-void update_residual(double * r, const double *  w, 
-    const double *  X, const double delta, 
-    const int k, const int n){
-    int i;
-    for (i = 0; i < n; i++){
-        r[i] = r[i] - w[i] * X[k*n+i] * delta; // delta = beta_new(k) - beta_old(k)
-    }
-}
-
 void solve_weighted_lasso_with_naive_update(const double* X, 
     const double* w, // w = p * (1-p)
     const double* lambda, 
@@ -94,9 +67,7 @@ void solve_weighted_lasso_with_naive_update(const double* X,
     double sum_r; 
     double dev_thr = prec * dev_null;
     while (loopcnt < max_ite) {  
-        if (verbose){
-            Rprintf("---innner loop %d\n", loopcnt);
-        }
+        
         
         loopcnt ++;
         terminate_loop = 1;
@@ -153,6 +124,9 @@ void solve_weighted_lasso_with_naive_update(const double* X,
             break;
         }           
     }
+    if (verbose){
+        Rprintf("---innner loop %d\n", loopcnt);
+    }
 
     *inner_loop_count = loopcnt;
        
@@ -160,4 +134,32 @@ void solve_weighted_lasso_with_naive_update(const double* X,
     stop = clock();
     *runt = (double)(stop - start)/CLOCKS_PER_SEC;
     *act_size = size_a;
+}
+
+
+void calc_IRLS_coef(const double *  w, const double *  X, 
+     double *  r,  double *  beta, 
+     int k,  int n, 
+    double * g, double * a){
+    (*g) = 0.0;
+    (*a) = 0.0;
+
+    int i;
+    double tmp;
+    for (i = 0; i < n; i++){
+        tmp = w[i]*X[k*n+i]*X[k*n+i];
+        (*g) += tmp*beta[k] + r[i]*X[k*n+i];
+        (*a) += tmp;
+    }
+    (*g) = (*g) / (2*n);
+    (*a) = (*a) / (2*n);
+}
+
+void update_residual(double * r, const double *  w, 
+    const double *  X, const double delta, 
+    const int k, const int n){
+    int i;
+    for (i = 0; i < n; i++){
+        r[i] = r[i] - w[i] * X[k*n+i] * delta; // delta = beta_new(k) - beta_old(k)
+    }
 }
