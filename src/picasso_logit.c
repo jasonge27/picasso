@@ -142,7 +142,7 @@ void picasso_logit_solver(
         }
 
 
-        int max_stage_ite = 1000;
+        int max_stage_ite = 100;
         while (stage_count < max_stage_ite){
             stage_count++;
 
@@ -253,7 +253,7 @@ void picasso_logit_solver(
 
             // for convex penalty, we jump out of the loop.
             // no need to run multistage convex relaxation
-            if (method_flag){
+            if (method_flag == 1){
                 ite_lamb[i] = outer_loop_count;
                 break;  
             }
@@ -276,7 +276,7 @@ void picasso_logit_solver(
                     stage_count, lambda[i], function_value, function_value_old);
             }
 
-            if (fabs(function_value- function_value_old) < 0.001 * fabs(dev_null)){
+            if (fabs(function_value- function_value_old) < 0.001 * fabs(function_value_old)){
                 break;
             }
             function_value_old = function_value;
