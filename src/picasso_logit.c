@@ -163,7 +163,7 @@ void picasso_logit_solver(
         }
 
 
-        int max_stage_ite = 100;
+        int max_stage_ite = 5;
         // p[i] = 1/(1+exp(-intcpt-Xb[i]))
         p_update(p, Xb, stage_intcpt, n); 
         while (stage_count < max_stage_ite){
@@ -298,10 +298,10 @@ void picasso_logit_solver(
                     stage_count, lambda[i], function_value, function_value_old);
             }
 
-            if (fabs(function_value- function_value_old) < 0.0001 * fabs(function_value_old)){
+            if (fabs(function_value- function_value_old) < 0.01 * fabs(function_value_old)){
                 break;
             }
-       
+
             function_value_old = function_value;
 
             // update lambdas using the multistage convex relaxation scheme
