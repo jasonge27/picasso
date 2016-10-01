@@ -47,7 +47,6 @@ void picasso_logit_solver(
     double *p = (double *) Calloc(n, double);
 
     double *Xb = (double *) Calloc(n, double);
-    double *Xb_previous_lambda = (double *) Calloc(n, double);
 
     double *w = (double *) Calloc(n, double);
     double *r = (double *) Calloc(n, double);
@@ -74,7 +73,14 @@ void picasso_logit_solver(
 
     int stage_count;
     double * stage_lambda = (double *) Calloc(d, double);
-    double * beta_previous_lambda = (double *) Calloc(d, double);
+
+    // cached intermediate vars on L1 path  
+    double * beta_L1 = (double *) Calloc(d, double);
+    int * active_set_L1 = (int *) Calloc(d, int);
+    double * Xb_L1 = (double *) Calloc(n, double);
+    double * p_L1 = (double *) Calloc(n, double);
+    double * gr_L1 = (double *) Calloc(d, double);
+    double intcpt_L1;
 
     int * active_set = (int *) Calloc(d, int);
     double * gr = (double *)Calloc(d, double);
@@ -91,7 +97,7 @@ void picasso_logit_solver(
     double stage_intcpt;
     double stage_intcpt_old;
     double intcpt_old; 
-    double intcpt_previous_lambda;
+    
     double sum_w;
     double function_value, function_value_old;
     int new_active_coord;
@@ -109,6 +115,20 @@ void picasso_logit_solver(
                 Xb[j] = 0.0;
             }   
         } 
+
+        if (i > 0){
+            for (j = 0; j < d; j++){
+                active_set[j] = active_set_L1[j];
+                gr[j] = gr_L1[j];
+                beta1[j] = beta_L1[j];
+            }
+            for (j = 0; j < n; j++){
+                Xb[j] = Xb_L1[j];
+                p[j] = p_L1[j];
+            }
+            stage_intcpt = intcpt_L1;
+        }
+
 
         if (i > 0){
             for (j = 0; j < d; j++)
@@ -130,8 +150,9 @@ void picasso_logit_solver(
         function_value_old = 0.0;
         if(method_flag != 1){   // nonconvex penalty
             for (j = 0; j < d; j++)
-                stage_lambda[j] = lambda[i] * 
-                            penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma); 
+           //     stage_lambda[j] = lambda[i] * 
+            //                penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma); 
+                stage_lambda[j] = lambda[i];
 
             function_value_old = get_penalized_logistic_loss(method_flag, p, Y, 
                                                 Xb, beta1, stage_intcpt, 
@@ -241,12 +262,15 @@ void picasso_logit_solver(
             // for lambda = lambda[i]
             if (stage_count == 1){
                 for (j = 0; j < d; j++){
-                    beta_previous_lambda[j] = beta1[j];
+                    beta_L1[j] = beta1[j];
+                    active_set_L1[j] = active_set[j];
+                    gr_L1[j] = gr[j];
                 }
                 for (j = 0; j < n; j++){
-                    Xb_previous_lambda[j] = Xb[j];
+                    Xb_L1[j] = Xb[j];
+                    p_L1[j] = p[j];
                 }
-                intcpt_previous_lambda = stage_intcpt;
+                intcpt_L1 = stage_intcpt;
             }
 
             // for convex penalty, we jump out of the loop.
@@ -299,4 +323,9 @@ void picasso_logit_solver(
     Free(Xb);
     Free(w);
     Free(r);
+    Free(beta_L1);
+    Free(active_set_L1);
+    Free(Xb_L1);
+    Free(p_L1);
+    Free(gr_L1);
 }
