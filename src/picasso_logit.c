@@ -157,7 +157,7 @@ void picasso_logit_solver(
             while (outer_loop_count < max_ite1) {
                 outer_loop_count++;
 
-                
+                // to construct the coefficients for iterative reweighted LS
                 sum_w = 0.0;
                 for (j = 0; j < n; j++){
                     w[j] = p[j] * (1 - p[j]);
@@ -213,31 +213,24 @@ void picasso_logit_solver(
                 if (terminate_loop){
                     break;
                 }
-
-                // to construct an iterative reweighted LS
+                
                 // p[i] = 1/(1+exp(-intcpt-Xb[i]))
                 p_update(p, Xb, stage_intcpt, n); 
-
-                if (method_flag == 1){ // for convex penalty
-                    new_active_coord = 0;
-                    for (s = 0; s < d; s++)
-                        if (active_set[s] == 0){
-                            gr[s] = 0.0;
-                            for (j = 0; j < n; j++){
-                                gr[s] += (Y[j] - p[j]) * X[s*n+j];
-                            }
-                            gr[s] = fabs(gr[s])/n;
-                            if (gr[s] > stage_lambda[s]){
-                                new_active_coord = 1;
-                                active_set[s] = 1;
-                            }
+                new_active_coord = 0;
+                for (s = 0; s < d; s++)
+                    if (active_set[s] == 0){
+                        gr[s] = 0.0;
+                        for (j = 0; j < n; j++)
+                            gr[s] += (Y[j] - p[j]) * X[s*n+j];
+                        gr[s] = fabs(gr[s])/n;
+                        if (gr[s] > stage_lambda[s]){
+                            new_active_coord = 1;
+                            active_set[s] = 1;
                         }
-                    if (!new_active_coord){
-                        break;
                     }
-                }
-                
-               
+                if (!new_active_coord){
+                    break;
+                } 
             }
              // only for R
             if (verbose){
