@@ -85,7 +85,7 @@ void picasso_logit_solver(
         for (j = 0; j < n; j++){
             gr[i] += X[i*n+j] * (Y[j] - q0);
         }
-        gr[i] = fabs(gr[i]);
+        gr[i] = fabs(gr[i])/n;
     }
   
     double stage_intcpt;
