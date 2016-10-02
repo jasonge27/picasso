@@ -75,7 +75,7 @@ test_lognet(n=2000, p=1000, c=1.0)
 
 As glmnet does not provide nonconvex penalty solver, we will compare with ncvreg for run-time and best estimation error along the regularization path.
 
-For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly deteriorates. Nonconvex penalty can be very helpful when some columns of the data are highly correlated.
+For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly deteriorates. Nonconvex penalty can be very helpful when some columns of the data are highly correlated. 
 
 ```R
 source('tests/test_picasso.R')
@@ -84,7 +84,13 @@ test_lognet_nonlinear(n=3000, p =3000, c=0.5)
 test_lognet_nonlinear(n=3000, p =3000, c=1.0)
 ```
 
-Timing for SCAD regularized logistic regression.
+Timing for SCAD regularized logistic regression. Estimation error is calculated by finding the best approximation to the true regression coefficient across all regularization parameter.
+
+```R
+min(apply(abs(fitted.model$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
+```
+
+
 
 |                                        |     c = 0.1     |     c = 0.5     |       c = 1.0        |
 | :------------------------------------: | :-------------: | :-------------: | :------------------: |
