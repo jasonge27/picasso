@@ -46,9 +46,9 @@ Let's see PICASSO in action — the estimation error drops to **3.4%** using SCA
 
 ## Fast and Stable
 
-As a traditional LASSO solver, our package is as fast as the state-of-the-art glmnet solver. For SCAD regularzied linear/logistic regression, it can be shown that our package is much faster and more stable than the alternative ncvreg. (The experiments can also be done with MCP penalty.)
+As a traditional LASSO solver, our package achieves state-of-the-art performance. For SCAD regularzied linear/logistic regression, it can be shown that our package is much faster and more stable than the alternative ncvreg. (The experiments can also be done with MCP penalty.)
 
-For the experiments, we use sample number n = 2000 and sample dimension p = 1000. The parameter c is used to control the column-wise correlation of the desgin matrix X as before.
+For the experiments, sample number is denoted by n and sample dimension is denoted by p. The parameter c is used to control the column-wise correlation of the desgin matrix X as before.
 
 ### State-of-the-art LASSO Solver
 
