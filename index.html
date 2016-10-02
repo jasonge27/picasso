@@ -60,46 +60,70 @@
 <h2>
 <a id="fast-and-stable" class="anchor" href="#fast-and-stable" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fast and Stable</h2>
 
-<p>As a traditional LASSO solver, our package is as fast as the state-of-the-art glmnet solver. For SCAD regularzied linear/logistic regression, it can be shown that our package is much faster and more stable than the alternative ncvreg. (The experiments can also be done with MCP penalty.)</p>
+<p>As a traditional LASSO solver, our package achieves state-of-the-art performance. For SCAD regularzied linear/logistic regression, it can be shown that our package is much faster and more stable than the alternative ncvreg. (The experiments can also be done with MCP penalty.)</p>
 
-<p>For the experiments, we use sample number n = 2000 and sample dimension p = 1000. The parameter c is used to control the column-wise correlation of the desgin matrix X as before.</p>
+<p>For the experiments, sample number is denoted by n and sample dimension is denoted by p. The parameter c is used to control the column-wise correlation of the desgin matrix X as before.</p>
 
-<p>Timing for L1 regularized linear regression.</p>
+<h3>
+<a id="state-of-the-art-lasso-solver" class="anchor" href="#state-of-the-art-lasso-solver" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>State-of-the-art LASSO Solver</h3>
+
+<p>We're as fast as glmnet for L1 regularized linear/logistic regression. Here we benchmark logistic regression as an example. Parameter c is used to add correlation between columns of X to mimic multi-colinearity. PICASSO is the best solver when we have multi-colinearity in the data.</p>
+
+<div class="highlight highlight-source-r"><pre>source(<span class="pl-s"><span class="pl-pds">"</span>tests/test_picasso.R<span class="pl-pds">"</span></span>)
+test_lognet(<span class="pl-v">n</span><span class="pl-k">=</span><span class="pl-c1">2000</span>, <span class="pl-v">p</span><span class="pl-k">=</span><span class="pl-c1">1000</span>, <span class="pl-v">c</span><span class="pl-k">=</span><span class="pl-c1">0.1</span>)
+test_lognet(<span class="pl-v">n</span><span class="pl-k">=</span><span class="pl-c1">2000</span>, <span class="pl-v">p</span><span class="pl-k">=</span><span class="pl-c1">1000</span>, <span class="pl-v">c</span><span class="pl-k">=</span><span class="pl-c1">0.5</span>)
+test_lognet(<span class="pl-v">n</span><span class="pl-k">=</span><span class="pl-c1">2000</span>, <span class="pl-v">p</span><span class="pl-k">=</span><span class="pl-c1">1000</span>, <span class="pl-v">c</span><span class="pl-k">=</span><span class="pl-c1">1.0</span>)</pre></div>
 
 <table>
 <thead>
 <tr>
 <th align="center"></th>
-<th align="center">c = 0.1</th>
-<th align="center">c = 0.5</th>
-<th align="center">c = 1.0</th>
+<th align="center">c=0.1</th>
+<th align="center">c=0.5</th>
+<th align="center">c= 1.0</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td align="center">PICASSO</td>
-<td align="center">0.296(s)</td>
-<td align="center">0.365(s)</td>
-<td align="center">0.575(s)</td>
+<td align="center">1.526(s)</td>
+<td align="center">0.721(s)</td>
+<td align="center">0.718(s)</td>
 </tr>
 <tr>
 <td align="center">glmnet</td>
-<td align="center">0.276(s)</td>
-<td align="center">0.297(s)</td>
-<td align="center">0.445(s)</td>
+<td align="center">1.494(s)</td>
+<td align="center">0.845(s)</td>
+<td align="center">1.743(s)</td>
 </tr>
 <tr>
 <td align="center">ncvreg</td>
-<td align="center">0.318(s)</td>
-<td align="center">1.818(s)</td>
-<td align="center">9.429(s) [*]</td>
+<td align="center">10.564(s) [*]</td>
+<td align="center">7.825(s) [#]</td>
+<td align="center">5.458(s) [#]</td>
 </tr>
 </tbody>
 </table>
 
 <p>'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.</p>
 
-<p>Timing for SCAD regularized linear regression.</p>
+<p>'[#]': Package exited with error messages.</p>
+
+<h3>
+<a id="nonconvex-penalty" class="anchor" href="#nonconvex-penalty" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Nonconvex Penalty</h3>
+
+<p>As glmnet does not provide nonconvex penalty solver, we will compare with ncvreg for run-time and best estimation error along the regularization path.</p>
+
+<p>For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly deteriorates. Nonconvex penalty can be very helpful when some columns of the data are highly correlated. </p>
+
+<div class="highlight highlight-source-r"><pre>source(<span class="pl-s"><span class="pl-pds">'</span>tests/test_picasso.R<span class="pl-pds">'</span></span>)
+test_lognet_nonlinear(<span class="pl-v">n</span><span class="pl-k">=</span><span class="pl-c1">3000</span>, <span class="pl-v">p</span> <span class="pl-k">=</span><span class="pl-c1">3000</span>, <span class="pl-v">c</span><span class="pl-k">=</span><span class="pl-c1">0.1</span>)
+test_lognet_nonlinear(<span class="pl-v">n</span><span class="pl-k">=</span><span class="pl-c1">3000</span>, <span class="pl-v">p</span> <span class="pl-k">=</span><span class="pl-c1">3000</span>, <span class="pl-v">c</span><span class="pl-k">=</span><span class="pl-c1">0.5</span>)
+test_lognet_nonlinear(<span class="pl-v">n</span><span class="pl-k">=</span><span class="pl-c1">3000</span>, <span class="pl-v">p</span> <span class="pl-k">=</span><span class="pl-c1">3000</span>, <span class="pl-v">c</span><span class="pl-k">=</span><span class="pl-c1">1.0</span>)</pre></div>
+
+<p>Timing for SCAD regularized logistic regression. Estimation error is calculated by finding the best approximation to the true regression coefficient across all regularization parameter.</p>
+
+<div class="highlight highlight-source-r"><pre>min(apply(abs(<span class="pl-smi">fitted.model</span><span class="pl-k">$</span><span class="pl-smi">beta</span> <span class="pl-k">-</span> <span class="pl-smi">true_beta</span>), <span class="pl-v">MARGIN</span><span class="pl-k">=</span><span class="pl-c1">2</span>, <span class="pl-v">FUN</span><span class="pl-k">=</span><span class="pl-smi">sum</span>))<span class="pl-k">/</span>sum(abs(<span class="pl-smi">true_beta</span>))</pre></div>
 
 <table>
 <thead>
@@ -112,50 +136,29 @@
 </thead>
 <tbody>
 <tr>
-<td align="center">PICASSO</td>
-<td align="center">0.446(s)</td>
-<td align="center">0.445(s)</td>
-<td align="center">0.712(s)</td>
+<td align="center">PICASSO (time/error)</td>
+<td align="center">8.727(s) / 4.6%</td>
+<td align="center">5.247(s) / 2.6%</td>
+<td align="center">6.062(s) / 11.2%</td>
 </tr>
 <tr>
-<td align="center">ncvreg</td>
-<td align="center">0.374(s)</td>
-<td align="center">0.405(s)</td>
-<td align="center">2.177(s) [*]</td>
+<td align="center">ncvreg (time/error)</td>
+<td align="center">7.461(s) / 5.6%</td>
+<td align="center">7.056(s) / 6.0%</td>
+<td align="center">51.85(s) / 35.3% [*]</td>
+</tr>
+<tr>
+<td align="center">Estimation Error using LASSO in glmnet</td>
+<td align="center">2.0%</td>
+<td align="center">14.1%</td>
+<td align="center">28.7%</td>
 </tr>
 </tbody>
 </table>
 
 <p>'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.</p>
 
-<p>Timing for SCAD regularized logistic regression</p>
-
-<table>
-<thead>
-<tr>
-<th align="center"></th>
-<th align="center">c = 0.1</th>
-<th align="center">c = 0.5</th>
-<th align="center">c = 1.0</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">PICASSO</td>
-<td align="center">1.016(s)</td>
-<td align="center">0.528(s)</td>
-<td align="center">0.603</td>
-</tr>
-<tr>
-<td align="center">ncvreg</td>
-<td align="center">3.104(s) [*]</td>
-<td align="center">2.778(s)</td>
-<td align="center">5.862</td>
-</tr>
-</tbody>
-</table>
-
-<p>'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.</p>
+<p>The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.5-2. The glmnet version is 2.0-5.</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/jasonge27/picasso">Picasso: Unleash The Power of Nonconvex Penalty</a> is maintained by <a href="https://github.com/jasonge27">jasonge27</a>.</span>
