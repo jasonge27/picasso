@@ -234,7 +234,7 @@ test_elnet_cov_nonlinear <- function(n = 400, p = 1000, c = 1.0, nlambda = 100, 
                                        prec=1e-7,nlambda=nlambda)))
 }
 
-test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, ratio = 0.01, verb=FALSE){
+test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, ratio = 0.05, verb=FALSE){
   library(picasso)
   set.seed(111)
   

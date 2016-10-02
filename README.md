@@ -50,31 +50,48 @@ As a traditional LASSO solver, our package is as fast as the state-of-the-art gl
 
 For the experiments, we use sample number n = 2000 and sample dimension p = 1000. The parameter c is used to control the column-wise correlation of the desgin matrix X as before.
 
-Timing for L1 regularized linear regression.
+### State-of-the-art LASSO Solver
 
-|         |  c=0.1   |  c=0.5   |    c= 1.0    |
-| :-----: | :------: | :------: | :----------: |
-| PICASSO | 0.296(s) | 0.365(s) |   0.575(s)   |
-| glmnet  | 0.276(s) | 0.297(s) |   0.445(s)   |
-| ncvreg  | 0.318(s) | 1.818(s) | 9.429(s) [*] |
+We're as fast as glmnet for L1 regularized linear/logistic regression. Here we benchmark logistic regression as an example. Parameter c is used to add correlation between columns of X to mimic multi-colinearity. PICASSO is the best solver when we have multi-colinearity in the data.
 
-'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
+```R
+source("tests/test_picasso.R")
+test_lognet(n=2000, p=1000, c=0.1)
+test_lognet(n=2000, p=1000, c=0.5)
+test_lognet(n=2000, p=1000, c=1.0)
+```
 
-Timing for SCAD regularized linear regression.
-
-|         | c = 0.1  | c = 0.5  |   c = 1.0    |
-| :-----: | :------: | :------: | :----------: |
-| PICASSO | 0.446(s) | 0.445(s) |   0.712(s)   |
-| ncvreg  | 0.374(s) | 0.405(s) | 2.177(s) [*] |
-
-'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
-
-Timing for SCAD regularized logistic regression
-
-|         |   c = 0.1    | c = 0.5  | c = 1.0 |
-| :-----: | :----------: | :------: | :-----: |
-| PICASSO |   1.016(s)   | 0.528(s) |  0.603  |
-| ncvreg  | 3.104(s) [*] | 2.778(s) |  5.862  |
+|         |     c=0.1     |    c=0.5     |    c= 1.0    |
+| :-----: | :-----------: | :----------: | :----------: |
+| PICASSO |   1.526(s)    |   0.721(s)   |   0.718(s)   |
+| glmnet  |   1.494(s)    |   0.845(s)   |   1.743(s)   |
+| ncvreg  | 10.564(s) [*] | 7.825(s) [#] | 5.458(s) [#] |
 
 '[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
 
+'[#]': Package exited with error messages.
+
+### Nonconvex Penalty
+
+As glmnet does not provide nonconvex penalty solver, we will compare with ncvreg for run-time and best estimation error along the regularization path.
+
+For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly deteriorates. Nonconvex penalty can be very helpful when some columns of the data are highly correlated.
+
+```R
+source('tests/test_picasso.R')
+test_lognet_nonlinear(n=3000, p =3000, c=0.1)
+test_lognet_nonlinear(n=3000, p =3000, c=0.5)
+test_lognet_nonlinear(n=3000, p =3000, c=1.0)
+```
+
+Timing for SCAD regularized logistic regression.
+
+|                                        |     c = 0.1     |     c = 0.5     |       c = 1.0        |
+| :------------------------------------: | :-------------: | :-------------: | :------------------: |
+|          PICASSO (time/error)          | 8.727(s) / 4.6% | 5.247(s) / 2.6% |   6.062(s) / 11.2%   |
+|          ncvreg (time/error)           | 7.461(s) / 5.6% | 7.056(s) / 6.0% | 51.85(s) / 35.3% [*] |
+| Estimation Error using LASSO in glmnet |      2.0%       |      14.1%      |        28.7%         |
+
+'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
+
+The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.5-2. The glmnet version is 2.0-5.
