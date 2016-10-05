@@ -10,7 +10,7 @@
 
 ## Unleash the power of nonconvex penalty
 
-L1 penalized linear regression (LASSO) is great for feature selection in linear regression. However when you use LASSO in very noisy setting, when some columns in your data has strong colinearity or they are just useless noise, it's easy to see that LASSO actually gives biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **10.589%**.
+L1 penalized linear regression (LASSO) is great for feature selection in linear regression. However when you use LASSO in very noisy setting, especially when some columns in your data has strong colinearity, it's easy to see that LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **10.589%**.
 
 ```R
 > set.seed(2016)
@@ -29,7 +29,7 @@ L1 penalized linear regression (LASSO) is great for feature selection in linear 
 
 
 
-Nonconvex penalties such as SCAD and MCP are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum. 
+Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum. 
 
 The PICASSO package solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). 
 
@@ -75,7 +75,7 @@ test_lognet(n=2000, p=1000, c=1.0)
 
 As glmnet does not provide nonconvex penalty solver, we will compare with ncvreg for run-time and best estimation error along the regularization path.
 
-For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly deteriorates. Nonconvex penalty can be very helpful when some columns of the data are highly correlated. 
+For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly increases. Nonconvex penalty can be very helpful when some columns of the data are highly correlated. 
 
 ```R
 source('tests/test_picasso.R')
@@ -101,3 +101,11 @@ min(apply(abs(fitted.model$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_b
 '[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
 
 The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.5-2. The glmnet version is 2.0-5.
+
+
+
+References
+
+[1] Jianqing Fan and Runze Li, Variable Selection via Nonconcave Penalized Likelihood and its Oracle Properties, 2001
+
+[2] Cun-Hui Zhang, Nearly Unbiased Variable Selection Under Minimax Concave Penalty, 2010
