@@ -129,8 +129,8 @@ properties. \emph{Journal of the American Statistical Association}, 2001.\cr
 ################################################################
 ## Sparse linear regression
 ## Generate the design matrix and regression coefficient vector
-n = 1000 # sample number 
-d = 800 # sample dimension
+n = 100 # sample number 
+d = 80 # sample dimension
 c = 0.5 # correlation parameter
 s = 20  # support size of coefficient
 set.seed(2016)
@@ -175,8 +175,8 @@ plot(fitted.scad)
 ################################################################
 ## Sparse logistic regression
 ## Generate the design matrix and regression coefficient vector
-n <- 1000  # sample number 
-d <- 800   # sample dimension
+n <- 100  # sample number 
+d <- 80   # sample dimension
 c <- 0.5   # parameter controlling the correlation between columns of X
 s <- 20    # support size of coefficient
 set.seed(2016)
@@ -218,8 +218,8 @@ param.l1 = fitted.l1$p
 ################################################################
 ## Sparse poisson regression
 ## Generate the design matrix and regression coefficient vector
-n <- 1000  # sample number 
-d <- 800   # sample dimension
+n <- 100  # sample number 
+d <- 80   # sample dimension
 c <- 0.5   # parameter controlling the correlation between columns of X
 s <- 20    # support size of coefficient
 set.seed(2016)
