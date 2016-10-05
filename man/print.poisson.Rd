@@ -1,5 +1,5 @@
-\name{print.scio}
-\alias{print.scio}
+\name{print.poisson}
+\alias{print.poisson}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Print Function for an object with S3 class \code{poisson}

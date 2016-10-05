@@ -46,30 +46,6 @@ Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
 Maintainer: Jason Ge <jiange@princeton.edu>
 }
 
-\examples{
-## generate data
-set.seed(123)
-n = 100
-d = 200
-d1 = 10
-rho0 = 0.3
-lambda = c(3:1)*sqrt(log(d)/n)
-Sigma = matrix(0,nrow=d,ncol=d)
-Sigma[1:d1,1:d1] = rho0
-diag(Sigma) = 1
-mu = rep(0,d)
-X = mvrnorm(n=2*n,mu=mu,Sigma=Sigma)
-X.fit = X[1:n,]
-X.pred = X[(n+1):(2*n),]
-beta = c(rep(sqrt(1/3),3),rep(0,d-3))
-Y.fit = exp(X.fit\%*\%beta)/(1+exp(X.fit\%*\%beta))
-
-## Regression with "l1".
-out=picasso(X=X.fit,Y=Y.fit,lambda=lambda,family="binomial")
-
-## Display results
-p=predict(out,X.pred)
-}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 

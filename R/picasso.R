@@ -6,11 +6,11 @@ picasso <- function(X,
                     lambda.min = NULL,
                     family = "gaussian",
                     method = "l1",
-                    type.gaussian = NULL,
+                    type.gaussian = "naive",
                     gamma = 3,
                     df = NULL,
                     standardize = TRUE,
-                    prec = 1e-4,
+                    prec = 1e-7,
                     max.ite = 1e3,
                     verbose = FALSE)
 {

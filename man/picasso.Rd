@@ -13,7 +13,7 @@ The function "picasso" implements the user interface.
 picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
         lambda.min = NULL, family = "gaussian", method="l1", 
         type.gaussian = "naive", gamma = 3, df = NULL, standardize = TRUE, 
-        prec = 1e-7, verbose = FALSE)
+        prec = 1e-7, max.ite = 1000,  verbose = FALSE)
 }
 
 \arguments{
@@ -39,13 +39,12 @@ picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
   
   \item{df}{Maximum degree of freedom for the covariance update. The default value is \code{2*n}.}
   
-  \item{sym}{Symmetrization of output graphs. If \code{sym = "and"}, the edge between node \code{i} and node \code{j} is selected ONLY when both node \code{i} and node \code{j} are selected as neighbors for each other. If \code{sym = "or"}, the edge is selected when either node \code{i} or node \code{j} is selected as the neighbor for each other. The default value is \code{"or"}. ONLY applicable to the sparse column inverse operator.}
-  
   \item{standardize}{Design matrix X will be standardized to have mean zero and unit standard deviation if \code{standardize = TRUE}. The default value is \code{TRUE}.}
       
+  \item{max.ite}{The iteration limit. The default value is 1000.}
+
   \item{prec}{Stopping precision. The default value is 1e-7.}
   
-  \item{max.ite}{The iteration limit. The default value is 1e4.}
   
   \item{verbose}{Tracing information is disabled if \code{verbose = FALSE}. The default value is \code{FALSE}.}
   }
@@ -155,10 +154,10 @@ fitted.mcp = picasso(X, Y, nlambda=100, method="mcp")
 fitted.scad = picasso(X, Y, nlambda=100, method="scad")
 
 ## lambdas used 
-print(fitted.l1$lambda)
+print(fitted.l1.naive$lambda)
 
 ## number of nonzero coefficients for each lambda
-print(fitted.l1$df)
+print(fitted.l1.naive$df)
 
 ## coefficients and intercept for the i-th lambda
 i = 30

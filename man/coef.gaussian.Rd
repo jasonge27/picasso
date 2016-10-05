@@ -1,7 +1,7 @@
-\name{coef.guassian}
-\alias{coef.guassian}
+\name{coef.gaussian}
+\alias{coef.gaussian}
 \title{
-Extract Model Coefficients for an object with S3 class \code{"guassian"}
+Extract Model Coefficients for an object with S3 class \code{"gaussian"}
 }
 \description{
 Extract estimated regression coefficient vectors from the solution path.
