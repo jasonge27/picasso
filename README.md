@@ -10,7 +10,7 @@
 
 ## Unleash the power of nonconvex penalty
 
-L1 penalized linear regression (LASSO) is great for feature selection in linear regression. However when you use LASSO in very noisy setting, especially when some columns in your data has strong colinearity, it's easy to see that LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **10.589%**.
+L1 penalized regression (LASSO) is great for feature selection. However when you use LASSO in very noisy setting, especially when some columns in your data have strong colinearity, LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **10.589%**.
 
 ```R
 > set.seed(2016)
