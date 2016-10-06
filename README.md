@@ -31,7 +31,7 @@ L1 penalized linear regression (LASSO) is great for feature selection in linear 
 
 Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum. 
 
-The PICASSO package solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). 
+The PICASSO package [3, 4]  solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). 
 
 Let's see PICASSO in action — the estimation error drops to **3.4%** using SCAD penalty from **10.57%** error produced by LASSO.
 
@@ -109,3 +109,7 @@ References
 [1] Jianqing Fan and Runze Li, Variable Selection via Nonconcave Penalized Likelihood and its Oracle Properties, 2001
 
 [2] Cun-Hui Zhang, Nearly Unbiased Variable Selection Under Minimax Concave Penalty, 2010
+
+[3] Jason Ge, Mingyi Hong, Mengdi Wang, Han Liu, and Tuo Zhao, Homotopy Active Set Proximal Newton Algorithm for Sparse Learning, 2016
+
+[4] Tuo Zhao, Han Liu, and Tong Zhang, Pathwise Coordinate Optimization for Nonconvex Sparse Learning: Algorithm and Theory, 2014
