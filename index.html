@@ -46,7 +46,7 @@
 <span class="pl-k">&gt;</span> min(apply(abs(<span class="pl-smi">fitg</span><span class="pl-k">$</span><span class="pl-smi">beta</span> <span class="pl-k">-</span> <span class="pl-smi">true_beta</span>), <span class="pl-v">MARGIN</span><span class="pl-k">=</span><span class="pl-c1">2</span>, <span class="pl-v">FUN</span><span class="pl-k">=</span><span class="pl-smi">sum</span>))<span class="pl-k">/</span>sum(abs(<span class="pl-smi">true_beta</span>))
 [<span class="pl-c1">1</span>] <span class="pl-c1">0.10589</span></pre></div>
 
-<p>Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum. </p>
+<p>Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder [5]. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum. </p>
 
 <p>The PICASSO package [3, 4]  solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). </p>
 
@@ -169,6 +169,8 @@ test_lognet_nonlinear(<span class="pl-v">n</span><span class="pl-k">=</span><spa
 <p>[3] Jason Ge, Mingyi Hong, Mengdi Wang, Han Liu, and Tuo Zhao, Homotopy Active Set Proximal Newton Algorithm for Sparse Learning, 2016</p>
 
 <p>[4] Tuo Zhao, Han Liu, and Tong Zhang, Pathwise Coordinate Optimization for Nonconvex Sparse Learning: Algorithm and Theory, 2014</p>
+
+<p>[5] Zhaoran Wang, Han Liu, Tong Zhang, Optimal Computational and Statistical Rates of Convergence for Sparse Monconvex Learning Problems, 2013</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/jasonge27/picasso">Picasso: Unleash The Power of Nonconvex Penalty</a> is maintained by <a href="https://github.com/jasonge27">jasonge27</a>.</span>
