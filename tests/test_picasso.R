@@ -303,3 +303,51 @@ test_fishnet_nonlinear <- function(n = 10000, p = 5000, c= 1.0, nlambda = 100, v
                                   verbose=FALSE, prec=1e-7)))
 
 }
+
+
+test_sparse_selection <- function(n = 2000, p = 1000, m = 0.5, nlambda = 200){
+  library(picasso)
+  library(glmnet)
+  set.seed(111)
+  
+  m = 10.0
+  X=scale(matrix(rnorm(n*p),n,p)+
+           m*rnorm(n))/sqrt(n-1)*sqrt(n)
+  s = 20
+  true_beta = c(0,0,2,0,0, rep(2, s-5), rep(0, p-s))
+  Y=X%*%true_beta+rnorm(n)
+  
+  cat("picasso timing:\n")
+  print(system.time(fitp<-picasso(X,Y,family="gaussian", method = "mcp",
+                                  lambda.min.ratio=0.0001, standardize = FALSE,
+                                  prec=1e-7,nlambda=nlambda)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitp$beta))
+  
+  cat("glmnet timing:\n")
+  print(system.time(fitg<-glmnet(X,Y,family="gaussian", type.gaussian = 'naive',
+                                 lambda = fitp$lambda,
+                                 standardize=FALSE, thresh=1e-7)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitg$beta))
+  
+  cat("ncvreg timing:\n")
+  print(system.time(fitncv<-ncvreg(X, Y, family="gaussian", penalty="SCAD",
+                                   lambda = fitp$lambda,
+                                   standardize=FALSE, eps=1e-7)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitncv$beta[2:(p+1),]))
+  
+  
+  cat("compare obj function values:\n")
+  objg = rep(0,nlambda)
+  objp = rep(0,nlambda)
+  for(i in 1:nlambda){
+    rp = X%*%fitp$beta[,i]+fitp$intercept[i]
+    objp[i] = sum((Y-rp)^2)/(2*n)+fitp$lambda[i]*sum(abs(fitp$beta[,i]))
+    rg = X%*%fitg$beta[,i]+fitg$a0[i]
+    objg[i] =  sum((Y-rg)^2)/(2*n)+fitg$lambda[i]*sum(abs(fitg$beta[,i]))
+  }
+  
+  print(mean((objp-objg)/abs(objg)))
+}

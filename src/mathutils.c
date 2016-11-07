@@ -284,9 +284,11 @@ void standardize_design(double * X, double * xx, double * xm,
             xinvc[j] += xx[jn+i]*xx[jn+i];
         }
 
-        xinvc[j] = 1/sqrt(xinvc[j]/(n-1));
-        for (i = 0; i < n; i++) {
-            xx[jn+i] = xx[jn+i]*xinvc[j];
+        if (xinvc[j] > 0){
+           xinvc[j] = 1/sqrt(xinvc[j]/(n-1));
+            for (i = 0; i < n; i++) {
+                xx[jn+i] = xx[jn+i]*xinvc[j];
+            } 
         }
     }
 }
