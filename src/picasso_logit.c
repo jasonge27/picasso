@@ -135,7 +135,7 @@ void picasso_logit_solver(
                 if (active_set[j] == 0){
                     if (gr[j] > 2*lambda[i] - lambda[i-1]) active_set[j] = 1;
                 }
-        } else if (i ==0){
+        } else if (i == 0){
             for (j = 0; j < d; j++)
                 if (active_set[j] == 0){
                     if (gr[j] > 2*lambda[i]) active_set[j] = 1;
@@ -152,7 +152,7 @@ void picasso_logit_solver(
             for (j = 0; j < d; j++)
            //     stage_lambda[j] = lambda[i] * 
             //                penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma); 
-                stage_lambda[j] = lambda[i];
+            stage_lambda[j] = lambda[i];
 
             function_value_old = get_penalized_logistic_loss(method_flag, p, Y, 
                                                 Xb, beta1, stage_intcpt, 

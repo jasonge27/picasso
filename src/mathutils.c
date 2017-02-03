@@ -1,4 +1,5 @@
 #include "mathutils.h"
+#include "sse_mathfun.h"
 
 #define BIG_EXPONENT (690) 
 
@@ -104,8 +105,19 @@ double get_penalized_logistic_loss(int method_flag, double *p, double * Y, doubl
     for (i = 0; i<n; i++){
         v -= Y[i]*(intcpt+Xb[i]); 
     }
-    for (i = 0; i<n; i++)
-    if (p[i] > 1e-8) {
+    i = 0;
+
+    v4sf vec;
+    v4sf log_vec;
+    while (i + 4 < n){
+        for (int j = 0; j < 4; j++)
+            vec[j] = p[i+j];
+        log_vec= log_ps(vec);
+        for (int j = 0; j < 4; j++)
+            v += (log_vec[j] - intcpt - Xb[i+j]);
+        i += 4;
+    }
+    for (; i<n; i++){
         v += (log(p[i]) - intcpt - Xb[i]);
     }
 
@@ -253,7 +265,20 @@ void X_beta_update(double *Xb, const double *X, double beta, int n){
 // p[i] = 1/(1+exp(-intcpt-Xb[i]))
 void p_update(double *p, double *Xb, double intcpt, int n){
     int i;    
-    for (i = 0; i < n; i++) {
+    v4sf vec;
+    v4sf exp_vec;
+    while (i+4 < n){
+        for (int j = i; j < i+4; j++)
+            vec[j] = truncate(-intcpt-Xb[i+j], BIG_EXPONENT);
+        
+        exp_vec = exp_ps(vec);
+        for (int j = i; j < i+4; j++)
+            p[i+j] = 1/(1+exp_vec[j]);
+
+        i += 4;
+    }
+
+    for (; i < n; i++) {
         p[i] = 1/(1+exp(truncate(-intcpt-Xb[i], BIG_EXPONENT)));
         if (p[i] > 0.999) p[i] = 1;
         if (p[i] < 0.001) p[i] = 0;
