@@ -45,24 +45,32 @@ int min_int(int a, int b){
 double penalty_derivative(int method_flag, double x, double lambda, double gamma){
     // mcp
     if (method_flag == 2){
-        if (x > lambda * gamma){
+        if (fabs(x) > lambda * gamma){
             return(0);
-        } else{
-            return(1 - x/(lambda*gamma));
-        }
-    }
-    // scad
-    if (method_flag == 3){
-        if (x > lambda * gamma){
-            return(0);
-        } else if ( x > lambda){
-            return((lambda*gamma-x)/(gamma-1));
-        } else {
-            return(1.0);
+        } else if (x > 0){
+            return(lambda - x/gamma);
+        } else if (x < 0){
+            return(-lambda + fabs(x)/gamma);
         }
     }
 
-    return(0);
+    // scad
+    if (method_flag == 3){
+        if (fabs(x) > lambda * gamma){
+            return(0);
+        } else if (fabs(x) > lambda){
+            if (x > 0)
+                return((lambda*gamma-fabs(x))/(gamma-1));
+            else 
+                return((-lambda*gamma+fabs(x)/(gamma-1)));
+        } else if (x > 0){
+            return(lambda);
+        } else if (x < 0){
+            return(-lambda);
+        }
+    }
+
+    return(0.0);
 }
 
 

@@ -141,8 +141,7 @@ void picasso_poisson_solver(
         function_value_old = 0.0;
         if(method_flag != 1){   // nonconvex penalty
             for (j = 0; j < d; j++)
-                stage_lambda[j] = lambda[i] * 
-                            penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma); 
+                stage_lambda[j] = lambda[i]; 
 
             function_value_old = get_penalized_poisson_loss(method_flag, p, Y, 
                                                 Xb, beta1, stage_intcpt, 
@@ -297,8 +296,7 @@ void picasso_poisson_solver(
 
             // update lambdas using the multistage convex relaxation scheme
             for (j = 0; j < d; j++){
-                stage_lambda[j] = lambda[i] * 
-                    penalty_derivative(method_flag, fabs(beta1[j]), lambda[i], *ggamma);
+                stage_lambda[j] = penalty_derivative(method_flag, beta1[j], lambda[i], *ggamma);
             }
         }           
         intcpt[i] = stage_intcpt;     
