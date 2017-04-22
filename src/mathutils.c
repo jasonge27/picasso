@@ -48,7 +48,7 @@ double penalty_derivative(int method_flag, double x, double lambda, double gamma
         if (fabs(x) > lambda * gamma){
             return(0);
         } else  {
-            return(lambda - x/gamma);
+            return(lambda - fabs(x)/gamma);
         }
     }
 
