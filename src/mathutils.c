@@ -47,10 +47,8 @@ double penalty_derivative(int method_flag, double x, double lambda, double gamma
     if (method_flag == 2){
         if (fabs(x) > lambda * gamma){
             return(0);
-        } else if (x > 0){
+        } else  {
             return(lambda - x/gamma);
-        } else if (x < 0){
-            return(-lambda + fabs(x)/gamma);
         }
     }
 
@@ -59,18 +57,13 @@ double penalty_derivative(int method_flag, double x, double lambda, double gamma
         if (fabs(x) > lambda * gamma){
             return(0);
         } else if (fabs(x) > lambda){
-            if (x > 0)
-                return((lambda*gamma-fabs(x))/(gamma-1));
-            else 
-                return((-lambda*gamma+fabs(x)/(gamma-1)));
-        } else if (x > 0){
+            return((lambda*gamma-fabs(x))/(gamma-1));
+        } else {
             return(lambda);
-        } else if (x < 0){
-            return(-lambda);
         }
     }
 
-    return(0.0);
+    return(lambda);
 }
 
 

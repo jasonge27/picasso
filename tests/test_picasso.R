@@ -245,7 +245,7 @@ test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, r
   
   cat("picasso timing for mcp penalty:\n")
   print(system.time(fitp.mcp<-picasso(X,Y,family="binomial", method="mcp",
-                                  lambda.min.ratio=ratio, verbose=FALSE, prec=1e-7, gamma =3,
+                                  lambda.min.ratio=ratio, verbose=verb, prec=1e-7, gamma =3,
                                   nlambda=nlambda)))
   cat("best estimation error along the path:\n")
   print(esterror(true_beta, fitp.mcp$beta))
@@ -259,7 +259,7 @@ test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, r
   
   cat("picasso timing for scad penalty:\n")
   print(system.time(fitp.scad<-picasso(X,Y,family="binomial", method="scad",
-                                  lambda.min.ratio=ratio, gamma = 3,
+                                  lambda.min.ratio=ratio, gamma = 3, verbose=verb,
                                   prec=1e-7,nlambda=nlambda)))
   cat("best estimation error along the path:\n")
   print(esterror(true_beta, fitp.scad$beta))
