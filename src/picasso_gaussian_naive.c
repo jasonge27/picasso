@@ -5,25 +5,24 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
     double *runt, int * err, double *lambda, int *nnlambda, double * ggamma, int *mmax_ite,
     double *pprec, int *fflag, int * nn, int * dd,  int * ddf, 
       int* vverbose, int * sstandardized){
-    int i, j, k, n, s, d, df, nlambda;
-    int max_ite1, max_ite2, outer_loop_count, inner_loop_count;
-    int cnz,  total_df;
-    double gamma, prec;
+    int i, j, k, n, s, d, nlambda;
+    int outer_loop_count = 0;
+    int inner_loop_count = 0;
+    int cnz = 0;
+    double prec =  *pprec;
     clock_t start, stop;
     int verbose = (*vverbose);
     int standardized = (*sstandardized);
     
     n = *nn;
     d = *dd;
-    df = *ddf;
-    max_ite1 = *mmax_ite;
-    max_ite2 = *mmax_ite;
-    prec = *pprec;
+    int max_ite1 = *mmax_ite;
+    int max_ite2 = *mmax_ite;
+
     nlambda = *nnlambda;
-    gamma = *ggamma;
     int method_flag = *fflag;
 
-    total_df = min_int(d,n)*nlambda;
+    int total_df = min_int(d,n)*nlambda;
     
     start = clock();
     double *beta1 = (double *) Calloc(d, double);
@@ -48,7 +47,8 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
     int act_size_L1 = 0;
 
     double gr, tmp;
-    int terminate_loop, new_active_idx;
+    int terminate_loop = 0;
+    int new_active_idx = 0;
 
     // grad[j] = <res, X[,j]> 
     for (i=0; i<n; i++){

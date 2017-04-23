@@ -23,8 +23,12 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     int *fflag, int * nn, int * dd, int * ddf, 
     int *vverbose, int * sstandardized){
     int i, j, k, l, s, idx, n, d, df, max_ite, nlambda;
-    int outer_loop_count, inner_loop_count, act_in, cnz, total_df;
-    double gamma, prec;
+    int outer_loop_count = 0;
+    int inner_loop_count = 0;
+    int act_in = 0;
+    int cnz = 0;
+    
+    double prec = *pprec;
     clock_t start, stop;
     int verbose = (*vverbose);
     int standardized = (*sstandardized);
@@ -34,14 +38,12 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     d = *dd;
     df = *ddf;
     max_ite = *mmax_ite;
-    prec = *pprec;
   
     nlambda = *nnlambda;
-    gamma = *ggamma;
 
     int method_flag = *fflag;
 
-    total_df = min_int(d,n)*nlambda;
+    int total_df = min_int(d,n)*nlambda;
 
     start = clock();
     double *beta1 = (double *) Calloc(d, double);

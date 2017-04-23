@@ -102,9 +102,7 @@ void picasso_poisson_solver(
     }
   
     
-    double stage_intcpt_old;
     double intcpt_old; 
-    double intcpt_previous_lambda;
     double sum_w;
     double function_value, function_value_old;
     int new_active_coord;
@@ -158,7 +156,6 @@ void picasso_poisson_solver(
             for (j = 0; j < d; j++){
                 stage_beta_old[j] = beta1[j];
             }
-            stage_intcpt_old = stage_intcpt;
 
             outer_loop_count = 0;
             while (outer_loop_count < max_ite1) {
@@ -260,7 +257,6 @@ void picasso_poisson_solver(
                 for (j = 0; j < n; j++){
                     Xb_previous_lambda[j] = Xb[j];
                 }
-                intcpt_previous_lambda = stage_intcpt;
             }
 
             // for convex penalty, we jump out of the loop.

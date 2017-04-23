@@ -54,7 +54,6 @@ void picasso_logit_solver(
     int method_flag = *fflag;
 
     double dev_null = 0.0;
-    double dev_sat = 0.0;
 
     double beta0_null = 0.0;
     double avr_y = 0.0;
@@ -65,8 +64,6 @@ void picasso_logit_solver(
     avr_y = avr_y / n;
     beta0_null = log(avr_y /(1-avr_y));
     dev_null = -(avr_y * beta0_null + log(1 - avr_y)); // dev_null > 0
-
-    dev_sat = dev_null; 
 
     int outer_loop_count;
     double dev_local;
@@ -95,7 +92,6 @@ void picasso_logit_solver(
     }
   
     double stage_intcpt;
-    double stage_intcpt_old;
     double intcpt_old; 
     
     double sum_w;
@@ -172,7 +168,6 @@ void picasso_logit_solver(
             for (j = 0; j < d; j++){
                 stage_beta_old[j] = beta1[j];
             }
-            stage_intcpt_old = stage_intcpt;
 
             outer_loop_count = 0;
             while (outer_loop_count < max_ite1) {
