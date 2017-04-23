@@ -236,6 +236,8 @@ test_elnet_cov_nonlinear <- function(n = 400, p = 1000, c = 1.0, nlambda = 100, 
 
 test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, ratio = 0.05, verb=FALSE){
   library(picasso)
+  library(ncvreg)
+  library(glmnet)
   set.seed(111)
   
   X = scale(matrix(rnorm(n*p),n,p) + c*rnorm(n))
@@ -258,22 +260,22 @@ test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, r
   print(esterror(true_beta, fitncv.mcp$beta[2:(p+1),]))
   
   cat("picasso timing for scad penalty:\n")
-  print(system.time(fitp.scad<-picasso(X,Y,family="binomial", method="scad",
-                                  lambda.min.ratio=ratio, gamma = 3, verbose=verb,
-                                  prec=1e-7,nlambda=nlambda)))
+  print(system.time(fitp.scad<-picasso(X, Y, family="binomial", method="scad",
+                                   lambda=fitp.mcp$lambda, gamma = 3, 
+                                   verbose=verb, prec=1e-7)))
   cat("best estimation error along the path:\n")
   print(esterror(true_beta, fitp.scad$beta))
   
   cat("ncvreg timing for scad penalty:\n")
   print(system.time(fitncv.scad<-ncvreg(X,Y, family="binomial", penalty="SCAD",
-                                        lambda = fitp.scad$lambda, gamma = 3,
+                                        lambda = fitp.mcp$lambda, gamma = 3,
                                         eps=1e-7)))
   cat("best estimation error along the path:\n")
   print(esterror(true_beta, fitncv.scad$beta[2:(p+1),]))
   
   cat("glmnet L1 timing:\n")
   print(system.time(fitg<-glmnet(X,Y,family="binomial",
-                                 lambda=fitp$lambda, standardize=FALSE,thresh=1e-7)))
+                                 lambda=fitp.mcp$lambda, standardize=FALSE,thresh=1e-7)))
   cat("best estimation for LASSO:\n")
   print(esterror(true_beta, fitg$beta))
   

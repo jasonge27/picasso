@@ -92,15 +92,15 @@ min(apply(abs(fitted.model$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_b
 
 
 
-|                                        |     c = 0.1     |     c = 0.5     |       c = 1.0        |
-| :------------------------------------: | :-------------: | :-------------: | :------------------: |
-|          PICASSO (time/error)          | 8.727(s) / 4.6% | 5.247(s) / 2.6% |   6.062(s) / 11.2%   |
-|          ncvreg (time/error)           | 7.461(s) / 5.6% | 7.056(s) / 6.0% | 51.85(s) / 35.3% [*] |
-| Estimation Error using LASSO in glmnet |      2.0%       |      14.1%      |        28.7%         |
+|                                        |     c = 0.1     |    c = 0.5     |       c = 1.0        |
+| :------------------------------------: | :-------------: | :------------: | :------------------: |
+|          PICASSO (time/error)          | 10.98(s) / 5.0% | 5.16(s) / 1.5% |    7.17(s) / 8.6%    |
+|          ncvreg (time/error)           | 8.05(s) / 5.6%  | 7.08(s) / 6.0% | 56.16(s) / 35.3% [*] |
+| Estimation Error using LASSO in glmnet |      1.3%       |     14.0%      |        36.6%         |
 
 '[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
 
-The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.5-2. The glmnet version is 2.0-5.
+The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.6-0. The glmnet version is 2.0-5.
 
 
 
