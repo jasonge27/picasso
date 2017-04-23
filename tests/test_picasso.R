@@ -220,18 +220,31 @@ test_elnet_cov_nonlinear <- function(n = 400, p = 1000, c = 1.0, nlambda = 100, 
   set.seed(111)
   
   X = scale(matrix(rnorm(n*p),n,p) + c*rnorm(n))/sqrt(n-1)*sqrt(n)
-  true_beta = runif(20)
-  Y = X[,1:20] %*% true_beta + rnorm(n)
+  s = 20
+  true_beta = c(runif(s), rep(0, p-s))
+  Y = X %*% true_beta + rnorm(n)
   
   cat("picasso timing for mcp penalty:\n")
-  print(system.time(fitp.mcp<-picasso(X,Y,family="gaussian", type.gaussian='cov', method="mcp",
+  print(system.time(fitp.mcp<-picasso(X,Y,family="gaussian", type.gaussian='covariance', method="mcp",
                                       lambda.min.ratio=0.001, standardize=FALSE,
                                       verbose=verb,prec=1e-7,nlambda=nlambda)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitp.mcp$beta))
   
   cat("picasso timing for scad penalty:\n")
-  print(system.time(fitp.scad<-picasso(X,Y,family="gaussian", type.gaussian='cov', method="scad",
-                                       lambda.min.ratio=0.001, standardize=FALSE,verbose=verb,
-                                       prec=1e-7,nlambda=nlambda)))
+  print(system.time(fitp.scad<-picasso(X,Y,family="gaussian", type.gaussian='covariance', method="scad",
+                                       lambda = fitp.mcp$lambda, standardize=FALSE,verbose=verb,
+                                       prec=1e-7)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitp.scad$beta))
+
+  cat("picasso timing for L1 penalty:\n")
+  print(system.time(fitp.lasso<-picasso(X,Y,family="gaussian", type.gaussian='covariance', method="l1",
+                                       lambda = fitp.mcp$lambda, standardize=FALSE,verbose=verb,
+                                       prec=1e-7)))
+  cat("best estimation error along the path:\n")
+  print(esterror(true_beta, fitp.lasso$beta))
+
 }
 
 test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, ratio = 0.05, verb=FALSE){

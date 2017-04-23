@@ -1,5 +1,21 @@
 #include "mathutils.h"
 
+
+void update_covmat(double ** covmat, int *set_idx_covmat, 
+        int * act_size_covmat_p, double * X, int n, int d, int j){
+    int act_size_covmat = *act_size_covmat_p;
+    if (set_idx_covmat[j] < 0){ // the j-th coord was not in XX before
+          set_idx_covmat[j] = act_size_covmat;
+                            
+          covmat[act_size_covmat] = (double *) Calloc(d, double);
+
+          for (int k = 0; k < d; k++)
+               covmat[act_size_covmat][k] = vec_inprod(X+j*n, X+k*n, n)/n; 
+
+           *act_size_covmat_p += 1;
+    }
+}
+
 void picasso_gaussian_cov(double *Y, double * X, double * beta,
     double * intcpt, int * beta_idx, int * cnzz, int * col_cnz,
     int * ite_lamb, int * ite_cyc, double *obj, double *runt, int * err,
@@ -7,12 +23,13 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     int *fflag, int * nn, int * dd, int * ddf, 
     int *vverbose, int * sstandardized){
     int i, j, k, l, s, idx, n, d, df, max_ite, nlambda;
-    int ite1, ite2, flag, act_in, cnz, total_df;
+    int outer_loop_count, inner_loop_count, act_in, cnz, total_df;
     double gamma, prec;
     clock_t start, stop;
     int verbose = (*vverbose);
     int standardized = (*sstandardized);
    
+    Rprintf("running gaussian cov\n");
     n = *nn;
     d = *dd;
     df = *ddf;
@@ -21,7 +38,8 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
   
     nlambda = *nnlambda;
     gamma = *ggamma;
-    flag = *fflag;
+
+    int method_flag = *fflag;
 
     total_df = min_int(d,n)*nlambda;
 
@@ -30,7 +48,7 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     double *beta_old = (double *) Calloc(d, double);
 
     int *set_act = (int *) Calloc(d, int); 
-    int *set_idx = (int *) Calloc(d, int); 
+    int *active_set = (int *) Calloc(d, int); 
     int *set_idx_covmat = (int *) Calloc(d, int); 
     int act_size = 0;
     int act_size_covmat = 0;
@@ -40,9 +58,15 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     double **covmat = (double **) Calloc(df, double *);
     double *S = (double *) Calloc(d, double);
 
+    double *stage_lambda = (double*) Calloc(d, double);
+    double *beta_L1 = (double *)Calloc(d, double);
+    int *active_set_L1 = (int*) Calloc(d, int);
+    double *gr_L1 = (double *) Calloc(d, double);
+    double *res_L1 = (double *) Calloc(n, double);
+    int act_size_L1 = 0;
 
     for (i = 0; i < d; i++){
-        set_idx[i] = 0; // i is not in the active set yet
+        active_set[i] = 0; // i is not in the active set yet
         beta1[i] = 0;
         set_idx_covmat[i] = -1; // j = act_idx_covmat[i]>0 is the position of i in covmat
         if (!standardized)
@@ -66,140 +90,198 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     int flag1 = 0;
     int flag2 = 1;
     for (i = 0; i < nlambda; i++) {
-        ite1 = 0;
-        flag2 = 1;
-        while (ite1 < max_ite) {
-            ite1 += 1;
-
-            // STEP1: one pass through the coordinates 
-            // and select the active sets
-            act_in=0;
-            terminate_loop = 1;
-
-            if (flag1 * flag2 == 0)
-            {
-                for (j = 0; j < d; j++){
-                    beta_cached = beta1[j];
-
-                    coordinate_update(&beta1[j], gr[j], S[j], 
-                                    standardized, lambda[i], gamma, flag);
-
-                    if (fabs(beta1[j] - beta_cached) < 1e-6)
-                        continue;
-
-                    if (set_idx[j] == 0){ 
-                        set_idx[j] = 1;
-                        set_act[act_size] = j;
-                        act_size += 1;
-                        act_in += 1;
-
-                        // update the XX matrix if needed
-                        if (set_idx_covmat[j] < 0){ // the j-th coord was not in XX before
-                            set_idx_covmat[j] = act_size_covmat;
-                           
-                            covmat[act_size_covmat] = (double *) Calloc(d, double);
-
-                            for (k = 0; k < d; k++)
-                                covmat[act_size_covmat][k] = vec_inprod(X+j*n, X+k*n, n)/n; 
-
-                            act_size_covmat += 1;
-                        }
-                    }
-
-                    tmp = beta1[j] - beta_cached;
-                    tmp_change = tmp*tmp;
-                    if (standardized == 0)
-                        tmp_change = tmp_change * S[j];
-
-                    if (tmp_change > prec){
-                        terminate_loop = 0;
-                    }
-
-                    idx = set_idx_covmat[j];
-                    for (k = 0; k < d; k++)
-                        gr[k] -= covmat[idx][k]*tmp;
-                    
-
-                    for (k = 0; k < n; k++)
-                        res[k] = res[k] - tmp*X[j*n+k];
-                }
-            } else {
-                terminate_loop = 0;
-                act_in = 1;
+        if (i > 0){
+            for (j = 0; j < d; j++){
+                active_set[j] = active_set_L1[j];
+                gr[j] = gr_L1[j];
+                beta1[j] = beta_L1[j];
             }
-            
-            flag1 = 1;
-
-            if (terminate_loop)
-                break;
-
-            if (act_in == 0) 
-                break;
-           
-            // STEP2: begin active set minimization
-            // update the active coordinate
-            ite2 = 0;
-            terminate_loop = 1;
-
-            for (k = 0; k < d; k++)
-                beta_old[k] = beta1[k];
-
-            while ( ite2 < max_ite) {
-                ite2 += 1;
-                        
-                terminate_loop = 1;
-                for (k = 0; k < act_size; k++) {
-                    j = set_act[k];
-                    
-                    beta_cached = beta1[j];
-                    coordinate_update(&beta1[j], gr[j], S[j], 
-                                standardized, lambda[i], gamma, flag); 
-                           
-                    if (fabs(beta1[j]-beta_cached)< 1e-8)
-                        continue;
-                                
-                    tmp = beta1[j] - beta_cached;
-
-                    tmp_change = tmp*tmp;
-                    if (standardized == 0)
-                        tmp_change = tmp_change * S[j];
-
-                    if (tmp_change > prec){
-                        terminate_loop = 0;
-                    }
-
-                    idx = set_idx_covmat[j];
-                    for (l = 0; l < act_size; l++)
-                        gr[set_act[l]] -= tmp * covmat[idx][set_act[l]];
-                    
-
-                    for (l = 0; l < n; l++)
-                        res[l] = res[l] - tmp*X[j*n+l];
-                }
-                        
-                if (terminate_loop){
-                    flag2 = 0;
-                    break;
-                }
+            for (j = 0; j < n; j++){
+                res[j] = res_L1[j];
             }
-
-            for (k = 0; k < d; k++){
-                if (set_idx[k])
-                    continue;
-
-                for (l = 0; l < act_size; l++){
-                    s = set_act[l];
-                    idx = set_idx_covmat[s];
-                    gr[k] -= (beta1[s]-beta_old[s])*covmat[idx][k]; 
-                }
-            }
-            
-            if (verbose)
-                Rprintf("---ite2=%d\n", ite2);
-            ite_cyc[i] += ite2; 
+            act_size = act_size_L1;
         }
 
-        ite_lamb[i] = ite1;
+        if (i > 0){
+            for (j = 0; j < d; j++)
+                if (active_set[j] == 0){
+                    if (gr[j] > 2*lambda[i] - lambda[i-1]) {
+                        active_set[j] = 1;
+                        set_act[act_size] = j;
+                        act_size += 1;
+                        update_covmat(covmat, set_idx_covmat, &act_size_covmat, X, n, d, j);
+                    }
+                }
+        } else if (i == 0){
+            for (j = 0; j < d; j++)
+                if (active_set[j] == 0){
+                    if (gr[j] > 2*lambda[i]) {
+                        active_set[j] = 1;
+                        set_act[act_size] = j;
+                        act_size += 1;
+                        update_covmat(covmat, set_idx_covmat, &act_size_covmat, X, n, d, j);
+                    }
+                }
+        } 
+
+
+        for (j = 0; j < d; j++)
+            stage_lambda[j] = lambda[i];
+
+
+        int dc_loop_max = 3;
+        int stage_count = 0;
+        while (stage_count < dc_loop_max){
+            stage_count += 1;
+            outer_loop_count = 0;
+            flag2 = 1;
+            while (outer_loop_count < max_ite) {
+                outer_loop_count += 1;
+                // STEP1: one pass through the coordinates 
+                // and select the active sets
+                act_in=0;
+                terminate_loop = 1;
+
+                if (flag1 * flag2 == 0)
+                {
+                    for (j = 0; j < d; j++){
+                        beta_cached = beta1[j];
+
+                        coordinate_update(&beta1[j], gr[j], S[j], 
+                                        standardized, stage_lambda[j], gamma, method_flag);
+
+                        if (fabs(beta1[j] - beta_cached) < 1e-6)
+                            continue;
+
+                        if (active_set[j] == 0){ 
+                            active_set[j] = 1;
+                            set_act[act_size] = j;
+                            act_size += 1;
+                            act_in += 1;
+
+                            // update the XX matrix if needed
+                            update_covmat(covmat, set_idx_covmat, &act_size_covmat, X, n, d, j);
+       
+                        }
+
+                        tmp = beta1[j] - beta_cached;
+                        tmp_change = tmp*tmp;
+                        if (standardized == 0)
+                            tmp_change = tmp_change * S[j];
+
+                        if (tmp_change > prec){
+                            terminate_loop = 0;
+                        }
+
+                        idx = set_idx_covmat[j];
+                        for (k = 0; k < d; k++)
+                            gr[k] -= covmat[idx][k]*tmp;
+                        
+
+                        for (k = 0; k < n; k++)
+                            res[k] = res[k] - tmp*X[j*n+k];
+                    }
+                } else {
+                    terminate_loop = 0;
+                    act_in = 1;
+                }
+                
+                flag1 = 1;
+
+                if (terminate_loop)
+                    break;
+
+                if (act_in == 0) 
+                    break;
+            
+                // STEP2: begin active set minimization
+                // update the active coordinate
+                inner_loop_count = 0;
+                terminate_loop = 1;
+
+                for (k = 0; k < d; k++)
+                    beta_old[k] = beta1[k];
+
+                while (inner_loop_count < max_ite) {
+                    inner_loop_count += 1;
+                            
+                    terminate_loop = 1;
+                    for (k = 0; k < act_size; k++) {
+                        j = set_act[k];
+                        
+                        beta_cached = beta1[j];
+                        coordinate_update(&beta1[j], gr[j], S[j], 
+                                    standardized, stage_lambda[j], gamma, method_flag); 
+                            
+                        if (fabs(beta1[j]-beta_cached)< 1e-8)
+                            continue;
+                                    
+                        tmp = beta1[j] - beta_cached;
+
+                        tmp_change = tmp*tmp;
+                        if (standardized == 0)
+                            tmp_change = tmp_change * S[j];
+
+                        if (tmp_change > prec){
+                            terminate_loop = 0;
+                        }
+
+                        idx = set_idx_covmat[j];
+                        for (l = 0; l < act_size; l++)
+                            gr[set_act[l]] -= tmp * covmat[idx][set_act[l]];
+                        
+
+                        for (l = 0; l < n; l++)
+                            res[l] = res[l] - tmp*X[j*n+l];
+                    }
+                            
+                    if (terminate_loop){
+                        flag2 = 0;
+                        break;
+                    }
+                }
+
+                for (k = 0; k < d; k++){
+                    if (active_set[k])
+                        continue;
+
+                    for (l = 0; l < act_size; l++){
+                        s = set_act[l];
+                        idx = set_idx_covmat[s];
+                        gr[k] -= (beta1[s]-beta_old[s])*covmat[idx][k]; 
+                    }
+                }
+                
+                if (verbose)
+                    Rprintf("---inner_loop_count=%d\n", inner_loop_count);
+                ite_cyc[i] += inner_loop_count; 
+            }
+
+            // for lambda = lambda[i]
+            if (stage_count == 1){
+                for (j = 0; j < d; j++){
+                    beta_L1[j] = beta1[j];
+                    active_set_L1[j] = active_set[j];
+                    gr_L1[j] = gr[j];
+                }
+                for (j = 0; j < n; j++){
+                    res_L1[j] = res[j];
+                }
+                act_size_L1 = act_size;
+            }
+
+            if (method_flag == 1){
+                ite_lamb[i] = outer_loop_count;
+                break;  
+            }
+
+            // update lambdas using the multistage convex relaxation scheme
+            for (j = 0; j < d; j++)
+                stage_lambda[j] = penalty_derivative(method_flag, beta1[j], lambda[i], *ggamma);
+       
+        }
+
+    
         stop = clock();
         runt[i] = (double)(stop - start)/CLOCKS_PER_SEC;
 
@@ -207,11 +289,9 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
         for (j = 0; j < n; j++)
             intcpt[i] += res[j];
         intcpt[i] = intcpt[i] / n;
-
-
         
         for (j = 0; j < d;  j++){
-            if ((set_idx[j] != 0) && (fabs(beta1[j])>1e-6)){
+            if ((active_set[j] != 0) && (fabs(beta1[j])>1e-6)){
                 if (cnz == total_df){
                     *err = 1;
                     break;
@@ -228,17 +308,23 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     }
 
     if (verbose)
-        Rprintf("-ite1=%d\n", ite1);
+        Rprintf("-outer_loop_count=%d\n", outer_loop_count);
     *cnzz = cnz;
     
     Free(beta1);
     Free(beta_old);
-    Free(set_idx);
+    Free(active_set);
     Free(set_act);
     Free(set_idx_covmat);
     Free(S);
     Free(res);
     Free(gr);
+
+    Free(stage_lambda);
+    Free(beta_L1);
+    Free(active_set_L1);
+    Free(gr_L1);
+    Free(res_L1);
 
     for (i = 0; i < df; i++){
         Free(covmat[i]);

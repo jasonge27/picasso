@@ -17,7 +17,7 @@ L1 penalized regression (LASSO) is great for feature selection. However when you
 > library(glmnet)
 > n <- 2000; p <- 1000; c <- 0.1
 > # n sample number, p dimension, c correlation parameter
-> X <- scale(matrix(rnorm(n*p),n,p)+c*rnorm(n)) # n is smaple number, 
+> X <- scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n) # n is smaple number, 
 > s <- 20  # sparsity level
 > true_beta <- c(runif(s), rep(0, p-s))
 > Y <- X%*%true_beta + rnorm(n)
