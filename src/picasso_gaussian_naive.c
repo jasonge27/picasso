@@ -73,19 +73,26 @@ void picasso_gaussian_naive(double *Y, double * X, double * beta, double * intcp
     for (i=0; i<nlambda; i++) {
         if (verbose)
             Rprintf("lambda i:%f \n", lambda[i]);
-        
-        for (j=0; j<d; j++)
-            if (active_set[j] == 0){
-                if (flag == 1)
-                    tmp = soft_thresh_l1(grad[j], lambda[i]);
-                if (flag == 2)
-                    tmp = soft_thresh_mcp(grad[j], lambda[i], gamma);
-                if (flag == 3)
-                    tmp = soft_thresh_scad(grad[j], lambda[i], gamma);
 
-                if (fabs(tmp) > 1e-8)
-                    active_set[j] = 1;
-            }
+         if (i > 0){
+            for (j = 0; j < d; j++)
+                if (active_set[j] == 0){
+                    if (grad[j] > 2*lambda[i] - lambda[i-1]) {
+                        active_set[j] = 1;
+                        set_act[act_size] = j;
+                        act_size += 1;
+                    }
+                }
+        } else if (i == 0){
+            for (j = 0; j < d; j++)
+                if (active_set[j] == 0){
+                    if (grad[j] > 2*lambda[i]) {
+                        active_set[j] = 1;
+                        set_act[act_size] = j;
+                        act_size += 1;
+                    }
+                }
+        } 
         ite1 = 0;
         flag2 = 1;
         

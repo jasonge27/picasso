@@ -4,7 +4,7 @@ test_fishnet <- function(n = 10000, p = 5000, c = 0.5, nlambda = 100){
   set.seed(111)
   
   s = 20
-  X = scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(s)
+  X = scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
   true_beta = runif(s)
   
   param = X[,1:s]%*%true_beta+rnorm(n)
@@ -253,7 +253,7 @@ test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 100, r
   library(glmnet)
   set.seed(111)
   
-  X = scale(matrix(rnorm(n*p),n,p) + c*rnorm(n))
+  X = scale(matrix(rnorm(n*p),n,p) + c*rnorm(n))/sqrt(n-1)*sqrt(n)
   s = 20
   true_beta = c(runif(s), rep(0, p-s))
   Y = X %*% true_beta + rnorm(n) > .5
@@ -301,7 +301,7 @@ test_fishnet_nonlinear <- function(n = 10000, p = 5000, c= 1.0, nlambda = 100, v
   set.seed(111)
   
   s = 20
-  X = scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(s)
+  X = scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
   true_beta = runif(s)
   
   param = X[,1:s]%*%true_beta+rnorm(n)
