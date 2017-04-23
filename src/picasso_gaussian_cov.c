@@ -29,7 +29,7 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
     int verbose = (*vverbose);
     int standardized = (*sstandardized);
    
-    Rprintf("running gaussian cov\n");
+
     n = *nn;
     d = *dd;
     df = *ddf;
