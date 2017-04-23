@@ -10,12 +10,12 @@
 
 ## Unleash the power of nonconvex penalty
 
-L1 penalized regression (LASSO) is great for feature selection. However when you use LASSO in very noisy setting, especially when some columns in your data have strong colinearity, LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **10.589%**.
+L1 penalized regression (LASSO) is a great tool for feature selection. However when applied in very noisy setting, especially with some columns in your data having strong colinearity, LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **16.41%**.
 
 ```R
 > set.seed(2016)
 > library(glmnet)
-> n <- 2000; p <- 1000; c <- 0.1
+> n <- 1000; p <- 1000; c <- 0.1
 > # n sample number, p dimension, c correlation parameter
 > X <- scale(matrix(rnorm(n*p),n,p)+c*rnorm(n)) # n is smaple number, 
 > s <- 20  # sparsity level
@@ -24,22 +24,22 @@ L1 penalized regression (LASSO) is great for feature selection. However when you
 > fitg<-glmnet(X,Y,family="gaussian")
 > # the minimal estimation error |\hat{beta}-beta| / |beta|
 > min(apply(abs(fitg$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
-[1] 0.10589
+[1] 0.1641195
 ```
 
 
 
-Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder [5]. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum. 
+Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder [5]. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resources, we can only obtain a local optimum which lacks the good property of the global optimum. 
 
-The PICASSO package [3, 4]  solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). 
+The PICASSO package [3, 4] solves the non-convex optimization through multi-stage convex relaxations. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). 
 
-Let's see PICASSO in action — the estimation error drops to **3.4%** using SCAD penalty from **10.57%** error produced by LASSO.
+Let's see PICASSO in action — the estimation error drops to **6.06%** using SCAD penalty from **16.41%** error produced by LASSO.
 
 ```R
 > library(picasso)
 > fitp <- picasso(X, Y, family="gaussian", method="scad")
 > min(apply(abs(fitp$beta-true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
-[1] 0.03392717
+[1] 0.06064173
 ```
 
 
@@ -94,13 +94,13 @@ min(apply(abs(fitted.model$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_b
 
 |                                        |     c = 0.1     |     c = 0.5     |       c = 1.0        |
 | :------------------------------------: | :-------------: | :-------------: | :------------------: |
-|          PICASSO (time/error)          | 8.727(s) / 4.6% | 5.247(s) / 2.6% |   6.062(s) / 11.2%   |
-|          ncvreg (time/error)           | 7.461(s) / 5.6% | 7.056(s) / 6.0% | 51.85(s) / 35.3% [*] |
+|          PICASSO (time/error)          | 8.727(s) / 4.6% | 5.247(s) / 1.5% |   7.171(s) / 8.6%   |
+|          ncvreg (time/error)           | 7.461(s) / 5.6% | 7.056(s) / 6.0% | 56.16(s) / 35.3% [*] |
 | Estimation Error using LASSO in glmnet |      2.0%       |      14.1%      |        28.7%         |
 
 '[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
 
-The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.5-2. The glmnet version is 2.0-5.
+The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.6-0. The glmnet version is 2.0-5.
 
 
 
