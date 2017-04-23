@@ -15,7 +15,7 @@
 #include <R_ext/Applic.h>
 
 void coordinate_update(double * beta, double gr, double S, 
-                        int standardized, double lambda, double gamma, int flag);
+                        int standardized, double lambda);
 
 double truncate(double x, double a);
 

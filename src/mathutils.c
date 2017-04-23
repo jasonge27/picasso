@@ -3,19 +3,15 @@
 #define BIG_EXPONENT (690) 
 
 void coordinate_update(double * beta, double gr, double S, 
-                        int standardized, double lambda, double gamma, int flag){
+                        int standardized, double lambda){
     double tmp = 0;
     if (standardized)
         tmp = gr + *beta;
     else
         tmp = gr + (*beta) * S;
 
-    if (flag == 1)
-        *beta = soft_thresh_l1(tmp, lambda);
-    if (flag == 2)
-        *beta = soft_thresh_mcp(tmp, lambda, gamma);
-    if (flag == 3)
-        *beta = soft_thresh_scad(tmp, lambda, gamma);
+    *beta = soft_thresh_l1(tmp, lambda);
+
 
     if (!standardized)
         *beta = (*beta) / S;

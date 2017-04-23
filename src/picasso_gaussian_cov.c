@@ -129,7 +129,7 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
             stage_lambda[j] = lambda[i];
 
 
-        int dc_loop_max = 3;
+        int dc_loop_max = 10;
         int stage_count = 0;
         while (stage_count < dc_loop_max){
             stage_count += 1;
@@ -148,7 +148,7 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
                         beta_cached = beta1[j];
 
                         coordinate_update(&beta1[j], gr[j], S[j], 
-                                        standardized, stage_lambda[j], gamma, method_flag);
+                                        standardized, stage_lambda[j]);
 
                         if (fabs(beta1[j] - beta_cached) < 1e-6)
                             continue;
@@ -211,7 +211,7 @@ void picasso_gaussian_cov(double *Y, double * X, double * beta,
                         
                         beta_cached = beta1[j];
                         coordinate_update(&beta1[j], gr[j], S[j], 
-                                    standardized, stage_lambda[j], gamma, method_flag); 
+                                    standardized, stage_lambda[j]); 
                             
                         if (fabs(beta1[j]-beta_cached)< 1e-8)
                             continue;

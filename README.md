@@ -10,12 +10,12 @@
 
 ## Unleash the power of nonconvex penalty
 
-L1 penalized regression (LASSO) is great for feature selection. However when you use LASSO in very noisy setting, especially when some columns in your data have strong colinearity, LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **10.589%**.
+L1 penalized regression (LASSO) is great for feature selection. However when you use LASSO in very noisy setting, especially when some columns in your data have strong colinearity, LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **16.41%**.
 
 ```R
 > set.seed(2016)
 > library(glmnet)
-> n <- 2000; p <- 1000; c <- 0.1
+> n <- 1000; p <- 1000; c <- 0.1
 > # n sample number, p dimension, c correlation parameter
 > X <- scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n) # n is smaple number, 
 > s <- 20  # sparsity level
@@ -24,7 +24,7 @@ L1 penalized regression (LASSO) is great for feature selection. However when you
 > fitg<-glmnet(X,Y,family="gaussian")
 > # the minimal estimation error |\hat{beta}-beta| / |beta|
 > min(apply(abs(fitg$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
-[1] 0.10589
+[1] 0.1641195
 ```
 
 
@@ -33,13 +33,13 @@ Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but co
 
 The PICASSO package [3, 4]  solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). 
 
-Let's see PICASSO in action — the estimation error drops to **3.4%** using SCAD penalty from **10.57%** error produced by LASSO.
+Let's see PICASSO in action — the estimation error drops to **6.06%** using SCAD penalty from **16.41%** error produced by LASSO.
 
 ```R
 > library(picasso)
 > fitp <- picasso(X, Y, family="gaussian", method="scad")
 > min(apply(abs(fitp$beta-true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
-[1] 0.03392717
+[1] 0.06064173
 ```
 
 
