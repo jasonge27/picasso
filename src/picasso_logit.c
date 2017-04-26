@@ -288,13 +288,9 @@ void picasso_logit_solver(
                                                 lambda[i], *ggamma);
 
             // only for R
-            if (verbose){
+            if (verbose && (stage_count > 1)){
                 Rprintf("Stage:%d, for lambda:%f, fvalue:%f, pre:%f\n", 
                     stage_count, lambda[i], function_value, function_value_old);
-            }
-
-            if (fabs(function_value- function_value_old) < 0.01 * fabs(function_value_old)){
-                break;
             }
 
             function_value_old = function_value;
