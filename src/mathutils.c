@@ -17,6 +17,28 @@ void coordinate_update(double * beta, double gr, double S,
         *beta = (*beta) / S;
 }
 
+void coordinate_update_nonlinear(double * beta, double gr, double S, 
+                        int standardized, double lambda, double gamma, int method_flag){
+    double tmp = 0;
+    if (standardized)
+        tmp = gr + *beta;
+    else
+        tmp = gr + (*beta) * S;
+
+    if (method_flag == 1)
+        *beta = soft_thresh_l1(tmp, lambda);
+    
+    if (method_flag == 2)
+        *beta = soft_thresh_mcp(tmp, lambda, gamma);
+
+    if (method_flag == 3)
+        *beta = soft_thresh_scad(tmp, lambda, gamma);
+
+    if (!standardized)
+        *beta = (*beta) / S;
+}
+
+
 double truncate(double x, double a){
     double t = fabs(x);
 
@@ -103,7 +125,7 @@ double get_penalized_logistic_loss(int method_flag, double *p, double * Y, doubl
     }
     for (i = 0; i<n; i++)
     if (p[i] > 1e-8) {
-        v += (log(p[i]) - intcpt - Xb[i]);
+        v -= (log(p[i]) - intcpt - Xb[i]);
     }
 
     v = v/n;
