@@ -17,6 +17,22 @@ void coordinate_update(double * beta, double gr, double S,
         *beta = (*beta) / S;
 }
 
+void coordinate_update_nonlinear(double * beta, double gr, double S, 
+                        int standardized, double lambda, double gamma, int method_flag){
+    double tmp = 0;
+    if (standardized)
+        tmp = gr + *beta;
+    else
+        tmp = gr + (*beta) * S;
+
+    *beta = soft_thresh_l1(tmp, lambda);
+
+
+    if (!standardized)
+        *beta = (*beta) / S;
+}
+
+
 double truncate(double x, double a){
     double t = fabs(x);
 
