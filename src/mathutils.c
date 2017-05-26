@@ -25,8 +25,14 @@ void coordinate_update_nonlinear(double * beta, double gr, double S,
     else
         tmp = gr + (*beta) * S;
 
-    *beta = soft_thresh_l1(tmp, lambda);
+    if (method_flag == 1)
+        *beta = soft_thresh_l1(tmp, lambda);
+    
+    if (method_flag == 2)
+        *beta = soft_thresh_mcp(tmp, lambda, gamma);
 
+    if (method_flag == 3)
+        *beta = soft_thresh_scad(tmp, lambda, gamma);
 
     if (!standardized)
         *beta = (*beta) / S;

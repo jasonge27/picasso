@@ -213,6 +213,8 @@ test_elnet_naive_nonlinear <- function(n = 500, p = 5000, c = 0.1, nlambda = 100
                                         eps=1e-7)))
   cat("best estimation error along the path:\n")
   print(esterror(true_beta, fitncv.scad$beta[2:(p+1),]))
+
+
 }
 
 test_elnet_cov_nonlinear <- function(n = 400, p = 1000, c = 1.0, nlambda = 100, verb=FALSE){
