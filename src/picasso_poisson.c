@@ -309,4 +309,7 @@ void picasso_poisson_solver(
     Free(Xb);
     Free(w);
     Free(r);
+    Free(beta_previous_lambda);
+    Free(stage_lambda);
+    Free(Xb_previous_lambda);
 }

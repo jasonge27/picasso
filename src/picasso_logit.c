@@ -309,6 +309,7 @@ void picasso_logit_solver(
     Free(stage_beta_old);
     Free(set_act);
     Free(active_set);
+    Free(stage_lambda);
     Free(gr);
     Free(p);
     Free(Xb);
