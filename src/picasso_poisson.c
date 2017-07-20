@@ -169,7 +169,7 @@ void picasso_poisson_solver(
 
                 // to construct an iterative reweighted LS
                 for (j = 0; j < n; j++)
-                    p[j] = exp(truncate(stage_intcpt + Xb[j], BIG_EXPONENT));
+                    p[j] = exp(truncate_exponent(stage_intcpt + Xb[j], BIG_EXPONENT));
 
                 sum_w = 0.0;
                 for (j = 0; j < n; j++){
@@ -272,7 +272,7 @@ void picasso_poisson_solver(
 
             // check stopping criterion
             for (j = 0; j < n; j++)
-                p[j] = exp(truncate(stage_intcpt + Xb[j], BIG_EXPONENT));
+                p[j] = exp(truncate_exponent(stage_intcpt + Xb[j], BIG_EXPONENT));
 
           
             function_value = get_penalized_poisson_loss(method_flag, p, Y, Xb, 

@@ -39,7 +39,7 @@ void coordinate_update_nonlinear(double * beta, double gr, double S,
 }
 
 
-double truncate(double x, double a){
+double truncate_exponent(double x, double a){
     double t = fabs(x);
 
     if (t > a){
@@ -273,7 +273,7 @@ void X_beta_update(double *Xb, const double *X, double beta, int n){
 void p_update(double *p, double *Xb, double intcpt, int n){
     int i;    
     for (i = 0; i < n; i++) {
-        p[i] = 1/(1+exp(truncate(-intcpt-Xb[i], BIG_EXPONENT)));
+        p[i] = 1/(1+exp(truncate_exponent(-intcpt-Xb[i], BIG_EXPONENT)));
         if (p[i] > 0.999) p[i] = 1;
         if (p[i] < 0.001) p[i] = 0;
     }

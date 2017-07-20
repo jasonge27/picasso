@@ -20,7 +20,7 @@ void coordinate_update(double * beta, double gr, double S,
 void coordinate_update_nonlinear(double * beta, double gr, double S, 
                         int standardized, double lambda, double gamma, int method_flag);
 
-double truncate(double x, double a);
+double truncate_exponent(double x, double a);
 
 int min_int(int a, int b);
 
