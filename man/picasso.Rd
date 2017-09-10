@@ -17,9 +17,9 @@ picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
 }
 
 \arguments{
-  \item{X}{For sparse linear regression and sparse logistic regression, \code{X} is an \eqn{n} by \eqn{d} design matrix where \code{n} is the sample size and \code{d} is the data dimension.}
+  \item{X}{ \code{X} is an \eqn{n} by \eqn{d} design matrix where \code{n} is the sample size and \code{d} is the data dimension.}
   
-  \item{Y}{\code{Y} is the \eqn{n} dimensional response vector. Y is numeric vector for \code{family=``gaussian''}, or a two-level factor for \code{family=``binomial''}, or a non-negative integer vector representing counts for \code{family = ``gaussian''}. }
+  \item{Y}{\code{Y} is the \eqn{n} dimensional response vector. Y is numeric vector for \code{family=``gaussian''} and \code{family=``sqrtlasso''}, or a two-level factor for \code{family=``binomial''}, or a non-negative integer vector representing counts for \code{family = ``gaussian''}. }
   
   \item{lambda}{A sequence of decresing positive values to control the regularization. Typical usage is to leave the input \code{lambda = NULL} and have the program compute its own \code{lambda} sequence based on \code{nlambda} and \code{lambda.min.ratio}. Users can also specify a sequence to override this. Default value is from \eqn{lambda.max} to \code{lambda.min.ratio*lambda.max}. The default value of \eqn{lambda.max} is the minimum regularization parameter which yields an all-zero estimates.}
   
@@ -29,7 +29,7 @@ picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
   
   \item{lambda.min}{The smallest value for \code{lambda}. If $\code{lambda.min.ratio} is provided, then it is set to \code{lambda.min.ratio*MAX}, where \code{MAX} is the uppperbound of the regularization parameter. The default value is \code{0.1*MAX}.}
   
-  \item{family}{Options for model. Sparse linear regression and sparse multivariate regression is applied if \code{family = "gaussian"}, sparse logistic regression is applied if \code{family = "binomial"} and sparse poisson regression is applied if \code{family = "poisson"}. The default value is \code{"gaussian"}.}
+  \item{family}{Options for model. Sparse linear regression and sparse multivariate regression is applied if \code{family = "gaussian"}, sqrt lasso is applied if \code{family = "sqrtlasso"}, sparse logistic regression is applied if \code{family = "binomial"} and sparse poisson regression is applied if \code{family = "poisson"}. The default value is \code{"gaussian"}.}
   
   \item{method}{Options for regularization. Lasso is applied if \code{method = "l1"}, MCP is applied if \code{method = "mcp"} and SCAD Lasso is applied if \code{method = "scad"}. The default value is \code{"l1"}.}
   

@@ -13,6 +13,7 @@ export("picasso",
        "plot.poisson",
        "coef.poisson",
        "predict.poisson",
+       "coef.sqrtlasso",
        "print.sqrtlasso",
        "plot.sqrtlasso",
        "coef.sqrtlasso"

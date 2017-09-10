@@ -131,11 +131,9 @@ picasso.sqrtlasso <- function(X,
 
 print.sqrtlasso <- function(x, ...)
 {  
-  cat("\n Logit options summary: \n")
+  cat("\n SQRT Lasso options summary: \n")
   cat(x$nlambda, " lambdas used:\n")
   print(signif(x$lambda,digits=3))
-  cat("Method =", x$method, "\n")
-  cat("Alg =", x$alg, "\n")
   cat("Degree of freedom:",min(x$df),"----->",max(x$df),"\n")
   if(units.difftime(x$runtime)=="secs") unit="secs"
   if(units.difftime(x$runtime)=="mins") unit="mins"
@@ -178,32 +176,31 @@ coef.sqrtlasso <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
   }
 }
 
-predict.sqrtlasso <- function(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1:5), ...)
+predict.sqrtlasso <- function(object, newdata, lambda.idx = c(1:3), Y.pred.idx = c(1:5), ...)
 {
   pred.n = nrow(newdata)
   lambda.n = length(lambda.idx)
-  p.pred.n = length(p.pred.idx)
+  Y.pred.n = length(Y.pred.idx)
   intcpt = matrix(rep(object$intercept[,lambda.idx],pred.n),nrow=pred.n,
                   ncol=lambda.n,byrow=T)
-  res = newdata%*%object$beta[,lambda.idx] + intcpt
-  p.pred = exp(res)/(1+exp(res))
-  cat("\n Values of predicted Bernoulli parameter: \n")
+  Y.pred = newdata%*%object$beta[,lambda.idx] + intcpt
+  cat("\n Values of predicted responses: \n")
   cat("   index   ")
-  for(i in 1:lambda.n){
-    cat("",formatC(lambda.idx[i],digits=5,width=10),"")
+  for (i in 1:lambda.n){
+    cat("",formatC(lambda.idx[i], digits=5, width=10),"")
   }
   cat("\n")
   cat("   lambda  ")
-  for(i in 1:lambda.n){
-    cat("",formatC(object$lambda[lambda.idx[i]],digits=4,width=10),"")
+  for (i in 1:lambda.n){
+    cat("",formatC(object$lambda[lambda.idx[i]], digits=4, width=10),"")
   }
   cat("\n")
-  for(i in 1:p.pred.n){
-    cat("    Y",formatC(p.pred.idx[i],digits=5,width=-5))
-    for(j in 1:lambda.n){
-      cat("",formatC(p.pred[p.pred.idx[i],j],digits=4,width=10),"")
+  for (i in 1:Y.pred.n){
+    cat("    Y",formatC(Y.pred.idx[i], digits=5, width=-5))
+    for (j in 1:lambda.n){
+      cat("",formatC(Y.pred[Y.pred.idx[i],j], digits=4, width=10),"")
     }
     cat("\n")
   }
-  return(p.pred)
+  return(Y.pred)
 }
