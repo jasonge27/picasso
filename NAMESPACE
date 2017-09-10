@@ -12,7 +12,10 @@ export("picasso",
        "print.poisson",
        "plot.poisson",
        "coef.poisson",
-       "predict.poisson"
+       "predict.poisson",
+       "print.sqrtlasso",
+       "plot.sqrtlasso",
+       "coef.sqrtlasso"
       )
 importFrom("grDevices", "dev.off", "gray.colors", "postscript")
 importFrom("graphics", "lines", "matplot", "par", "plot")
@@ -30,3 +33,7 @@ S3method("print", "poisson")
 S3method("plot", "poisson")
 S3method("coef", "poisson")
 S3method("predict", "poisson")
+S3method("print", "sqrtlasso")
+S3method("plot", "sqrtlasso")
+S3method("coef", "sqrtlasso")
+S3method("predict", "sqrtlasso")

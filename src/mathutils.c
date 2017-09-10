@@ -2,6 +2,25 @@
 
 #define BIG_EXPONENT (690) 
 
+double sqrt_mse_obj_change(const double *r, 
+    const double *X, const double L, int k, int n, double beta_new, double beta_old){
+    double delta = beta_new - beta_old;
+
+    double tmp = 0.0;
+    double a = 0.0;
+    for (int i = 0; i < n; i++){
+        tmp = r[i] / L;
+        tmp = tmp*tmp/n;
+        a += X[k*n+i]*X[k*n+i]*(1-tmp);
+    }
+
+    a = a/(n*L);
+
+    double obj_change = a*delta*delta*0.5;
+    return obj_change; 
+}
+
+
 void coordinate_update(double * beta, double gr, double S, 
                         int standardized, double lambda){
     double tmp = 0;
@@ -136,6 +155,38 @@ double get_penalized_logistic_loss(int method_flag, double *p, double * Y, doubl
 
     return(v); 
 }
+
+double get_penalized_sqrt_mse_loss(int method_flag, const double * Y, 
+            const double * Xb, double * beta, int n, int d, 
+            const double* lambda, double gamma){
+    int i;
+    double v = 0.0;
+    for (i = 0; i<n; i++){
+        v += (Y[i]-Xb[i])*(Y[i]-Xb[i]); 
+    }
+
+    v = sqrt(v/n);
+    
+    for (i = 0; i<d; i++){
+        v += get_penalty_value(method_flag, fabs(beta[i]), lambda[i], gamma);
+    }
+
+    return(v); 
+}
+
+double get_sqrt_mse_loss(const double * Y, 
+            double * Xb, double intcpt, int n, int d){
+    int i;
+    double v = 0.0;
+    for (i = 0; i<n; i++){
+        v += (Y[i]-Xb[i]-intcpt)*(Y[i]-Xb[i]-intcpt); 
+    }
+
+    v = sqrt(v/n);
+    
+    return(v); 
+}
+
 
 
 double get_penalized_poisson_loss(int method_flag, double *p, double * Y, double * Xb, double * beta, 

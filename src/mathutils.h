@@ -14,6 +14,17 @@
 #include "R_ext/Rdynload.h"
 #include <R_ext/Applic.h>
 
+
+double sqrt_mse_obj_change(const double *r, 
+    const double *X, const double L, int k, int n, double beta_new, double beta_old);
+
+
+double get_penalized_sqrt_mse_loss(int method_flag, const double * Y, 
+            const double * Xb, double * beta, int n, int d, 
+            const double* lambda, double gamma);
+   
+double get_sqrt_mse_loss(const double * Y, double * Xb, double intcpt, int n, int d);
+
 void coordinate_update(double * beta, double gr, double S, 
                         int standardized, double lambda);
 
