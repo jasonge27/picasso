@@ -1,5 +1,4 @@
 #include <picasso/actnewton.h>
-#include <dmlc/parameter.h>
 
 namespace picasso {
 namespace solver {
@@ -29,6 +28,9 @@ public:
   /*! max number of iteration for innner loop */
   int max_iter;
 
+  /*! whether or not to add intercept term */
+  bool intercept;
+
   std::vector<double> lambdas;
 
   ActiveNewtonTrainParam() {
@@ -39,6 +41,7 @@ public:
     num_relaxation_round = 3;
     prec = 1e-4;
     max_iter = 1000;
+    intercept = true;
     lambdas.clear();
   }
 
@@ -70,7 +73,7 @@ public:
     num_lambda = lambdas.size();
     target_lambda = lambdas[num_lambda-1];
   }
-}
+};
 
 class ActNewtonSolver {
 private:
@@ -102,8 +105,6 @@ public:
     // model parameters on the master path 
     // each master parameter is relaxed into SCAD/MCP parameter
     ModelParam model_master = obj->get_model_params();
-
-    obj->init_active_set();
 
     std::vector<double> stage_lambdas(d, 0);
     for (int i = 0; i < lambdas.size(); i++){
@@ -217,7 +218,7 @@ public:
       solution_path.push_back(obj->get_model_param());
     }
   }
-}
+};
 
 }
 }
