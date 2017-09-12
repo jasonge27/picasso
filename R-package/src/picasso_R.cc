@@ -1,4 +1,5 @@
 #include <picasso/c_api.h>
+#include <R.h>
 
 void picasso_logit_solver(
     double *Y,      // input: 0/1 model response 

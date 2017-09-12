@@ -34,18 +34,20 @@ private:
 public:
   ObjFunction(ObjType obj_type, const double * xmat, const double * y, int n, int d);
 
-  ModelParam get_model_param();
+  ModelParam get_model_param() {return m_model_param;};
   
-  double coordinate_descent(int idx, double thr);
-  void intercept_update()
-  double get_local_change();
-  double get_local_change(ModelParam model_param, int idx); 
+  virtual double coordinate_descent(int idx, double thr) = 0;
+  virtual void intercept_update() = 0;
+  virtual double get_local_change() = 0;
+  virtual double get_local_change(ModelParam model_param, int idx) = 0; 
 
-  vector<double> get_grad();
-  double get_grad(int idx);
+  virtual vector<double> get_grad() = 0;
+  virtual double get_grad(int idx) = 0;
 
-  double get_model_coef(int idx);
-  double eval();
+  virtual double get_model_coef(int idx) = 0;
+  virtual double eval() = 0;
+
+  ~ObjFunction() {};
 };
 
 }
