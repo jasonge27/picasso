@@ -1,0 +1,25 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.page
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.page
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*~
+*.Rcheck
+*.rds
+*pyc
+.Rhistory
+*.dll
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+R-package/*.Rproj

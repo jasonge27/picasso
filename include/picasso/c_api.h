@@ -22,7 +22,7 @@ extern "C" SolveLogisticRegression(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not 
-); 
+){}
 
 extern "C" SolvePoissonRegression(
     double *Y,      // input: 0/1 model response 
@@ -45,9 +45,8 @@ extern "C" SolvePoissonRegression(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not
-)
+){}
 
- 
 
 extern "C" SolveSqrtLinearRegression(
     double *Y,      // input: 0/1 model response 
@@ -70,7 +69,7 @@ extern "C" SolveSqrtLinearRegression(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not
-); 
+){}
 
 extern "C" SolveLinearRegressionNaiveUpdate(
     double *Y,      // input: 0/1 model response 
@@ -93,7 +92,7 @@ extern "C" SolveLinearRegressionNaiveUpdate(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not
-); 
+){}
 
 extern "C" SolveLinearRegressionCovUpdate(
     double *Y,      // input: 0/1 model response 
@@ -116,6 +115,6 @@ extern "C" SolveLinearRegressionCovUpdate(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not
-)
+){}
 
-#endif PICASSO_C_API_H
+#endif // PICASSO_C_API_H

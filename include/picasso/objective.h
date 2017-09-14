@@ -30,26 +30,28 @@ private:
 
   ObjType m_obj_type;
   ModelParam m_model_param;
+  
 
 public:
   ObjFunction(ObjType obj_type, const double * xmat, const double * y, int n, int d);
 
   ModelParam get_model_param() {return m_model_param;};
+  virtual void set_model_param(ModelParam &other_param) = 0; // TODO
   
   virtual double coordinate_descent(int idx, double thr) = 0;
   virtual void intercept_update() = 0;
   virtual double get_local_change() = 0;
   virtual double get_local_change(ModelParam model_param, int idx) = 0; 
 
-  virtual vector<double> get_grad() = 0;
+  virtual std::vector<double> get_grad() = 0;
   virtual double get_grad(int idx) = 0;
 
   virtual double get_model_coef(int idx) = 0;
   virtual double eval() = 0;
 
   ~ObjFunction() {};
-};
+}; 
 
-}
+} // namespace picasso
 
-#endif PICASSO_OBJECTIVE_H
+#endif // PICASSO_OBJECTIVE_H

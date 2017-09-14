@@ -1,5 +1,7 @@
 #include <picasso/objective.h>
 
+namespace picasso{
+
 class LogisticObjective: public ObjFunction {
 private:
   std::vector<double> p;
@@ -14,6 +16,7 @@ private:
 
 public:
   double coordinate_descent(int idx, double thr){
+    /*
     g = 0.0;
     a = 0.0;
 
@@ -40,9 +43,11 @@ public:
       r[i] = r[i] - w[i]*X[idx*n+i] * (model_param.beta[idx] - tmp);
     
     local_change = 0.0;
-    tmp = ()
+    tmp = ()*/
+    return 0;
   }
 
-  void 
 
-}
+};
+
+} // namespace picasso
