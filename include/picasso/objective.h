@@ -36,6 +36,7 @@ public:
   ObjFunction(ObjType obj_type, const double * xmat, const double * y, int n, int d);
 
   ModelParam get_model_param() {return m_model_param;};
+  virtual void set_model_param(ModelParam &other_param) = 0; // TODO
   
   virtual double coordinate_descent(int idx, double thr) = 0;
   virtual void intercept_update() = 0;

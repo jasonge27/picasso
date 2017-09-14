@@ -33,7 +33,7 @@ public:
 
   std::vector<double> lambdas;
 
-  ActiveNewtonTrainParam() {
+  ActNewtonTrainParam() {
     num_lambda = 100;
     target_lambda = 1e-6;
     reg_type = L1;
@@ -73,6 +73,13 @@ public:
     num_lambda = lambdas.size();
     target_lambda = lambdas[num_lambda-1];
   }
+  
+  std::vector<double> get_lambda_path() const
+  {
+    // TODO
+    std::vector<double> emptyvec;
+    return emptyvec;
+  }
 };
 
 class ActNewtonSolver {
@@ -85,13 +92,13 @@ private:
 
 public:
   ActNewtonSolver(ObjFunction * obj, ActNewtonTrainParam param):
-    m_obj(obj), m_param(param) {}
+    m_param(param),m_obj(obj)  {}
 
   void solve(ObjFunction* obj){
-    std::vector<double> & gr = obj->get_grad();
+    std::vector<double> && gr = obj->get_grad();
     unsigned int d = gr.size();
 
-    const std::vector<double> & lambdas = param.get_lambda_path();
+    const std::vector<double> & lambdas = m_param.get_lambda_path();
     itercnt_path.resize(lambdas.size(), 0);
 
     double dev_null = obj->eval(); // initial un-penalized fvalue
@@ -104,12 +111,12 @@ public:
     
     // model parameters on the master path 
     // each master parameter is relaxed into SCAD/MCP parameter
-    ModelParam model_master = obj->get_model_params();
+    ModelParam model_master = obj->get_model_param();
 
     std::vector<double> stage_lambdas(d, 0);
     for (int i = 0; i < lambdas.size(); i++){
       // start with the previous solution on the master path
-      obj->set_model_params(model_master);  
+      obj->set_model_param(model_master);  
 
       // init the active set
       double threshold = 2*lambdas[i];
@@ -138,7 +145,7 @@ public:
           actset_idx.clear();
           for (int j = 0; j < d; j++)
             if (actset_indcat[j]) {
-              double updated_coord = obj->coordinate_descent(j, stage_lambda[j]);
+              double updated_coord = obj->coordinate_descent(j, stage_lambdas[j]);
               
               if (fabs(updated_coord) > 0)
                 actset_idx.push_back(j);
@@ -154,7 +161,7 @@ public:
             for (int k = 0; k < actset_idx.size(); k++){
               int idx = actset_idx[k];
             
-              double updated_coord = obj->coordinate_descent(idx, stage_lambda[idx]);
+              double updated_coord = obj->coordinate_descent(idx, stage_lambdas[idx]);
 
               if (obj->get_local_change() > dev_thr) 
                 terminate_loop_level_2 = false;
@@ -181,7 +188,7 @@ public:
           for (int k = 0; k < d; k++)
             if (actset_indcat[k] == 0){
               gr[k] = obj->get_grad(k);
-              if (gr[k] > stage_lambda[k]){
+              if (gr[k] > stage_lambdas[k]){
                 actset_indcat[k] = 1;
                 terminate_loop_level_1 = false;
               }
@@ -192,7 +199,7 @@ public:
         }
 
         if (loopcnt_level_0 == 1)
-          model_master = obj->get_model_params();
+          model_master = obj->get_model_param();
         
         if (m_param.reg_type == L1)
           break;
@@ -203,14 +210,14 @@ public:
 
           switch (m_param.reg_type) {
             case MCP: 
-               stage_lambda[j] = (fabs(beta) > lambda[i] * m_param.gamma) 
-                  ? 0.0 : lambda[i] - fabs(beta)/m_param.gamma; 
+               stage_lambdas[j] = (fabs(beta) > lambdas[i] * m_param.reg_gamma) 
+                  ? 0.0 : lambdas[i] - fabs(beta)/m_param.reg_gamma; 
             case SCAD: 
-               stage_lambda[j] = (fabs(beta) > lambda[i] * m_param.gamma) 
-                  ? 0.0 : ((fabs(beta) > lambda[i]) 
-                  ? ((lambda[i]*m_param.gamma - fabs(beta))/(m_param.gamma-1)):lambda[i]) 
+               stage_lambdas[j] = (fabs(beta) > lambdas[i] * m_param.reg_gamma) 
+                  ? 0.0 : ((fabs(beta) > lambdas[i]) 
+                  ? ((lambdas[i]*m_param.reg_gamma - fabs(beta))/(m_param.reg_gamma-1)):lambdas[i]); 
             default: 
-               stage_lambda[j] = lambda[i];
+               stage_lambdas[j] = lambdas[i];
           }
         }
       }

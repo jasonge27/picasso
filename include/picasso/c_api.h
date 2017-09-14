@@ -1,7 +1,7 @@
 #ifndef PICASSO_C_API_H
 #define PICASSO_C_API_H
 
-extern "C" void SolveLogisticRegression(
+extern "C" SolveLogisticRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -22,9 +22,9 @@ extern "C" void SolveLogisticRegression(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not 
-);
+){}
 
-extern "C" void SolvePoissonRegression(
+extern "C" SolvePoissonRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -45,11 +45,10 @@ extern "C" void SolvePoissonRegression(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not
-);
+){}
 
- 
 
-extern "C" void SolveSqrtLinearRegression(
+extern "C" SolveSqrtLinearRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -70,9 +69,9 @@ extern "C" void SolveSqrtLinearRegression(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not
-); 
+){}
 
-extern "C" void SolveLinearRegressionNaiveUpdate(
+extern "C" SolveLinearRegressionNaiveUpdate(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -93,9 +92,9 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not
-); 
+){}
 
-extern "C" void SolveLinearRegressionCovUpdate(
+extern "C" SolveLinearRegressionCovUpdate(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -116,6 +115,6 @@ extern "C" void SolveLinearRegressionCovUpdate(
     double pprec,  //
     int reg_type,    // type of regularization
     bool intercept   // to have intercept term or not
-);
+){}
 
 #endif // PICASSO_C_API_H

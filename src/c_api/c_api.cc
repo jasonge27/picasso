@@ -2,6 +2,7 @@
 
 using namespace picasso;
 
+/*  TODO
 extern "C" SolveLogisticRegression() {
 
 }
@@ -17,3 +18,4 @@ extern "C" SolveSqrtLinearRegression() {
 extern "C" SolveLinearRegression() {
 
 }
+*/
