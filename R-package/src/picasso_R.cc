@@ -23,9 +23,9 @@ void picasso_logit_solver(
     int *fflag,      //
     int *intercept // input: 1 for adding intercept term 
     ){
-  SolveLogisticRegression(Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc,
-     obj, runt, lambda, *nnlambda, *ggamma, *mmax_ite, 
-     *pprec, *fflag, *intercept);
+  SolveLogisticRegression(Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc, 
+                          size_act, obj, runt, lambda, *nnlambda, *ggamma, *mmax_ite, 
+                          *pprec, *fflag, *intercept);
 }
 
 void picasso_sqrt_lasso_solver(
@@ -51,8 +51,8 @@ void picasso_sqrt_lasso_solver(
     int *intercept // input: 1 for adding intercept term 
     ){
    SolveSqrtLinearRegression(Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc,
-     obj, runt, lambda, *nnlambda, *ggamma, 
-     *mmax_ite, *pprec, *fflag, *intercept);
+                             size_act, obj, runt, lambda, *nnlambda, *ggamma, 
+                             *mmax_ite, *pprec, *fflag, *intercept);
 }
 
 void picasso_poisson_solver(
@@ -79,8 +79,8 @@ void picasso_poisson_solver(
     ){
    // call picasso c api 
    SolvePoissonRegression(Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc,
-     obj, runt, lambda, *nnlambda, *ggamma, 
-     *mmax_ite, *pprec, *fflag, *intercept);
+                          size_act, obj, runt, lambda, *nnlambda, *ggamma, 
+                          *mmax_ite, *pprec, *fflag, *intercept);
 }
 
 void picasso_gaussian_cov(
@@ -107,7 +107,7 @@ void picasso_gaussian_cov(
    ){
   SolveLinearRegressionCovUpdate(
     Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc,
-     obj, runt, lambda, *nnlambda, *ggamma, 
+    size_act, obj, runt, lambda, *nnlambda, *ggamma, 
      *mmax_ite, *pprec, *fflag, *intercept);
 }
 
@@ -135,7 +135,7 @@ void picasso_gaussian_naive(
    ){
   SolveLinearRegressionNaiveUpdate(
     Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc,
-     obj, runt, lambda, *nnlambda, *ggamma, *mmax_ite, 
+    size_act, obj, runt, lambda, *nnlambda, *ggamma, *mmax_ite, 
      *pprec, *fflag, *intercept);
 }
 
