@@ -25,14 +25,15 @@ private:
   int n; // sample number
   int d; // sample dimension
 
-  std::vector<double> X;
+  std::vector<std::vector<double> > X;
   std::vector<double> Y;
 
   std::vector<double> gr;
 
   ObjType obj_type;
   ModelParam model_param;
-  
+
+  double deviance;
 
 public:
   ObjFunction(ObjType obj_type, const double * xmat, 
@@ -41,16 +42,25 @@ public:
     this->d = d;
     this->n = n;
     Y.resize(n);
-    X.resize(n*d);
-    for (int i = 0; i < n; i++){
+    X.resize(d);
+
+    for (int i = 0; i < n; i++)
       Y[i] = y[i];
-      for (int j = 0; j < d; j++)
-        X[j*n+i] = xmat[j*n+i];
+    
+    for (int j = 0; j < d; j++){
+      X[j].resize(n);
+      for (int i = 0; i < n; i++)
+        X[j][i] = xmat[j*n+i];
     }
   };
 
   int get_dim() {return d;}
+
   double get_grad(int idx){return gr[idx]);
+
+  // fabs(null fvalue - saturated fvalue)
+  double get_deviance(){return(deviance)} ;
+
   double get_model_coef(int idx){
     return((idx<0) ? model_param.intercept : model_param.beta[idx])
   }
@@ -62,12 +72,13 @@ public:
   }
 
   ModelParam get_model_param() {return(m_model_param);};
-  void set_model_param(ModelParam &other_param) {
-    m_model_param = other_param;
-  }
+
+  // reset model param and also update related aux vars 
+  virtual void set_model_param(ModelParam &other_param) = 0; 
   
   // coordinate descent
   virtual double coordinate_descent(int idx, double thr) = 0;
+  
   // update intercept term
   virtual void intercept_update() = 0;
 
@@ -79,6 +90,7 @@ public:
 
   // unpenalized function value
   virtual double eval() = 0;
+
 
   ~ObjFunction() {};
 }; 

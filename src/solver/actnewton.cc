@@ -100,8 +100,7 @@ public:
     const std::vector<double> & lambdas = m_param.get_lambda_path();
     itercnt_path.resize(lambdas.size(), 0);
 
-    double dev_null = obj->eval(); // initial un-penalized fvalue
-    double dev_thr = dev_null * m_param.prec;
+    double dev_thr = obj->get_deviance() * m_param.prec;
 
     // actset_indcat[i] == 1 if i is in the active set
     std::vector<int> actset_indcat(d, 0); 
@@ -199,7 +198,7 @@ public:
               (obj->get_local_change(old_intcpt, -1) > dev_thr))
             terminate_loop_level_1 = false;
 
-          // recompute grad, second order coef w and other aux vars
+          // recompute grad, second order coef w jand other aux vars
           obj->update_auxiliary();
 
           // check stopping criterion 2: active set change 
