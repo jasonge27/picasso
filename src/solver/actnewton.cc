@@ -95,8 +95,7 @@ public:
     m_param(param),m_obj(obj)  {}
 
   void solve(ObjFunction* obj){
-    std::vector<double> && gr = obj->get_grad();
-    unsigned int d = gr.size();
+    unsigned int d = obj->get_dim();
 
     const std::vector<double> & lambdas = m_param.get_lambda_path();
     itercnt_path.resize(lambdas.size(), 0);
@@ -120,17 +119,19 @@ public:
       // start with the previous solution on the master path
       obj->set_model_param(model_master);  
 
+      // calculating gradients and other auxiliary vars such as r
+      obj->update_auxiliary();
+
       // init the active set
       double threshold = 2*lambdas[i];
       if (i > 0) threshold -= lambdas[i-1];
       for (int j = 0; j < d; ++j){
         stage_lambdas[j] = lambdas[i];
 
-        if (gr[j] > threshold)
+        if (obj->get_grad[j] > threshold)
           actset_indcat[j] = 1;
       }
 
-      obj->update_auxiliary();
 
       // loop level 0: multistage convex relaxation
       int loopcnt_level_0 = 0;
@@ -148,6 +149,7 @@ public:
           for (int j = 0; j < d; j++)
             old_coef[j] = obj->get_model_coef(j);
 
+          // initialize actset_idx
           actset_idx.clear();
           for (int j = 0; j < d; j++)
             if (actset_indcat[j]) {
@@ -193,14 +195,17 @@ public:
             if (obj->get_local_change(old_coef[idx], idx) > dev_thr)
               terminate_loop_level_1 = false;
           }
-          if (obj->get_local_change(old_intcpt, -1) > dev_thr)
+          if ((m_param.include_intercept) && 
+              (obj->get_local_change(old_intcpt, -1) > dev_thr))
             terminate_loop_level_1 = false;
+
+          // recompute grad, second order coef w and other aux vars
+          obj->update_auxiliary();
 
           // check stopping criterion 2: active set change 
           for (int k = 0; k < d; k++)
             if (actset_indcat[k] == 0){
-              gr[k] = obj->get_grad(k);
-              if (gr[k] > stage_lambdas[k]){
+              if (fabs(obj->get_grad(k)) > stage_lambdas[k]){
                 actset_indcat[k] = 1;
                 terminate_loop_level_1 = false;
               }
