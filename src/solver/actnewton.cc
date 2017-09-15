@@ -29,7 +29,7 @@ public:
   int max_iter;
 
   /*! whether or not to add intercept term */
-  bool intercept;
+  bool include_intercept;
 
   std::vector<double> lambdas;
 
@@ -41,7 +41,7 @@ public:
     num_relaxation_round = 3;
     prec = 1e-4;
     max_iter = 1000;
-    intercept = true;
+    include_intercept = true;
     lambdas.clear();
   }
 
@@ -109,6 +109,8 @@ public:
     // actset_idx <- which(actset_indcat==1) 
     std::vector<int> actset_idx; 
     
+    std::vector<double> old_coef(d);
+
     // model parameters on the master path 
     // each master parameter is relaxed into SCAD/MCP parameter
     ModelParam model_master = obj->get_model_param();
@@ -128,6 +130,8 @@ public:
           actset_indcat[j] = 1;
       }
 
+      obj->update_auxiliary();
+
       // loop level 0: multistage convex relaxation
       int loopcnt_level_0 = 0;
       while (loopcnt_level_0 < m_param.num_relaxation_round) {
@@ -140,7 +144,9 @@ public:
           loopcnt_level_1++;
           terminate_loop_level_1 = true;
 
-          ModelParam model_param_level_1 = obj->get_model_param();
+          double old_intcpt = obj->get_model_coef(-1);
+          for (int j = 0; j < d; j++)
+            old_coef[j] = obj->get_model_coef(j);
 
           actset_idx.clear();
           for (int j = 0; j < d; j++)
@@ -161,15 +167,17 @@ public:
             for (int k = 0; k < actset_idx.size(); k++){
               int idx = actset_idx[k];
             
+              double old_beta = obj->get_model_coef(idx);
               double updated_coord = obj->coordinate_descent(idx, stage_lambdas[idx]);
 
-              if (obj->get_local_change() > dev_thr) 
+              if (obj->get_local_change(old_beta, idx) > dev_thr) 
                 terminate_loop_level_2 = false;
             }
 
-            if (m_param.intercept){
+            if (m_param.include_intecept){
+              double old_intcpt = obj->get_model_coef(-1);
               obj->intercept_update();
-              if (obj->get_local_change() > dev_thr)
+              if (obj->get_local_change(old_intcpt, -1) > dev_thr)
                 terminate_loop_level_2 = false;
             }
 
@@ -180,9 +188,13 @@ public:
           itercnt_path[i] += loopcnt_level_2;
 
           // check stopping criterion 1: fvalue change
-          for (int k = 0; k < actset_idx.size(); ++k)
-            if (obj->get_local_change(model_param_level_1, actset_idx[k]) > dev_thr)
+          for (int k = 0; k < actset_idx.size(); ++k){
+            int idx = actset_idx[k];
+            if (obj->get_local_change(old_coef[idx], idx) > dev_thr)
               terminate_loop_level_1 = false;
+          }
+          if (obj->get_local_change(old_intcpt, -1) > dev_thr)
+            terminate_loop_level_1 = false;
 
           // check stopping criterion 2: active set change 
           for (int k = 0; k < d; k++)

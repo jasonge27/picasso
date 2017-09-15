@@ -10,7 +10,9 @@ private:
   // quadratic approx coefs for each coordinate
   // a*x^2 + g*x + constant 
   double a, g; 
-  double local_change;
+  double wXX;
+  double sum_r;
+  double sum_w;
 
 public:
   double coordinate_descent(int idx, double thr){
@@ -32,60 +34,63 @@ public:
     else 
       model_param.beta[idx] = 0.0;
     
-
     for (int i = 0; i < n; i++)
       Xb[i] = Xb[i] + (model_param.beta[idx]-tmp)*X[idx*n+i];
     
-    for (int i = 0; i < n; i++)
+    sum_r = 0.0;
+    for (int i = 0; i < n; i++){
       r[i] = r[i] - w[i]*X[idx*n+i]*(model_param.beta[idx]-tmp);
+      sum_r += r[i];
+    }
     
-    local_change = 0.0;
-    tmp = (model_param.beta[idx]-tmp)*(model_param.beta[idx]-tmp);
-    for (int i = 0; i < n; i++)
-      local_change += w[i]*X[idx*n+i]*X[idx*n+i];
-    local_change = local_change * tmp / (2*n);
-
     return model_param.beta[idx];
   }
 
-  void intercept_update(){
-    double sum_r = 0.0;
-    double sum_w = 0.0;
+  void update_auxiliary(){
+    sum_w = 0.0;
     for (int i = 0; i < n; i++){
-      sum_r += r[i];
+      p[i] = 1.0/(1.0 + exp(-model_param.intercept - Xb[i]));
+      w[i] = p[i]*(1-p[i]);
       sum_w += w[i];
     }
-         
+
+    for (int idx = 0; idx < d; idx++){
+      wXX[idx] = 0.0;
+      for (int i = 0; i < n; i++)
+        wXX[idx] += w[i]*X[idx*n+i]*X[idx*n+i];
+    }
+  }
+
+  void intercept_update(){
     tmp = sum_r / sum_w; 
-    for (i = 0; i < n; i++)
+
+    sum_r = 0.0;
+    for (i = 0; i < n; i++){
       r[i] = r[i] - tmp * w[i];
+      sum_r += r[i];
+    }
             
     model_param.intercept += tmp;
-    local_change = sum_w * tmp*tmp/ (2*n);
   }
 
-  double get_global_change(ModelParam old_model_param, int idx) {
-    double global_change = 0.0;
-    double dev = 0.0;
-
-    for (int i = 0; i < d; i++){
-      double tmp = model_param.beta[i] - old_model_param.beta[i];
-      tmp = tmp*tmp;
-      dev = 0.0;
-      for (int j = 0; j < n; j++)
-        dev += w[j] * X[j*n+i] * X[j*n+i] * tmp;
-      dev = dev / (2*n);
-
-      if (dev > global_change)
-        global_change = dev;
+  double get_local_change(double old, int idx){
+    if (idx >= 0){
+      double tmp = old - model_param.beta[idx];
+      return wXX[idx]*tmp*tmp/(2*n); 
+    } else {
+      double tmp = old - model_param.intercept;
+      return sum_w*tmp*tmp/(2*n); 
     }
-  
-    tmp = model_param.intercept - old_model_param.intercept;
-    dev = sum_w * tmp*tmp/(2*n);
-    if (dev > global_change)
-      global_change = dev;
-
-    return global_change;
   }
 
+  double get_global_change(double old, int idx){
+    if (idx >= 0){
+      double tmp = model_param.beta[idx] - old;
+      return wXX[idx]*tmp*tmp/(2*n);
+    } else {
+      double tmp = model_param.intercept - old;
+      dev = sum_w*tmp*tmp/(2*n);
+      return dev; 
+    }
+  } 
 }

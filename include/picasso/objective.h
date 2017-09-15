@@ -40,8 +40,10 @@ public:
   
   virtual double coordinate_descent(int idx, double thr) = 0;
   virtual void intercept_update() = 0;
-  virtual double get_local_change() = 0;
-  virtual double get_local_change(ModelParam model_param, int idx) = 0; 
+
+  virtual void update_auxiliary() = 0;
+
+  virtual double get_local_change(double old, int idx) = 0;
 
   virtual std::vector<double> get_grad() = 0;
   virtual double get_grad(int idx) = 0;
