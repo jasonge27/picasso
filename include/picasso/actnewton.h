@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cmath>
+#include <picasso/objective.h>
 
 
 #endif // PICASSO_ACTNEWTON_H

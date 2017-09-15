@@ -1,4 +1,5 @@
 #include <picasso/actnewton.h>
+#include <vector>
 
 namespace picasso {
 namespace solver {

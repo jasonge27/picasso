@@ -23,3 +23,9 @@
 .RData
 .Ruserdata
 R-package/*.Rproj
+
+#CLion
+.idea
+
+#cmake
+cmake-build-debug
