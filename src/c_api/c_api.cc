@@ -1,6 +1,6 @@
 #include <picasso/c_api.h>
 
-//using namespace picasso;
+using namespace picasso;
 
 void SolveLogisticRegression(
     double *Y,      // input: 0/1 model response 
@@ -25,7 +25,7 @@ void SolveLogisticRegression(
     bool intercept   // to have intercept term or not 
 ){}
 
-extern "C" void SolvePoissonRegression(
+void SolvePoissonRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -49,7 +49,7 @@ extern "C" void SolvePoissonRegression(
 ){}
 
 
-extern "C" void SolveSqrtLinearRegression(
+void SolveSqrtLinearRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -72,7 +72,7 @@ extern "C" void SolveSqrtLinearRegression(
     bool intercept   // to have intercept term or not
 ){}
 
-extern "C" void SolveLinearRegressionNaiveUpdate(
+void SolveLinearRegressionNaiveUpdate(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -95,7 +95,7 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
     bool intercept   // to have intercept term or not
 ){}
 
-extern "C" void SolveLinearRegressionCovUpdate(
+void SolveLinearRegressionCovUpdate(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
