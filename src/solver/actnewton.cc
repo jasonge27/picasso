@@ -5,71 +5,43 @@ namespace solver {
 enum RegType {L1, SCAD, MCP};
 
 // training parameters
-class ActNewtonTrainParam {
-public:
-  /*! number of regularization parameters */
-  unsigned num_lambda;
+ActNewtonTrainParam::ActNewtonTrainParam() {
+  num_lambda = 100;
+  target_lambda = 1e-6;
+  reg_type = L1;
+  reg_gamma = 3.0;
+  num_relaxation_round = 3;
+  prec = 1e-4;
+  max_iter = 1000;
+  include_intercept = true;
+  lambdas.clear();
+}
 
-  /*! the last paramter on the regularization path */
-  double target_lambda;
-
-  /*! type of regularization terms */
-  RegType reg_type;
-
-  /*! gamma param for SCAD and MCP regularization */
-  double reg_gamma;
-
-  /*！ rounds of relaxation when solving SCAD and MCP penalty */
-  unsigned num_relaxation_round;
-
-  /*! precision of optimization */
-  double prec;
-
-  /*! max number of iteration for innner loop */
-  int max_iter;
-
-  /*! whether or not to add intercept term */
-  bool include_intercept;
-
-  std::vector<double> lambdas;
-
-  ActNewtonTrainParam() {
-    num_lambda = 100;
-    target_lambda = 1e-6;
-    reg_type = L1;
-    reg_gamma = 3.0;
-    num_relaxation_round = 3;
-    prec = 1e-4;
-    max_iter = 1000;
-    include_intercept = true;
-    lambdas.clear();
-  }
-
-  void configure(const std::vector<std::pair<std::string, std::string> >& cfg){
-    for (auto iter = cfg.begin(); iter != cfg.end(); iter++){
-      if (iter->first == "nlambda")
-        num_lambda = stoi(iter->second);
-      else if (iter->first == "target_lambda")
-        target_lambda = stof(iter->second);
-      else if (iter->first == "reg_type"){
-        if (iter->second == "L1")
-          reg_type = L1;
-        else if (iter->second == "SCAD")
-          reg_type = SCAD;
-        else if (iter->second == "MCP")
-          reg_type = MCP;
-        else 
-        {/* throw exception */}
-      }
+ActNewtonTrainParam::configure(const std::vector<std::pair<std::string, std::string> >& cfg){
+  for (auto iter = cfg.begin(); iter != cfg.end(); iter++){
+    if (iter->first == "nlambda")
+      num_lambda = stoi(iter->second);
+    else if (iter->first == "target_lambda")
+      target_lambda = stof(iter->second);
+    else if (iter->first == "reg_type"){
+      if (iter->second == "L1")
+        reg_type = L1;
+      else if (iter->second == "SCAD")
+        reg_type = SCAD;
+      else if (iter->second == "MCP")
+        reg_type = MCP;
       else 
-      {/* TODO */}
+        {/* throw exception */}
+    } else {
+      /* TODO */
     }
   }
+}
 
-  void set_lambdas(const double * lambda_path, int n) {
-    lambdas.resize(n);
-    for (int i = 0; i < n; i++)
-      lambdas[i] = lambda_path[i];
+ActNewtonTrainParam::set_lambdas(const double * lambda_path, int n) {
+  lambdas.resize(n);
+  for (int i = 0; i < n; i++)
+    lambdas[i] = lambda_path[i];
     num_lambda = lambdas.size();
     target_lambda = lambdas[num_lambda-1];
   }

@@ -83,6 +83,7 @@ public:
   virtual void intercept_update() = 0;
 
   // update gradient and other aux vars
+  virtual void update_key_aux() = 0;
   virtual void update_auxiliary() = 0;
 
   // compute quadratic change of fvalue on the idx dimension
