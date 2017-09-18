@@ -1,61 +1,8 @@
 #include <picasso/actnewton.h>
+#include <picasso/solver_params.h>
 
 namespace picasso {
 namespace solver {
-enum RegType { L1, SCAD, MCP };
-
-// training parameters
-ActNewtonTrainParam::ActNewtonTrainParam() {
-  num_lambda = 100;
-  target_lambda = 1e-6;
-  reg_type = L1;
-  reg_gamma = 3.0;
-  num_relaxation_round = 3;
-  prec = 1e-4;
-  max_iter = 1000;
-  include_intercept = true;
-  lambdas.clear();
-}
-
-void ActNewtonTrainParam::configure(
-    const std::vector<std::pair<std::string, std::string>> &cfg) {
-  for (auto iter = cfg.begin(); iter != cfg.end(); iter++) {
-    if (iter->first == "nlambda")
-      num_lambda = stoi(iter->second);
-    else if (iter->first == "target_lambda")
-      target_lambda = stof(iter->second);
-    else if (iter->first == "reg_type") {
-      if (iter->second == "L1")
-        reg_type = L1;
-      else if (iter->second == "SCAD")
-        reg_type = SCAD;
-      else if (iter->second == "MCP")
-        reg_type = MCP;
-      else { /* throw exception */
-      }
-    } else {
-      /* TODO */
-    }
-  }
-}
-
-void ActNewtonTrainParam::set_lambdas(const double *lambda_path, int n) {
-  lambdas.resize(n);
-  for (int i = 0; i < n; i++)
-    lambdas[i] = lambda_path[i];
-  num_lambda = lambdas.size();
-  target_lambda = lambdas[num_lambda - 1];
-}
-
-std::vector<double> ActNewtonTrainParam::get_lambda_path() const {
-  // TODO
-  std::vector<double> emptyvec;
-  return emptyvec;
-}
-
-ActNewtonSolver::ActNewtonSolver(ObjFunction *obj, ActNewtonTrainParam param)
-    : m_param(param), m_obj(obj){};
-
 void ActNewtonSolver::solve(ObjFunction *obj) {
   unsigned int d = obj->get_dim();
 
