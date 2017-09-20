@@ -1,7 +1,7 @@
 #ifndef PICASSO_C_API_H
 #define PICASSO_C_API_H
 
-extern "C" SolveLogisticRegression(
+extern "C" void SolveLogisticRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -24,7 +24,7 @@ extern "C" SolveLogisticRegression(
     bool intercept   // to have intercept term or not 
 ){}
 
-extern "C" SolvePoissonRegression(
+extern "C" void SolvePoissonRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -48,7 +48,7 @@ extern "C" SolvePoissonRegression(
 ){}
 
 
-extern "C" SolveSqrtLinearRegression(
+extern "C" void SolveSqrtLinearRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
@@ -94,7 +94,7 @@ extern "C" SolveLinearRegressionNaiveUpdate(
     bool intercept   // to have intercept term or not
 ){}
 
-extern "C" SolveLinearRegressionCovUpdate(
+extern "C" void SolveLinearRegressionCovUpdate(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
