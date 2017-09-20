@@ -71,7 +71,7 @@ extern "C" void SolveSqrtLinearRegression(
     bool intercept   // to have intercept term or not
 ){}
 
-extern "C" SolveLinearRegressionNaiveUpdate(
+extern "C" void SolveLinearRegressionNaiveUpdate(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
     double *beta,   // output: an nlambda * d dim matrix 
