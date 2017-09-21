@@ -9,7 +9,7 @@ extern "C" SolveLogisticRegression() {
 
 extern "C" SolvePoissonRegression() {
 
-} 
+}
 
 extern "C" SolveSqrtLinearRegression() {
 
