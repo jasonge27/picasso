@@ -23,6 +23,7 @@ void ActNewtonSolver::solve(ObjFunction *obj) {
   ModelParam model_master = obj->get_model_param();
 
   std::vector<double> stage_lambdas(d, 0);
+  RegFunction *regfunc = new RegL1();
   for (int i = 0; i < lambdas.size(); i++) {
     // start with the previous solution on the master path
     obj->set_model_param(model_master);
@@ -32,13 +33,11 @@ void ActNewtonSolver::solve(ObjFunction *obj) {
 
     // init the active set
     double threshold = 2 * lambdas[i];
-    if (i > 0)
-      threshold -= lambdas[i - 1];
+    if (i > 0) threshold -= lambdas[i - 1];
     for (int j = 0; j < d; ++j) {
       stage_lambdas[j] = lambdas[i];
 
-      if (obj->get_grad[j] > threshold)
-        actset_indcat[j] = 1;
+      if (obj->get_grad[j] > threshold) actset_indcat[j] = 1;
     }
 
     // loop level 0: multistage convex relaxation
@@ -54,17 +53,16 @@ void ActNewtonSolver::solve(ObjFunction *obj) {
         terminate_loop_level_1 = true;
 
         double old_intcpt = obj->get_model_coef(-1);
-        for (int j = 0; j < d; j++)
-          old_coef[j] = obj->get_model_coef(j);
+        for (int j = 0; j < d; j++) old_coef[j] = obj->get_model_coef(j);
 
         // initialize actset_idx
         actset_idx.clear();
         for (int j = 0; j < d; j++)
           if (actset_indcat[j]) {
-            double updated_coord = obj->coordinate_descent(j, stage_lambdas[j]);
+            regfunc->set_param(stage_lambdas[j]);
+            double updated_coord = obj->coordinate_descent(regfunc, j);
 
-            if (fabs(updated_coord) > 0)
-              actset_idx.push_back(j);
+            if (fabs(updated_coord) > 0) actset_idx.push_back(j);
           }
 
         // loop level 2: proximal newton on active set
@@ -78,8 +76,8 @@ void ActNewtonSolver::solve(ObjFunction *obj) {
             int idx = actset_idx[k];
 
             double old_beta = obj->get_model_coef(idx);
-            double updated_coord =
-                obj->coordinate_descent(idx, stage_lambdas[idx]);
+            regfunc->set_param(stage_lambdas[idx]);
+            double updated_coord = obj->coordinate_descent(regfunc, idx);
 
             if (obj->get_local_change(old_beta, idx) > dev_thr)
               terminate_loop_level_2 = false;
@@ -92,8 +90,7 @@ void ActNewtonSolver::solve(ObjFunction *obj) {
               terminate_loop_level_2 = false;
           }
 
-          if (terminate_loop_level_2)
-            break;
+          if (terminate_loop_level_2) break;
         }
 
         itercnt_path[i] += loopcnt_level_2;
@@ -120,42 +117,42 @@ void ActNewtonSolver::solve(ObjFunction *obj) {
             }
           }
 
-        if (terminate_loop_level_1)
-          break;
+        if (terminate_loop_level_1) break;
       }
 
-      if (loopcnt_level_0 == 1)
-        model_master = obj->get_model_param();
+      if (loopcnt_level_0 == 1) model_master = obj->get_model_param();
 
-      if (m_param.reg_type == L1)
-        break;
+      if (m_param.reg_type == L1) break;
 
       // update stage lambda
       for (int j = 0; j < d; j++) {
         double beta = obj->get_model_coef(j);
 
         switch (m_param.reg_type) {
-        case MCP:
-          stage_lambdas[j] = (fabs(beta) > lambdas[i] * m_param.reg_gamma)
-                                 ? 0.0
-                                 : lambdas[i] - fabs(beta) / m_param.reg_gamma;
-        case SCAD:
-          stage_lambdas[j] =
-              (fabs(beta) > lambdas[i] * m_param.reg_gamma)
-                  ? 0.0
-                  : ((fabs(beta) > lambdas[i])
-                         ? ((lambdas[i] * m_param.reg_gamma - fabs(beta)) /
-                            (m_param.reg_gamma - 1))
-                         : lambdas[i]);
-        default:
-          stage_lambdas[j] = lambdas[i];
+          case MCP:
+            stage_lambdas[j] =
+                (fabs(beta) > lambdas[i] * m_param.reg_gamma)
+                    ? 0.0
+                    : lambdas[i] - fabs(beta) / m_param.reg_gamma;
+          case SCAD:
+            stage_lambdas[j] =
+                (fabs(beta) > lambdas[i] * m_param.reg_gamma)
+                    ? 0.0
+                    : ((fabs(beta) > lambdas[i])
+                           ? ((lambdas[i] * m_param.reg_gamma - fabs(beta)) /
+                              (m_param.reg_gamma - 1))
+                           : lambdas[i]);
+          default:
+            stage_lambdas[j] = lambdas[i];
         }
       }
     }
 
     solution_path.push_back(obj->get_model_param());
   }
+
+  delete regfunc;
 }
 
-} // namespace solver
-} // namespace picasso
+}  // namespace solver
+}  // namespace picasso

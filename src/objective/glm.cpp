@@ -1,8 +1,8 @@
-#include <picasso/objective.h>
+#include <picasso/objective.hpp>
 
 namespace picasso {
 class GLMObjective : public ObjFunction {
-private:
+ private:
   std::vector<double> p;
   std::vector<double> w;
   std::vector<double> Xb;
@@ -17,10 +17,9 @@ private:
   double sum_r;
   double sum_w;
 
-public:
-  GLMObjective(ObjType obj_type, const double *xmat, const double *y, int n,
-               int d)
-      : ObjFunction(obj_type, xmat, y, n, d) {
+ public:
+  GLMObjective(const double *xmat, const double *y, int n, int d)
+      : ObjFunction(xmat, y, n, d) {
     a = 0.0;
     g = 0.0;
     p.resize(d);
@@ -30,8 +29,7 @@ public:
 
     if (m_param.include_intercept) {
       double avr_y = 0.0;
-      for (int i = 0; i < n; i++)
-        avr_y += Y[i];
+      for (int i = 0; i < n; i++) avr_y += Y[i];
       avr_y = avr_y / n;
       model_param.intercept = log(avr_y / (1 - avr_y));
     }
@@ -42,7 +40,7 @@ public:
     deviance = fabs(eval());
   }
 
-  double coordinate_descent(int idx, double thr) {
+  double coordinate_descent(RegFunction *regfunc, int idx) {
     g = 0.0;
     a = 0.0;
 
@@ -59,7 +57,7 @@ public:
 
     tmp = beta[idx];
     if (fabs(g) > thr)
-      model_param.beta[idx] = soft_thresh_l1(g, thr) / a;
+      model_param.beta[idx] = regfunc->threshold(g) / a;
     else
       model_param.beta[idx] = 0.0;
 
@@ -92,8 +90,7 @@ public:
     model_param = other_param;
     for (int i = 0; i < n; i++) {
       Xb[i] = 0.0;
-      for (int j = 0; j < d; j++)
-        Xb[i] = X[j][i] * model_param.beta[j];
+      for (int j = 0; j < d; j++) Xb[i] = X[j][i] * model_param.beta[j];
     }
   }
 
@@ -130,7 +127,7 @@ public:
 };
 
 class LogisticObjective : public GLMObjective {
-public:
+ public:
   void update_key_aux() {
     for (int i = 0; i < n; i++) {
       p[i] = 1.0 / (1.0 + exp(-model_param.intercept - Xb[i]));
@@ -139,19 +136,17 @@ public:
   }
   double eval() {
     double v = 0.0;
-    for (int i = 0; i < n; i++)
-      v -= Y[i] * (model_param.intercept + Xb[i]);
+    for (int i = 0; i < n; i++) v -= Y[i] * (model_param.intercept + Xb[i]);
 
     for (int i = 0; i < n; i++)
-      if (p[i] > 1e-8)
-        v -= (log(p[i]) - model_param.intercept - Xb[i]);
+      if (p[i] > 1e-8) v -= (log(p[i]) - model_param.intercept - Xb[i]);
 
     return (v / n);
   }
 };
 
 class PoissonObjective : public ObjFunction {
-public:
+ public:
   void update_key_aux() {
     for (int i = 0; i < n; i++) {
       p[i] = exp(model_param.intercept + Xb[i]);
@@ -167,4 +162,4 @@ public:
   }
 };
 
-} // namespace picasso
+}  // namespace picasso
