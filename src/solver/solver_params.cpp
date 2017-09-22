@@ -15,28 +15,6 @@ PicassoSolverParams::PicassoSolverParams() {
   lambdas.clear();
 }
 
-void PicassoSolverParams::configure(
-    const std::vector<std::pair<std::string, std::string>> &cfg) {
-  for (auto iter = cfg.begin(); iter != cfg.end(); iter++) {
-    if (iter->first == "nlambda")
-      num_lambda = stoi(iter->second);
-    else if (iter->first == "target_lambda")
-      target_lambda = stof(iter->second);
-    else if (iter->first == "reg_type") {
-      if (iter->second == "L1")
-        reg_type = L1;
-      else if (iter->second == "SCAD")
-        reg_type = SCAD;
-      else if (iter->second == "MCP")
-        reg_type = MCP;
-      else { /* throw exception */
-      }
-    } else {
-      /* TODO */
-    }
-  }
-}
-
 void PicassoSolverParams::set_lambdas(const double *lambda_path, int n) {
   lambdas.resize(n);
   for (int i = 0; i < n; i++)
@@ -46,9 +24,7 @@ void PicassoSolverParams::set_lambdas(const double *lambda_path, int n) {
 }
 
 std::vector<double> PicassoSolverParams::get_lambda_path() const {
-  // TODO
-  std::vector<double> emptyvec;
-  return emptyvec;
+  return lambdas; 
 }
 
 } // namespace solver

@@ -145,7 +145,7 @@ class LogisticObjective : public GLMObjective {
   }
 };
 
-class PoissonObjective : public ObjFunction {
+class PoissonObjective : public GLMFunction {
  public:
   void update_key_aux() {
     for (int i = 0; i < n; i++) {

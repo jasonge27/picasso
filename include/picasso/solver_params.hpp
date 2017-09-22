@@ -18,7 +18,7 @@ public:
   RegType reg_type;
 
   /*! gamma param for SCAD and MCP regularization */
-  double reg_gamma;
+  double gamma;
 
   /*！ rounds of relaxation when solving SCAD and MCP penalty */
   unsigned num_relaxation_round;
@@ -35,8 +35,6 @@ public:
   std::vector<double> lambdas;
 
   PicassoSolverParams();
-
-  void configure(const std::vector<std::pair<std::string, std::string>> &cfg);
 
   void set_lambdas(const double *lambda_path, int n);
 

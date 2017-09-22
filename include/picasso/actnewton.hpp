@@ -20,7 +20,10 @@ public:
   ActNewtonSolver(ObjFunction *obj, PicassoSolverParams param)
       : m_param(param), m_obj(obj);
 
-  void solve(ObjFunction *obj);
+  void solve();
+
+  const std::vector<int> & get_itercnt_path() const {return itercnt_path; };
+  const ModelParam & get_model_param(int i) const {return solution_path[i];};
 };
 
 } // namespace solver

@@ -24,6 +24,7 @@ class GaussianNaiveUpdateObjective : public ObjFunction {
     for (int j = 0; j < d; j++) {
       XX[j] = 0.0;
       for (int i = 0; i < n; i++) XX[j] += X[j][i] * X[j][i];
+      XX[j] = XX[j] / n;
     }
   }
 
