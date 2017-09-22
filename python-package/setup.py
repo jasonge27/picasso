@@ -3,25 +3,38 @@
 from __future__ import absolute_import
 import sys
 import os
+import shutil
 from setuptools import setup, find_packages
 # import subprocess
 sys.path.insert(0, '.')
 
 CURRENT_DIR = os.path.dirname(__file__)
 
-libpath_py = os.path.join(CURRENT_DIR, 'picasso/libpath.py')
+# We can not import `picasso.libpath` in setup.py directly, since it will automatically import other package
+# and case conflict to `install_requires`
+libpath_py = os.path.join(CURRENT_DIR, 'pycasso/libpath.py')
 libpath = {'__file__': libpath_py}
 exec(compile(open(libpath_py, "rb").read(), libpath_py, 'exec'), libpath, libpath)
+LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path'](False)]
+if not LIB_PATH:
+    LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path'](True)]
+    print("Install libpicasso from: %s" % LIB_PATH)
+    # copy LIB_PATH to '.\\lib'
+    for oldlibpath in LIB_PATH:
+        newlibpath = os.path.join('.\\lib', os.path.dirname(oldlibpath))
+        os.makedirs(newlibpath, exist_ok=True)
+        shutil.copy(oldlibpath, newlibpath)
+else:
+    print("libpicasso already exists: " % LIB_PATH)
 
-LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path']()]
+VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
+# For pip
+if not os.path.exists(VERSION_PATH):
+    VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
+if
 
-LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path']()]
-print("Install libpicasso from: %s" % LIB_PATH)
-# Please use setup_pip.py for generating and deploying pip installation
-# detailed instruction in setup_pip.py
-
-setup(name='picasso',
-      version=open(os.path.join(CURRENT_DIR, 'picasso/VERSION')).read().strip(),
+setup(name='pycasso',
+      version=open(VERSION_PATH).read().strip(),
       # version='0.4a23',
       description="Picasso Python Package",
       long_description=open(os.path.join(CURRENT_DIR, 'README.rst')).read(),
@@ -36,8 +49,8 @@ setup(name='picasso',
       # this will use MANIFEST.in during install where we specify additional files,
       # this is the golden line
       include_package_data=True,
-      data_files=[('picasso', LIB_PATH)],
       license='MIT',
       classifiers=['Development Status :: 3 - Alpha',
-                   'License :: OSI Approved :: MIT Software License'],
+                   'Programming Language :: Python :: 3 :: Only',
+                   'License :: OSI Approved :: MIT License'],
       url='https://github.com/jasonge27/picasso')
