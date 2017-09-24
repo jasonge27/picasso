@@ -1,7 +1,6 @@
 // objective
 #include "../src/objective/gaussian_naive_update.cpp"
 #include "../src/objective/glm.cpp"
-#include "../src/objective/objective.cpp"
 #include "../src/objective/sqrtmse.cpp"
 
 // solver
