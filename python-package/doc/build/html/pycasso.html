@@ -36,7 +36,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="pycasso 0.0.1 documentation" href="index.html"/>
-        <link rel="prev" title="Welcome to pycasso’s documentation!" href="index.html"/> 
+        <link rel="prev" title="Picasso Python Package" href="README.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -91,10 +91,11 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Picasso Python Package</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">pycasso package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pycasso.core">pycasso.core module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pycasso.libpath">pycasso.libpath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pycasso.core">pycasso.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pycasso.libpath">pycasso.libpath</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pycasso">Module contents</a></li>
 </ul>
 </li>
@@ -167,7 +168,7 @@
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-pycasso.core">
-<span id="pycasso-core-module"></span><h2>pycasso.core module<a class="headerlink" href="#module-pycasso.core" title="Permalink to this headline">¶</a></h2>
+<span id="pycasso-core"></span><h2>pycasso.core<a class="headerlink" href="#module-pycasso.core" title="Permalink to this headline">¶</a></h2>
 <p>Main Interface of the package</p>
 <dl class="exception">
 <dt id="pycasso.core.PycassoError">
@@ -180,18 +181,96 @@
 <dt id="pycasso.core.Solver">
 <em class="property">class </em><code class="descclassname">pycasso.core.</code><code class="descname">Solver</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>lambdas=()</em>, <em>nlambda=100</em>, <em>lambda_min_ratio=0.05</em>, <em>lambda_min=()</em>, <em>family='gaussian'</em>, <em>method='l1'</em>, <em>type_gaussian='naive'</em>, <em>gamma=3</em>, <em>df=()</em>, <em>standardize=True</em>, <em>prec=1e-07</em>, <em>max_ite=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>The picasso solver for GLM.</p>
+<p>The PICASSO Solver For GLM.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> &#8211; An <cite>n*m</cite> design matrix where n is the sample size and d is the data dimension.</li>
+<li><strong>y</strong> &#8211; The <em>n</em> dimensional response vector. <cite>y</cite> is numeric vector for <cite>gaussian</cite> and <cite>sqrtlasso</cite>,
+or a two-level factor for <cite>binomial</cite>, or a non-negative integer vector representing counts
+for <cite>gaussian</cite>.</li>
+<li><strong>lambdas</strong> &#8211; A sequence of decreasing positive values to control the regularization. Typical usage
+is to leave the input <cite>lambda = ()</cite> and have the program compute its own <cite>lambda</cite> sequence
+based on <cite>nlambda</cite> and <cite>lambda_min_ratio</cite>. Users can also specify a sequence to override this.
+Default value is from <cite>lambda_max</cite> to <cite>lambda_min_ratio*lambda_max</cite>. The default value of
+<cite>lambda_max</cite> is the minimum regularization parameter which yields an all-zero estimates.</li>
+<li><strong>nlambda</strong> &#8211; The number of values used in lambdas. Default value is 100.</li>
+<li><strong>lambda_min_ratio</strong> &#8211; The smallest value for lambdas, as a fraction of the upper-bound (<cite>MAX</cite>) of the
+regularization parameter. The program can automatically generate <cite>lambda</cite> as a sequence of
+<cite>length = nlambda</cite> starting from <cite>MAX</cite> to <cite>lambda_min_ratio</cite> * <cite>MAX</cite> in log scale. The
+default value is <cite>0.05</cite>. <strong>Caution</strong>: logistic and poisson regression can be ill-conditioned
+if lambda is too small for nonconvex penalty. We suggest the user to avoid using any
+<cite>lambda_min_raito</cite> smaller than 0.05 for logistic/poisson regression under nonconvex penalty.</li>
+<li><strong>lambda_min</strong> &#8211; The smallest value for <cite>lambda</cite>. If <cite>lambda_min_ratio</cite> is provided, then it is set to
+<cite>lambda.min.ratio*MAX</cite>, where <cite>MAX</cite> is the uppperbound of the regularization parameter. The default
+value is <cite>0.1*MAX</cite>.</li>
+<li><strong>family</strong> &#8211; Options for model. Sparse linear regression and sparse multivariate regression is applied if
+<cite>family = &#8220;gaussian&#8221;</cite>, sqrt lasso is applied if <cite>family = &#8220;sqrtlasso&#8221;</cite>, sparse logistic regression is
+applied if <cite>family = &#8220;binomial&#8221;</cite> and sparse poisson regression is applied if <cite>family = &#8220;poisson&#8221;</cite>.
+The default value is <cite>&#8220;gaussian&#8221;</cite>.</li>
+<li><strong>method</strong> &#8211; Options for regularization. Lasso is applied if <cite>method = &#8220;l1&#8221;</cite>, MCP is applied if `
+method = &#8220;mcp&#8221;` and SCAD Lasso is applied if <cite>method = &#8220;scad&#8221;</cite>. The default value is <cite>&#8220;l1&#8221;</cite>.</li>
+<li><strong>type_gaussian</strong> &#8211; Options for updating residuals in sparse linear regression. The naive update rule is
+applied if <cite>opt = &#8220;naive&#8221;</cite>, and the covariance update rule is applied if <cite>opt = &#8220;covariance&#8221;</cite>. The
+default value is <cite>&#8220;naive&#8221;</cite>.</li>
+<li><strong>gamma</strong> &#8211; The concavity parameter for MCP and SCAD. The default value is <cite>3</cite>.</li>
+<li><strong>df</strong> &#8211; Maximum degree of freedom for the covariance update. The default value is <cite>2*n</cite>.</li>
+<li><strong>standardize</strong> &#8211; Design matrix X will be standardized to have mean zero and unit standard deviation if
+<cite>standardize = TRUE</cite>. The default value is <cite>TRUE</cite>.</li>
+<li><strong>prec</strong> &#8211; Stopping precision. The default value is 1e-7.</li>
+<li><strong>max_ite</strong> &#8211; The iteration limit. The default value is 1000.</li>
+<li><strong>verbose</strong> &#8211; Tracing information is disabled if <cite>verbose = FALSE</cite>. The default value is <cite>FALSE</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pycasso.core.Solver.coef">
+<code class="descname">coef</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver.coef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract model coefficients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a dictionary of the model coefficients.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict{name : value}</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="pycasso.core.Solver.lalala">
-<code class="descname">lalala</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver.lalala" title="Permalink to this definition">¶</a></dt>
-<dd><p>lalala?wtf</p>
+<code class="descname">lalala</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>g</em>, <em>s</em>, <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver.lalala" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>a</strong> &#8211; </li>
+<li><strong>b</strong> &#8211; </li>
+<li><strong>g</strong> &#8211; </li>
+<li><strong>s</strong> &#8211; </li>
+<li><strong>e</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return sth:</th><td class="field-body"><p class="first last">val</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
 </div>
 <div class="section" id="module-pycasso.libpath">
-<span id="pycasso-libpath-module"></span><h2>pycasso.libpath module<a class="headerlink" href="#module-pycasso.libpath" title="Permalink to this headline">¶</a></h2>
+<span id="pycasso-libpath"></span><h2>pycasso.libpath<a class="headerlink" href="#module-pycasso.libpath" title="Permalink to this headline">¶</a></h2>
 <p>Find the path to picasso dynamic library files.</p>
 <dl class="exception">
 <dt id="pycasso.libpath.PicassoLibraryNotFound">
@@ -204,18 +283,38 @@
 <dt id="pycasso.libpath.find_lib_path">
 <code class="descclassname">pycasso.libpath.</code><code class="descname">find_lib_path</code><span class="sig-paren">(</span><em>update=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.libpath.find_lib_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the path to picasso dynamic library files.</p>
-<dl class="docutils">
-<dt>lib_path: list(string)</dt>
-<dd>List of all found library path to picasso</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of all found library path to picasso</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list(string)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
 <div class="section" id="module-pycasso">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pycasso" title="Permalink to this headline">¶</a></h2>
 <p>PICASSO: Penalized Generalized Linear Model Solver - Unleash the Power of Non-convex Penalty</p>
-<p>Author: Jason(Jian) Ge, Haoming Jiang</p>
-<p>Package Maintainer: Haoming Jiang</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Jason(Jian) Ge, Haoming Jiang</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Maintainer:</th><td class="field-body">Haoming Jiang &lt;<a class="reference external" href="mailto:jianghm&#37;&#52;&#48;gatech&#46;edu">jianghm<span>&#64;</span>gatech<span>&#46;</span>edu</a>&gt;</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="pycasso.test">
+<code class="descclassname">pycasso.</code><code class="descname">test</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show welcome information.</p>
+</dd></dl>
+
 </div>
 </div>
 
@@ -230,7 +329,7 @@
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="index.html" class="btn btn-neutral" title="Welcome to pycasso’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="README.html" class="btn btn-neutral" title="Picasso Python Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

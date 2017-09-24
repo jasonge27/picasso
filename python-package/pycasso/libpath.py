@@ -12,10 +12,8 @@ class PicassoLibraryNotFound(Exception):
 def find_lib_path(update = False):
     """Find the path to picasso dynamic library files.
 
-    Returns
-    -------
-    lib_path: list(string)
-       List of all found library path to picasso
+    :return: List of all found library path to picasso
+    :rtype: list(string)
     """
     curr_path = os.path.dirname(os.path.abspath(os.path.expanduser(__file__)))
     # make pythonpack hack: copy this directory one level upper for setup.py

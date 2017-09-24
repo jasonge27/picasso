@@ -53,4 +53,4 @@ setup(name='pycasso',
       classifiers=['Development Status :: 3 - Alpha',
                    'Programming Language :: Python :: 3 :: Only',
                    'License :: OSI Approved :: MIT License'],
-      url='https://github.com/jasonge27/picasso')
+      url='https://hmjianggatech.github.io/picasso/')

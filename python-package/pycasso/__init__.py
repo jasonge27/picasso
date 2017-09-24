@@ -2,9 +2,8 @@
 """
 PICASSO: Penalized Generalized Linear Model Solver - Unleash the Power of Non-convex Penalty
 
-Author: Jason(Jian) Ge, Haoming Jiang
-
-Package Maintainer: Haoming Jiang
+:Author: Jason(Jian) Ge, Haoming Jiang
+:Maintainer: Haoming Jiang <jianghm@gatech.edu>
 
 """
 

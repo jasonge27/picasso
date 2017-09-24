@@ -1,6 +1,15 @@
-Inroduction
-===========
+Picasso Python Package
+======================
 PICASSO: Penalized Generalized Linear Model Solver - Unleash the Power of Non-convex Penalty
+
+Unleash the power of nonconvex penalty
+--------------------------------------
+L1 penalized regression (LASSO) is great for feature selection. However when you use LASSO in
+very noisy setting, especially when some columns in your data have strong colinearity, LASSO
+tends to give biased estimator due to the penalty term. As demonstrated in the example below,
+the lowest estimation error among all the lambdas computed is as high as **16.41%**.
+
+
 
 Installation
 ------------
@@ -38,3 +47,13 @@ Usage
 
 ..
 
+For Developer
+-------------
+Please follow the `sphinx syntax style
+<https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html>`__
+
+Copy Right
+----------
+
+:Author: Jason(Jian) Ge, Haoming Jiang
+:Maintainer: Haoming Jiang <jianghm@gatech.edu>
