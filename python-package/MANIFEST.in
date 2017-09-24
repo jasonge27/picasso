@@ -1,10 +1,10 @@
 include *.md *.rst
 recursive-include lib *
-recursive-include pycasso *
-recursive-include pycasso/include *
-recursive-include pycasso/src *
-recursive-include pycasso/lib *
-recursive-include pycasso/dmlc-core *
+recursive-include picasso *
+recursive-include picasso/include *
+recursive-include picasso/src *
+recursive-include picasso/lib *
+recursive-include picasso/dmlc-core *
 #exclude pre-compiled .o and .a file for less confusions
 #make sure .a files are all removed for forcing compiling
 #include the pre-compiled .so is needed as a placeholder
