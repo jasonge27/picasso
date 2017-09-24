@@ -1,6 +1,6 @@
-#include <picasso/c_api.h>
 #include <picasso/actgd.hpp>
 #include <picasso/actnewton.hpp>
+#include <picasso/c_api.hpp>
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
 #include <vector>
@@ -239,4 +239,10 @@ extern "C" void SolveLinearRegressionCovUpdate(
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
-) {}
+) {
+  picasso::ObjFunction *obj =
+      new picasso::GaussianNaiveUpdateObjective(X, Y, nn, dd, intercept);
+  picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
+                       pprec, reg_type, intercept, beta, intcpt, ite_lamb,
+                       size_act, runt);
+}
