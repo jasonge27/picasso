@@ -19,20 +19,20 @@ class ModelParam {
   }
 };
 
-double threshold_l1(double x, double thr) {
-  if (x > thr)
-    return x - thr;
-  else if (x < -thr)
-    return x + thr;
-  else
-    return 0;
-}
-
 class RegFunction {
  public:
   virtual double threshold(double x) = 0;
   virtual void set_param(double lambda, double gamma) = 0;
   virtual ~RegFunction(){};
+
+  double threshold_l1(double x, double thr) {
+    if (x > thr)
+      return x - thr;
+    else if (x < -thr)
+      return x + thr;
+    else
+      return 0;
+  }
 };
 
 class RegL1 : public RegFunction {
