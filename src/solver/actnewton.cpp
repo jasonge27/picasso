@@ -1,5 +1,5 @@
-#include <picasso/actnewton.h>
-#include <picasso/solver_params.h>
+#include <picasso/actnewton.hpp>
+#include <picasso/solver_params.hpp>
 
 namespace picasso {
 namespace solver {
@@ -20,7 +20,7 @@ void ActNewtonSolver::solve() {
 
   // model parameters on the master path
   // each master parameter is relaxed into SCAD/MCP parameter
-  ModelParam model_master = m_m_obj->get_model_param();
+  ModelParam model_master = m_obj->get_model_param();
 
   std::vector<double> stage_lambdas(d, 0);
   RegFunction *regfunc = new RegL1();
@@ -37,7 +37,7 @@ void ActNewtonSolver::solve() {
     for (int j = 0; j < d; ++j) {
       stage_lambdas[j] = lambdas[i];
 
-      if (m_obj->get_grad[j] > threshold) actset_indcat[j] = 1;
+      if (m_obj->get_grad(j) > threshold) actset_indcat[j] = 1;
     }
 
     // loop level 0: multistage convex relaxation
@@ -59,7 +59,7 @@ void ActNewtonSolver::solve() {
         actset_idx.clear();
         for (int j = 0; j < d; j++)
           if (actset_indcat[j]) {
-            regfunc->set_param(stage_lambdas[j]);
+            regfunc->set_param(stage_lambdas[j], 0.0);
             double updated_coord = m_obj->coordinate_descent(regfunc, j);
 
             if (fabs(updated_coord) > 0) actset_idx.push_back(j);
@@ -76,14 +76,14 @@ void ActNewtonSolver::solve() {
             int idx = actset_idx[k];
 
             double old_beta = m_obj->get_model_coef(idx);
-            regfunc->set_param(stage_lambdas[idx]);
+            regfunc->set_param(stage_lambdas[idx], 0.0);
             double updated_coord = m_obj->coordinate_descent(regfunc, idx);
 
             if (m_obj->get_local_change(old_beta, idx) > dev_thr)
               terminate_loop_level_2 = false;
           }
 
-          if (m_param.include_intecept) {
+          if (m_param.include_intercept) {
             double old_intcpt = m_obj->get_model_coef(-1);
             m_obj->intercept_update();
             if (m_obj->get_local_change(old_intcpt, -1) > dev_thr)
@@ -130,17 +130,16 @@ void ActNewtonSolver::solve() {
 
         switch (m_param.reg_type) {
           case MCP:
-            stage_lambdas[j] =
-                (fabs(beta) > lambdas[i] * m_param.reg_gamma)
-                    ? 0.0
-                    : lambdas[i] - fabs(beta) / m_param.reg_gamma;
+            stage_lambdas[j] = (fabs(beta) > lambdas[i] * m_param.gamma)
+                                   ? 0.0
+                                   : lambdas[i] - fabs(beta) / m_param.gamma;
           case SCAD:
             stage_lambdas[j] =
-                (fabs(beta) > lambdas[i] * m_param.reg_gamma)
+                (fabs(beta) > lambdas[i] * m_param.gamma)
                     ? 0.0
                     : ((fabs(beta) > lambdas[i])
-                           ? ((lambdas[i] * m_param.reg_gamma - fabs(beta)) /
-                              (m_param.reg_gamma - 1))
+                           ? ((lambdas[i] * m_param.gamma - fabs(beta)) /
+                              (m_param.gamma - 1))
                            : lambdas[i]);
           default:
             stage_lambdas[j] = lambdas[i];

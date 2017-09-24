@@ -2,13 +2,13 @@
 
 namespace picasso {
 namespace solver {
-void ActGDSolver : solve(ObjFunction *obj) {
-  unsigned int d = obj->get_dim();
+void ActGDSolver ::solve() {
+  unsigned int d = m_obj->get_dim();
 
   const std::vector<double> &lambdas = m_param.get_lambda_path();
   itercnt_path.resize(lambdas.size(), 0);
 
-  double dev_thr = obj->get_deviance() * m_param.pred;
+  double dev_thr = m_obj->get_deviance() * m_param.prec;
 
   std::vector<int> actset_indcat(d, 0);
   std::vector<int> actset_indcat_aux(d, 0);
@@ -18,7 +18,7 @@ void ActGDSolver : solve(ObjFunction *obj) {
 
   double tmp = 0.0;
   bool new_active_idx;
-  ObjFunction *regfunc = nullptr;
+  RegFunction *regfunc = nullptr;
   if (m_param.reg_type == SCAD)
     regfunc = new RegSCAD();
   else if (m_param.reg_type == MCP)
@@ -27,13 +27,14 @@ void ActGDSolver : solve(ObjFunction *obj) {
     regfunc = new RegL1();
 
   for (int i = 0; i < lambdas.size(); i++) {
-    obj->update_auxiliary();
-    regfunc->set_param(lambdas[i], m_param.m_gamma);
+    m_obj->update_auxiliary();
+    regfunc->set_param(lambdas[i], m_param.gamma);
 
     for (int j = 0; j < d; j++)
       if (actset_indcat[j] == 0) {
-        tmp = soft_thresh(obj->get_grad(j), lambdas[i], m_param.gamma,
-                          m_param.reg_type);
+        // tmp = regfunc->threshold
+        // tmp = soft_thresh_l1(m_obj->get_grad(j), lambdas[i], m_param.gamma,
+        //                 m_param.reg_type);
         if (fabs(tmp) > 1e-8) actset_indcat[j] = 1;
       }
 
@@ -48,9 +49,9 @@ void ActGDSolver : solve(ObjFunction *obj) {
       new_active_idx = false;
       for (int j = 0; j < d; j++)
         if (actset_indcat[j] == 1) {
-          double beta_old = obj->get_model_coef(j);
+          double beta_old = m_obj->get_model_coef(j);
 
-          double updated_coord = obj->coordinate_descent(regfunc, j);
+          double updated_coord = m_obj->coordinate_descent(regfunc, j);
 
           if (updated_coord == beta_old) continue;
 
@@ -60,7 +61,7 @@ void ActGDSolver : solve(ObjFunction *obj) {
             new_active_idx = true;
           }
 
-          if (obj->get_local_change(beta_old, j) > dev_thr)
+          if (m_obj->get_local_change(beta_old, j) > dev_thr)
             terminate_loop_level_0 = false;
         }
 
@@ -78,17 +79,17 @@ void ActGDSolver : solve(ObjFunction *obj) {
         terminate_loop_level_1 = true;
         for (int j = 0; j < actset_idx.size(); j++) {
           int idx = actset_idx[j];
-          double beta_old = obj->get_model_coef(idx);
+          double beta_old = m_obj->get_model_coef(idx);
 
           // compute thresholded coordinate
-          double updated_coord = obj->coordinate_descent(regfunc, j);
+          double updated_coord = m_obj->coordinate_descent(regfunc, j);
 
-          if (obj->get_local_change(beta_old, idx) > dev_thr)
+          if (m_obj->get_local_change(beta_old, idx) > dev_thr)
             terminate_loop_level_1 = false;
           // update gradient for idx
         }
 
-        if (terminte_loop_level_1) break;
+        if (terminate_loop_level_1) break;
       }
 
       // update gradient
@@ -100,11 +101,11 @@ void ActGDSolver : solve(ObjFunction *obj) {
       // update intercept
     }
 
-    solution_path.push_back(obj->get_model_param());
+    solution_path.push_back(m_obj->get_model_param());
   }
 
   delete regfunc;
 }
 
 }  // namespace solver
-}  // naemspace picasso
+}  // namespace picasso

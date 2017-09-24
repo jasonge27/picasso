@@ -2,137 +2,127 @@
 #include <picasso/c_api.h>
 
 void picasso_logit_solver(
-    double *Y,       // input: 0/1 model response
-    double *X,       // input: model covariates
-    double *beta,    // output: an nlambda * d dim matrix
-                     // saving the coefficients for each lambda
-    double *intcpt,  // output: an nlambda dim array
-                     // saving the model intercept for each lambda
-    int *nn,         // number of samples
-    int *dd,         // dimension
-    int *ite_lamb,   //
-    int *ite_cyc,    //
-    int *size_act,   // output: an array of solution sparsity (model df)
-    double *obj,     // output: objective function value
-    double *runt,    // output: runtime
-    double *lambda,  // input: regularization parameter
-    int *nnlambda,   // input: number of lambda on the regularization path
-    double *ggamma,  // input:
-    int *mmax_ite,   //
-    double *pprec,   //
-    int *fflag,      //
-    int *intercept   // input: 1 for adding intercept term
-    ) {
-  SolveLogisticRegression(Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc,
-                          size_act, obj, runt, lambda, *nnlambda, *ggamma,
-                          *mmax_ite, *pprec, *fflag, *intercept);
-}
+    double *Y,                  // input: 0/1 model response
+    double *X,                  // input: model covariates
+    int* nn,                    // input: number of samples
+    int* dd,                    // input: dimension
+    double *lambda,             // input: regularization parameter
+    int* nnlambda,              // input: number of lambda on the regularization path
+    double* gamma,              // input: gamma for SCAD or MCP penalty
+    int* mmax_ite,              // input: max number of interations
+    double* pprec,              // input: optimization precision
+    int* reg_type,              // input: type of regularization
+    int* include_intercept,     // input: to have intercept term or not
+    double *beta,               // output: an nlambda * d dim matrix
+                                //         saving the coefficients for each lambda
+    double *intcpt,             // output: an nlambda dim array
+                                //         saving the model intercept for each lambda
+    int *ite_lamb,              // output: number of iterations for each lambda
+    int *size_act,              // output: an array of solution sparsity (model df)
+    double *runt,               // output: runtime
+     ) {
+  SolveLogisticRegression(
+      Y, X, *nn, *dd, *lambda, *nnlambda, *gamma, *mmax_ite, *pprec, 
+      *reg_type, *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
+ }
 
 void picasso_sqrt_lasso_solver(
-    double *Y,       // input: 0/1 model response
-    double *X,       // input: model covariates
-    double *beta,    // output: an nlambda * d dim matrix
-                     // saving the coefficients for each lambda
-    double *intcpt,  // output: an nlambda dim array
-                     // saving the model intercept for each lambda
-    int *nn,         // number of samples
-    int *dd,         // dimension
-    int *ite_lamb,   //
-    int *ite_cyc,    //
-    int *size_act,   // output: an array of solution sparsity (model df)
-    double *obj,     // output: objective function value
-    double *runt,    // output: runtime
-    double *lambda,  // input: regularization parameter
-    int *nnlambda,   // input: number of lambda on the regularization path
-    double *ggamma,  // input:
-    int *mmax_ite,   //
-    double *pprec,   //
-    int *fflag,      //
-    int *intercept   // input: 1 for adding intercept term
-    ) {
-  SolveSqrtLinearRegression(Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc,
-                            size_act, obj, runt, lambda, *nnlambda, *ggamma,
-                            *mmax_ite, *pprec, *fflag, *intercept);
+     double *Y,                  // input: 0/1 model response
+    double *X,                  // input: model covariates
+    int* nn,                    // input: number of samples
+    int* dd,                    // input: dimension
+    double *lambda,             // input: regularization parameter
+    int* nnlambda,              // input: number of lambda on the regularization path
+    double* gamma,              // input: gamma for SCAD or MCP penalty
+    int* mmax_ite,              // input: max number of interations
+    double* pprec,              // input: optimization precision
+    int* reg_type,              // input: type of regularization
+    int* include_intercept,     // input: to have intercept term or not
+    double *beta,               // output: an nlambda * d dim matrix
+                                //         saving the coefficients for each lambda
+    double *intcpt,             // output: an nlambda dim array
+                                //         saving the model intercept for each lambda
+    int *ite_lamb,              // output: number of iterations for each lambda
+    int *size_act,              // output: an array of solution sparsity (model df)
+    double *runt,               // output: runtime
+){   SolveSqrtLinearRegression(      
+      Y, X, *nn, *dd, *lambda, *nnlambda, *gamma, *mmax_ite, *pprec, 
+      *reg_type, *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
 }
 
 void picasso_poisson_solver(
-    double *Y,       // input: 0/1 model response
-    double *X,       // input: model covariates
-    double *beta,    // output: an nlambda * d dim matrix
-                     // saving the coefficients for each lambda
-    double *intcpt,  // output: an nlambda dim array
-                     // saving the model intercept for each lambda
-    int *nn,         // number of samples
-    int *dd,         // dimension
-    int *ite_lamb,   //
-    int *ite_cyc,    //
-    int *size_act,   // output: an array of solution sparsity (model df)
-    double *obj,     // output: objective function value
-    double *runt,    // output: runtime
-    double *lambda,  // input: regularization parameter
-    int *nnlambda,   // input: number of lambda on the regularization path
-    double *ggamma,  // input:
-    int *mmax_ite,   //
-    double *pprec,   //
-    int *fflag,      //
-    int *intercept   // input: 1 for adding intercept term
-    ) {
+     double *Y,                  // input: 0/1 model response
+    double *X,                  // input: model covariates
+    int* nn,                    // input: number of samples
+    int* dd,                    // input: dimension
+    double *lambda,             // input: regularization parameter
+    int* nnlambda,              // input: number of lambda on the regularization path
+    double* gamma,              // input: gamma for SCAD or MCP penalty
+    int* mmax_ite,              // input: max number of interations
+    double* pprec,              // input: optimization precision
+    int* reg_type,              // input: type of regularization
+    int* include_intercept,     // input: to have intercept term or not
+    double *beta,               // output: an nlambda * d dim matrix
+                                //         saving the coefficients for each lambda
+    double *intcpt,             // output: an nlambda dim array
+                                //         saving the model intercept for each lambda
+    int *ite_lamb,              // output: number of iterations for each lambda
+    int *size_act,              // output: an array of solution sparsity (model df)
+    double *runt,               // output: runtime
+){ 
   // call picasso c api
-  SolvePoissonRegression(Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc,
-                         size_act, obj, runt, lambda, *nnlambda, *ggamma,
-                         *mmax_ite, *pprec, *fflag, *intercept);
+  SolvePoissonRegression(
+       Y, X, *nn, *dd, *lambda, *nnlambda, *gamma, *mmax_ite, *pprec, 
+      *reg_type, *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
 }
 
 void picasso_gaussian_cov(
-    double *Y,       // input: 0/1 model response
-    double *X,       // input: model covariates
-    double *beta,    // output: an nlambda * d dim matrix
-                     // saving the coefficients for each lambda
-    double *intcpt,  // output: an nlambda dim array
-                     // saving the model intercept for each lambda
-    int *nn,         // number of samples
-    int *dd,         // dimension
-    int *ite_lamb,   //
-    int *ite_cyc,    //
-    int *size_act,   // output: an array of solution sparsity (model df)
-    double *obj,     // output: objective function value
-    double *runt,    // output: runtime
-    double *lambda,  // input: regularization parameter
-    int *nnlambda,   // input: number of lambda on the regularization path
-    double *ggamma,  // input:
-    int *mmax_ite,   //
-    double *pprec,   //
-    int *fflag,      //
-    int *intercept   // input: 1 for adding intercept term
-    ) {
+     double *Y,                  // input: 0/1 model response
+    double *X,                  // input: model covariates
+    int* nn,                    // input: number of samples
+    int* dd,                    // input: dimension
+    double *lambda,             // input: regularization parameter
+    int* nnlambda,              // input: number of lambda on the regularization path
+    double* gamma,              // input: gamma for SCAD or MCP penalty
+    int* mmax_ite,              // input: max number of interations
+    double* pprec,              // input: optimization precision
+    int* reg_type,              // input: type of regularization
+    int* include_intercept,     // input: to have intercept term or not
+    double *beta,               // output: an nlambda * d dim matrix
+                                //         saving the coefficients for each lambda
+    double *intcpt,             // output: an nlambda dim array
+                                //         saving the model intercept for each lambda
+    int *ite_lamb,              // output: number of iterations for each lambda
+    int *size_act,              // output: an array of solution sparsity (model df)
+    double *runt,               // output: runtime
+){ 
   SolveLinearRegressionCovUpdate(
-      Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc, size_act, obj, runt,
-      lambda, *nnlambda, *ggamma, *mmax_ite, *pprec, *fflag, *intercept);
+       Y, X, *nn, *dd, *lambda, *nnlambda, *gamma, *mmax_ite, *pprec, 
+      *reg_type, *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
 }
 
 void picasso_gaussian_naive(
-    double *Y,       // input: 0/1 model response
-    double *X,       // input: model covariates
-    double *beta,    // output: an nlambda * d dim matrix
-                     // saving the coefficients for each lambda
-    double *intcpt,  // output: an nlambda dim array
-                     // saving the model intercept for each lambda
-    int *nn,         // number of samples
-    int *dd,         // dimension
-    int *ite_lamb,   //
-    int *ite_cyc,    //
-    int *size_act,   // output: an array of solution sparsity (model df)
-    double *obj,     // output: objective function value
-    double *runt,    // output: runtime
-    double *lambda,  // input: regularization parameter
-    int *nnlambda,   // input: number of lambda on the regularization path
-    double *ggamma,  // input:
-    int *mmax_ite,   //
-    double *pprec,   //
-    int *fflag,      //
-    int *intercept   // input: 1 for adding intercept term
-    ) {
+     double *Y,                  // input: 0/1 model response
+    double *X,                  // input: model covariates
+    int* nn,                    // input: number of samples
+    int* dd,                    // input: dimension
+    double *lambda,             // input: regularization parameter
+    int* nnlambda,              // input: number of lambda on the regularization path
+    double* gamma,              // input: gamma for SCAD or MCP penalty
+    int* mmax_ite,              // input: max number of interations
+    double* pprec,              // input: optimization precision
+    int* reg_type,              // input: type of regularization
+    int* include_intercept,     // input: to have intercept term or not
+    double *beta,               // output: an nlambda * d dim matrix
+                                //         saving the coefficients for each lambda
+    double *intcpt,             // output: an nlambda dim array
+                                //         saving the model intercept for each lambda
+    int *ite_lamb,              // output: number of iterations for each lambda
+    int *size_act,              // output: an array of solution sparsity (model df)
+    double *runt,               // output: runtime
+){ 
   SolveLinearRegressionNaiveUpdate(
-      Y, X, beta, intcpt, *nn, *dd, ite_lamb, ite_cyc, size_act, obj, runt,
-      lambda, *nnlambda, *ggamma, *mmax_ite, *pprec, *fflag, *intercept);
+      Y, X, *nn, *dd, *lambda, *nnlambda, *gamma, *mmax_ite, *pprec, 
+      *reg_type, *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
 }
+

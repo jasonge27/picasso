@@ -2,26 +2,29 @@
 #define PICASSO_ACTGD_H
 
 #include <cmath>
-#include <picasso/solver_params.h>
+#include <picasso/objective.hpp>
+#include <picasso/solver_params.hpp>
 #include <string>
 
 namespace picasso {
 namespace solver {
 class ActGDSolver {
-private:
-  const PicassoSolverParams m_param;
-  const ObjFunction *m_obj;
+ private:
+  PicassoSolverParams m_param;
+  ObjFunction *m_obj;
 
   std::vector<int> itercnt_path;
   std::vector<ModelParam> solution_path;
 
-public:
-  ActGDSolver(ObjFunction *obj, PicassoSolverParams param)
-      : m_param(param), m_obj(obj);
+ public:
+  ActGDSolver(ObjFunction *obj, PicassoSolverParams param);
 
-  void solve(ObjFunction *obj);
+  void solve();
+
+  const std::vector<int> &get_itercnt_path() const { return itercnt_path; };
+  const ModelParam &get_model_param(int i) const { return solution_path[i]; };
 };
 
-} // namespace solver
-} // namespace picasso
+}  // namespace solver
+}  // namespace picasso
 #endif
