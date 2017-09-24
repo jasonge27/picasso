@@ -15,18 +15,10 @@ Install from source file (Github):
 -  Install with ``cd python-package; python setup.py install`` command from this directory.
 -  **Note**: If you are installing in this way, make sure `python-package/lib` is deleted before installing.
 
-Install from PyPI:
+Install from PyPI
 
 - ``pip install pycasso``
 
-You can test if the package has been successfully installed by:
-
-.. code-block:: python
-
-        import pycasso
-        picasso.test()
-
-..
 
 Usage
 -----
