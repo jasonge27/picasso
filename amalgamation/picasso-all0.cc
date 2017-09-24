@@ -1,10 +1,13 @@
-//objective
-#include "../src/objective/glm.cc"
-#include "../src/objective/sqrtmse.cc"
-#include "../src/objective/objective.cc"
+// objective
+#include "../src/objective/gaussian_naive_update.cpp"
+#include "../src/objective/glm.cpp"
+#include "../src/objective/objective.cpp"
+#include "../src/objective/sqrtmse.cpp"
 
-//solver
-#include "../src/solver/actnewton.cc"
+// solver
+#include "../src/solver/actgd.cpp"
+#include "../src/solver/actnewton.cpp"
+#include "../src/solver/solver_params.cpp"
 
-//c api
-#include "../src/c_api/c_api.cc"
+// c api
+#include "../src/c_api/c_api.cpp"

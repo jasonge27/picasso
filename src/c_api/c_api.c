@@ -48,7 +48,6 @@ void SolvePoissonRegression(
     bool intercept   // to have intercept term or not
 ){}
 
-
 void SolveSqrtLinearRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
