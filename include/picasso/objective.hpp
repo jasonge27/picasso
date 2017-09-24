@@ -19,18 +19,20 @@ class ModelParam {
   }
 };
 
-double threshold_l1(double x, double thr) {
-  if (x > thr)
-    return x - thr;
-  else if (x < -thr)
-    return x + thr;
-  else
-    return 0;
-}
-
 class RegFunction {
  public:
   virtual double threshold(double x) = 0;
+  virtual void set_param(double lambda, double gamma) = 0;
+  virtual ~RegFunction(){};
+
+  double threshold_l1(double x, double thr) {
+    if (x > thr)
+      return x - thr;
+    else if (x < -thr)
+      return x + thr;
+    else
+      return 0;
+  }
 };
 
 class RegL1 : public RegFunction {
@@ -38,7 +40,7 @@ class RegL1 : public RegFunction {
   double m_lambda;
 
  public:
-  void set_param(double lambda) { m_lambda = lambda; }
+  void set_param(double lambda, double gamma) { m_lambda = lambda; }
 
   double threshold(double x) { return threshold_l1(x, m_lambda); }
 };
@@ -94,7 +96,7 @@ class RegMCP : public RegFunction {
 };
 
 class ObjFunction {
- private:
+ protected:
   int n;  // sample number
   int d;  // sample dimension
 
@@ -163,6 +165,123 @@ class ObjFunction {
   virtual double eval() = 0;
 
   ~ObjFunction(){};
+};
+
+class GLMObjective : public ObjFunction {
+ protected:
+  std::vector<double> p;
+  std::vector<double> w;
+  std::vector<double> Xb;
+  std::vector<double> r;
+
+  // wXX[j] = sum(w*X[j]*X[j])
+  std::vector<double> wXX;
+
+  // quadratic approx coefs for each coordinate
+  // a*x^2 + g*x + constant
+  double a, g;
+  double sum_r;
+  double sum_w;
+
+ public:
+  GLMObjective(const double *xmat, const double *y, int n, int d);
+
+  GLMObjective(const double *xmat, const double *y, int n, int d,
+               bool include_intercept);
+
+  double coordinate_descent(RegFunction *regfunc, int idx);
+
+  void intercept_update();
+
+  void set_model_param(ModelParam &other_param);
+
+  void update_auxiliary();
+
+  double get_local_change(double old, int idx);
+};
+
+class LogisticObjective : public GLMObjective {
+ public:
+  LogisticObjective(const double *xmat, const double *y, int n, int d);
+
+  LogisticObjective(const double *xmat, const double *y, int n, int d,
+                    bool include_intercept);
+
+  void update_key_aux();
+
+  double eval();
+};
+
+class PoissonObjective : public GLMObjective {
+ public:
+  PoissonObjective(const double *xmat, const double *y, int n, int d);
+
+  PoissonObjective(const double *xmat, const double *y, int n, int d,
+                   bool include_intercept);
+
+  void update_key_aux();
+
+  double eval();
+};
+
+class SqrtMSEObjective : public ObjFunction {
+ private:
+  std::vector<double> w;
+  std::vector<double> Xb;
+  std::vector<double> r;
+
+  // wXX[j] = sum(w*X[j]*X[j])
+  std::vector<double> wXX;
+
+  // quadratic approx coefs for each coordinate
+  // a*x^2 + g*x + constant
+  double a, g;
+  double L;  // sqrt(MSE)
+  double sum_r;
+  double sum_r2;
+
+ public:
+  SqrtMSEObjective(const double *xmat, const double *y, int n, int d);
+
+  SqrtMSEObjective(const double *xmat, const double *y, int n, int d,
+                   bool include_intercept);
+
+  double coordinate_descent(RegFunction *regfunc, int idx);
+
+  void intercept_update();
+
+  void set_model_param(ModelParam &other_param);
+
+  void update_key_aux(){};
+
+  void update_auxiliary();
+
+  double get_local_change(double old, int idx);
+
+  double eval();
+};
+
+class GaussianNaiveUpdateObjective : public ObjFunction {
+ private:
+  std::vector<double> r;
+  std::vector<double> XX;
+
+ public:
+  GaussianNaiveUpdateObjective(const double *xmat, const double *y, int n,
+                               int d);
+
+  GaussianNaiveUpdateObjective(const double *xmat, const double *y, int n,
+                               int d, bool include_intercept);
+  double coordinate_descent(RegFunction *regfunc, int idx);
+
+  void intercept_update();
+  void update_key_aux(){};
+  void set_model_param(ModelParam &other_param);
+  void update_auxiliary();
+
+  double get_local_change(double old, int idx);
+
+  double eval();
 };
 
 }  // namespace picasso

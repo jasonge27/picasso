@@ -1,13 +1,15 @@
 #ifndef PICASSO_SOLVER_PARAMS_H
 #define PICASSO_SOLVER_PARAMS_H
 
+#include <vector>
+
 namespace picasso {
 namespace solver {
 enum RegType { L1, SCAD, MCP };
 
 // training parameters
 class PicassoSolverParams {
-public:
+ public:
   /*! number of regularization parameters */
   unsigned num_lambda;
 
@@ -18,7 +20,7 @@ public:
   RegType reg_type;
 
   /*! gamma param for SCAD and MCP regularization */
-  double reg_gamma;
+  double gamma;
 
   /*！ rounds of relaxation when solving SCAD and MCP penalty */
   unsigned num_relaxation_round;
@@ -36,14 +38,12 @@ public:
 
   PicassoSolverParams();
 
-  void configure(const std::vector<std::pair<std::string, std::string>> &cfg);
-
   void set_lambdas(const double *lambda_path, int n);
 
   std::vector<double> get_lambda_path() const;
 };
 
-} // namespace solver
-} // namespace picasso
+}  // namespace solver
+}  // namespace picasso
 
 #endif
