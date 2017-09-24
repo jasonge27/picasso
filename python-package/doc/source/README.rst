@@ -1,5 +1,5 @@
-Picasso Python Package
-======================
+Inroduction
+===========
 PICASSO: Penalized Generalized Linear Model Solver - Unleash the Power of Non-convex Penalty
 
 Installation
