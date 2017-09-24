@@ -4,16 +4,16 @@ pycasso package
 Submodules
 ----------
 
-pycasso\.core module
---------------------
+pycasso\.core
+-------------
 
 .. automodule:: pycasso.core
     :members:
     :undoc-members:
     :show-inheritance:
 
-pycasso\.libpath module
------------------------
+pycasso\.libpath
+----------------
 
 .. automodule:: pycasso.libpath
     :members:
@@ -25,6 +25,6 @@ Module contents
 ---------------
 
 .. automodule:: pycasso
-    :members:
+    :members: test
     :undoc-members:
     :show-inheritance:
