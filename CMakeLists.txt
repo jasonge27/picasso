@@ -40,7 +40,7 @@ file(GLOB_RECURSE SOURCES
 #add_subdirectory(dmlc-core)
 #set(LINK_LIBRARIES dmlccore)
 
-add_library(picassoobj OBJECT ${SOURCES})
+add_library(objpicasso OBJECT ${SOURCES})
 
 # Executable (----no cli version yet----)
 #add_executable(clipicasso $<TARGET_OBJECTS:objpicasso> src/cli_main.cc)
@@ -50,7 +50,7 @@ add_library(picassoobj OBJECT ${SOURCES})
 #set_output_directory(clipicasso ${PROJECT_SOURCE_DIR})
 #target_link_libraries(clipicasso ${LINK_LIBRARIES})
 
-add_library(picasso SHARED $<TARGET_OBJECTS:picassoobj>)
+add_library(picasso SHARED $<TARGET_OBJECTS:objpicasso>)
 target_link_libraries(picasso ${LINK_LIBRARIES})
 set_output_directory(picasso ${PROJECT_SOURCE_DIR}/lib)
 if(MINGW)

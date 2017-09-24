@@ -27,8 +27,14 @@ if not LIB_PATH:
 else:
     print("libpicasso already exists: " % LIB_PATH)
 
+VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
+# For pip
+if not os.path.exists(VERSION_PATH):
+    VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
+if
+
 setup(name='pycasso',
-      version=open(os.path.join(CURRENT_DIR, 'pycasso/VERSION')).read().strip(),
+      version=open(VERSION_PATH).read().strip(),
       # version='0.4a23',
       description="Picasso Python Package",
       long_description=open(os.path.join(CURRENT_DIR, 'README.rst')).read(),
