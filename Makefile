@@ -96,7 +96,6 @@ AMALGA_OBJ = amalgamation/picasso-all0.o
 LIB_DEP = $(DMLC_CORE)/libdmlc.a 
 ALL_DEP = $(filter-out build/cli_main.o, $(ALL_OBJ)) $(LIB_DEP)
 CLI_OBJ = build/cli_main.o
-include tests/cpp/picasso_test.mk
 
 build/%.o: src/%.cc
 	@mkdir -p $(@D)
@@ -136,12 +135,6 @@ lint: rcpplint
 
 pylint:
 	flake8 --ignore E501 python-package
-	flake8 --ignore E501 tests/python
-
-test: $(ALL_TEST)
-
-check: test
-	./tests/cpp/picasso_test
 
 ifeq ($(TEST_COVER), 1)
 cover: check
@@ -152,7 +145,6 @@ endif
 
 clean:
 	$(RM) -rf build build_plugin lib bin *~ */*~ */*/*~ */*/*/*~ */*.o */*/*.o */*/*/*.o picasso
-	$(RM) -rf build_tests *.gcov tests/cpp/picasso_test
 
 clean_all: clean
 	cd $(DMLC_CORE); $(MAKE) clean; cd $(ROOTDIR)
