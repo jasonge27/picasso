@@ -20,6 +20,7 @@ class GLMObjective : public ObjFunction {
  public:
   GLMObjective(const double *xmat, const double *y, int n, int d)
       : ObjFunction(xmat, y, n, d) {
+    /*
     a = 0.0;
     g = 0.0;
     p.resize(d);
@@ -38,6 +39,7 @@ class GLMObjective : public ObjFunction {
 
     // saturated fvalue = 0
     deviance = fabs(eval());
+    */
   }
 
   double coordinate_descent(RegFunction *regfunc, int idx) {

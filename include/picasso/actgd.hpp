@@ -2,7 +2,7 @@
 #define PICASSO_ACTGD_H
 
 #include <cmath>
-#include <picasso/solver_params.h>
+#include <picasso/solver_params.hpp>
 #include <string>
 
 namespace picasso {

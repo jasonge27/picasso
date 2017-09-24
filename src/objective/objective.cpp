@@ -1,4 +1,4 @@
-#include <picasso/objective.h>
+#include <picasso/objective.hpp>
 
 namespace picasso {
 
