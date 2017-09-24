@@ -28,10 +28,6 @@ else:
     print("libpicasso already exists: " % LIB_PATH)
 
 VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
-# For pip
-if not os.path.exists(VERSION_PATH):
-    VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
-if
 
 setup(name='pycasso',
       version=open(VERSION_PATH).read().strip(),
