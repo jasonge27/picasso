@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.9)
 project(picasso)
 include(cmake/Utils.cmake)
 find_package(OpenMP)
@@ -34,23 +34,23 @@ file(GLOB_RECURSE SOURCES
         include/*.h
         )
 # Only add main function for executable target (---no cli version yet---)
-# list(REMOVE_ITEM SOURCES ${PROJECT_SOURCE_DIR}/src/cli_main.cpp)
+#list(REMOVE_ITEM SOURCES ${PROJECT_SOURCE_DIR}/src/cli_main.cpp)
 
 # dmlc-core
-add_subdirectory(dmlc-core)
-set(LINK_LIBRARIES dmlccore)
+#add_subdirectory(dmlc-core)
+#set(LINK_LIBRARIES dmlccore)
 
-add_library(objpicasso OBJECT ${SOURCES})
+add_library(picassoobj OBJECT ${SOURCES})
 
 # Executable (----no cli version yet----)
-# add_executable(clipicasso $<TARGET_OBJECTS:objpicasso> src/cli_main.cpp)
-# set_target_properties(clipicasso PROPERTIES
-#         OUTPUT_NAME picasso
-#         )
-# set_output_directory(clipicasso ${PROJECT_SOURCE_DIR})
-# target_link_libraries(clipicasso ${LINK_LIBRARIES})
+#add_executable(clipicasso $<TARGET_OBJECTS:objpicasso> src/cli_main.cc)
+#set_target_properties(clipicasso PROPERTIES
+#     OUTPUT_NAME picasso
+#     )
+#set_output_directory(clipicasso ${PROJECT_SOURCE_DIR})
+#target_link_libraries(clipicasso ${LINK_LIBRARIES})
 
-add_library(picasso SHARED $<TARGET_OBJECTS:objpicasso>)
+add_library(picasso SHARED $<TARGET_OBJECTS:picassoobj>)
 target_link_libraries(picasso ${LINK_LIBRARIES})
 set_output_directory(picasso ${PROJECT_SOURCE_DIR}/lib)
 if(MINGW)
@@ -59,8 +59,7 @@ if(MINGW)
 endif()
 
 #Ensure these two targets do not build simultaneously, as they produce outputs with conflicting names (---no cli version yet---)
-# add_dependencies(picassoX clipicassoX)
-
+#add_dependencies(picasso clipicasso)
 
 # Group sources
 auto_source_group("${SOURCES}")
