@@ -149,7 +149,6 @@ Rpack:
 	cp -r src picasso/src/src
 	cp -r include picasso/src/include
 	cp -r amalgamation picasso/src/amalgamation
-	cp ./LICENSE picasso
 	cat R-package/src/Makevars.in|sed '2s/.*/PKGROOT=./' | sed '3s/.*/ENABLE_STD_THREAD=0/' > picasso/src/Makevars.in
 	cp picasso/src/Makevars.in picasso/src/Makevars.win
 
