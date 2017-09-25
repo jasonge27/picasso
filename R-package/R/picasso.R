@@ -10,6 +10,7 @@ picasso <- function(X,
                     gamma = 3,
                     df = NULL,
                     standardize = TRUE,
+                    intercept = TRUE,
                     prec = 1e-7,
                     max.ite = 1e3,
                     verbose = FALSE)
@@ -28,7 +29,8 @@ picasso <- function(X,
       out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
                           lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
                           method = method, type.gaussian = type.gaussian, gamma = gamma, df = df, 
-                          standardize = standardize,  prec = prec, 
+                          standardize = standardize,  intercept= intercept, 
+                           prec = prec, 
                           max.ite = max.ite, verbose = verbose)
   }
   
@@ -38,7 +40,7 @@ picasso <- function(X,
     
     out = picasso.logit(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
                         lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
-                        method = method, gamma = gamma, standardize = standardize, 
+                        method = method, gamma = gamma, standardize = standardize, intercept=intercept, 
                         prec = prec, max.ite = max.ite, verbose = verbose)
   }
 
@@ -48,7 +50,7 @@ picasso <- function(X,
     
     out = picasso.sqrtlasso(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
                         lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
-                        method = method, gamma = gamma, standardize = standardize, 
+                        method = method, gamma = gamma, standardize = standardize, intercept=intercept, 
                         prec = prec, max.ite = max.ite, verbose = verbose)
   }
 
@@ -56,8 +58,10 @@ picasso <- function(X,
     out = picasso.poisson(X = X, Y=Y, lambda = lambda, nlambda = nlambda, 
                         lambda.min.ratio = lambda.min.ratio,
                        lambda.min = lambda.min, method = method, gamma = gamma, 
+                       standardize = standardize, 
+                       intercept = intercept,
                        prec = prec, max.ite = max.ite, 
-                       standardize = standardize, verbose = verbose)
+                       verbose = verbose)
   }
   out$family = family
   return(out)

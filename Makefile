@@ -162,5 +162,9 @@ Rcheck:
 	$(MAKE) Rbuild
 	R CMD check  picasso*.tar.gz
 
+Rinstall:
+	$(MAKE) Rbuild
+	R CMD INSTALL  picasso*.tar.gz
+
 -include build/*.d
 -include build/*/*.d

@@ -1,7 +1,7 @@
 #include <R.h>
 #include <picasso/c_api.hpp>
 
-void picasso_logit_solver(
+extern "C" void picasso_logit_solver(
     double* Y,       // input: 0/1 model response
     double* X,       // input: model covariates
     int* nn,         // input: number of samples
@@ -26,7 +26,7 @@ void picasso_logit_solver(
                           ite_lamb, size_act, runt);
 }
 
-void picasso_sqrt_lasso_solver(
+extern "C" void picasso_sqrt_lasso_solver(
     double* Y,       // input: 0/1 model response
     double* X,       // input: model covariates
     int* nn,         // input: number of samples
@@ -51,7 +51,7 @@ void picasso_sqrt_lasso_solver(
                             beta, intcpt, ite_lamb, size_act, runt);
 }
 
-void picasso_poisson_solver(
+extern "C" void picasso_poisson_solver(
     double* Y,       // input: 0/1 model response
     double* X,       // input: model covariates
     int* nn,         // input: number of samples
@@ -77,7 +77,7 @@ void picasso_poisson_solver(
                          ite_lamb, size_act, runt);
 }
 
-void picasso_gaussian_cov(
+extern "C" void picasso_gaussian_cov(
     double* Y,       // input: 0/1 model response
     double* X,       // input: model covariates
     int* nn,         // input: number of samples
@@ -102,7 +102,7 @@ void picasso_gaussian_cov(
       *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
 }
 
-void picasso_gaussian_naive(
+extern "C" void picasso_gaussian_naive(
     double* Y,       // input: 0/1 model response
     double* X,       // input: model covariates
     int* nn,         // input: number of samples
@@ -127,8 +127,8 @@ void picasso_gaussian_naive(
       *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
 }
 
-void standardize_design(double* X, double* xx, double* xm, double* xinvc,
-                        int* nn, int* dd) {
+extern "C" void standardize_design(double* X, double* xx, double* xm,
+                                   double* xinvc, int* nn, int* dd) {
   int i, j, jn, n, d;
 
   n = *nn;

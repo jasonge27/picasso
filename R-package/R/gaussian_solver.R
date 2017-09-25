@@ -1,5 +1,5 @@
 gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, prec, 
-                    verbose, standardize, method.flag, type.gaussian)
+                    verbose, standardize, intercept, method.flag, type.gaussian)
 {
   if (verbose){
     if (method.flag == 1)
@@ -27,8 +27,8 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
          as.double(Y), as.double(X), 
          as.integer(n), as.integer(d),  
          as.double(lambda), as.integer(nlambda), 
-         as.double(gamma), as.integer(max.ite), as.double(pprec),
-         as.integer(method_flag), as.integer(intercept),
+         as.double(gamma), as.integer(max.ite), as.double(prec),
+         as.integer(method.flag), as.integer(intercept),
          as.double(beta), as.double(beta.intcpt), as.integer(ite.lamb), 
          as.integer(beta.idx), 
         as.double(runt), 
@@ -38,8 +38,8 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
            as.double(Y), as.double(X), 
          as.integer(n), as.integer(d),  
          as.double(lambda), as.integer(nlambda), 
-         as.double(gamma), as.integer(max.ite), as.double(pprec),
-         as.integer(method_flag), as.integer(intercept),
+         as.double(gamma), as.integer(max.ite), as.double(prec),
+         as.integer(method.flag), as.integer(intercept),
          as.double(beta), as.double(beta.intcpt), as.integer(ite.lamb), 
          as.integer(beta.idx), 
         as.double(runt), 

@@ -20,7 +20,7 @@ extern "C" void SolveLogisticRegression(
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
-);
+    );
 
 extern "C" void SolvePoissonRegression(
     double *Y,       // input: 0/1 model response
@@ -41,7 +41,7 @@ extern "C" void SolvePoissonRegression(
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
-);
+    );
 
 extern "C" void SolveSqrtLinearRegression(
     double *Y,       // input: 0/1 model response
@@ -62,7 +62,7 @@ extern "C" void SolveSqrtLinearRegression(
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
-);
+    );
 
 extern "C" void SolveLinearRegressionNaiveUpdate(
     double *Y,       // input: 0/1 model response
@@ -83,7 +83,7 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
-);
+    );
 
 extern "C" void SolveLinearRegressionCovUpdate(
     double *Y,       // input: model response
@@ -104,6 +104,6 @@ extern "C" void SolveLinearRegressionCovUpdate(
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
-);
+    );
 
 #endif  // PICASSO_C_API_H

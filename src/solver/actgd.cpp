@@ -39,9 +39,7 @@ void ActGDSolver::solve() {
 
     for (int j = 0; j < d; j++)
       if (actset_indcat[j] == 0) {
-        // tmp = regfunc->threshold
-        // tmp = soft_thresh_l1(m_obj->get_grad(j), lambdas[i], m_param.gamma,
-        //                 m_param.reg_type);
+        tmp = m_obj->coordinate_descent(regfunc, j);
         if (fabs(tmp) > 1e-8) actset_indcat[j] = 1;
       }
 

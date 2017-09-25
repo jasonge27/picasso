@@ -7,6 +7,7 @@ picasso.logit <- function(X,
                           method="l1",
                           gamma = 3,
                           standardize = TRUE,
+                          intercept = TRUE,
                           prec = 1e-4,
                           max.ite = 1e4,
                           verbose = FALSE)
@@ -90,7 +91,7 @@ picasso.logit <- function(X,
     }
     
     out = logit_solver(yy, xx, lambda, nlambda, gamma, 
-                n, d, max.ite, prec, verbose, 
+                n, d, max.ite, prec, intercept, verbose, 
                 method.flag)
   }
   
