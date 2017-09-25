@@ -1,8 +1,15 @@
 #include <picasso/actgd.hpp>
+#include <picasso/objective.hpp>
 
 namespace picasso {
 namespace solver {
-void ActGDSolver ::solve() {
+ActGDSolver::ActGDSolver(ObjFunction *obj, PicassoSolverParams param)
+    : m_obj(obj), m_param(param) {
+  itercnt_path.clear();
+  solution_path.clear();
+}
+
+void ActGDSolver::solve() {
   unsigned int d = m_obj->get_dim();
 
   const std::vector<double> &lambdas = m_param.get_lambda_path();

@@ -151,6 +151,7 @@ Rpack:
 	cp -r amalgamation picasso/src/amalgamation
 	cat R-package/src/Makevars.in|sed '2s/.*/PKGROOT=./' | sed '3s/.*/ENABLE_STD_THREAD=0/' > picasso/src/Makevars.in
 	cp picasso/src/Makevars.in picasso/src/Makevars.win
+	cp picasso/src/Makevars.in picasso/src/Makevars
 
 Rbuild:
 	$(MAKE) Rpack

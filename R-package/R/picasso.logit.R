@@ -40,7 +40,7 @@ picasso.logit <- function(X,
     xx = rep(0,n*d)
     xm = rep(0,d)
     xinvc.vec = rep(0,d)
-    str = .C("standardize_design", as.double(X), as.double(xx), as.double(xm), as.double(xinvc.vec), 
+    str = .Call("standardize_design", as.double(X), as.double(xx), as.double(xm), as.double(xinvc.vec), 
              as.integer(n), as.integer(d), PACKAGE="picasso")
     xx = matrix(unlist(str[2]), nrow=n, ncol=d, byrow=FALSE)
     xm = matrix(unlist(str[3]), nrow=1)
@@ -116,7 +116,6 @@ picasso.logit <- function(X,
   }
 
   runt = Sys.time()-begt
-  est$obj = out$obj
   est$runt = out$runt
   est$beta = Matrix(beta1)
   res = X%*%beta1+matrix(rep(intcpt,n),nrow=n,byrow=TRUE)

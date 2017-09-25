@@ -111,7 +111,6 @@ picasso.sqrtlasso <- function(X,
   }
 
   runt = Sys.time()-begt
-  est$obj = out$obj
   est$runt = out$runt
   est$beta = Matrix(beta1)
   res = X%*%beta1+matrix(rep(intcpt,n),nrow=n,byrow=TRUE)

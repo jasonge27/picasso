@@ -1,8 +1,15 @@
 #include <picasso/actnewton.hpp>
+#include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
 
 namespace picasso {
 namespace solver {
+ActNewtonSolver::ActNewtonSolver(ObjFunction *obj, PicassoSolverParams param)
+    : m_obj(obj), m_param(param) {
+  itercnt_path.clear();
+  solution_path.clear();
+}
+
 void ActNewtonSolver::solve() {
   unsigned int d = m_obj->get_dim();
 
