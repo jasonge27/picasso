@@ -36,6 +36,7 @@ setup(name='pycasso',
       long_description=open(os.path.join(CURRENT_DIR, 'README.rst')).read(),
       install_requires=[
           'numpy',
+          'math',
           'scipy',
       ],
       maintainer='Haoming Jiang',

@@ -3,6 +3,9 @@
 Main Interface of the package
 """
 
+import math
+import numpy as np
+import scipy.stats as ss
 import ctypes
 
 from .libpath import find_lib_path
@@ -28,11 +31,11 @@ class Solver:
             or a two-level factor for `binomial`, or a non-negative integer vector representing counts
             for `gaussian`.
     :param lambdas: A sequence of decreasing positive values to control the regularization. Typical usage
-            is to leave the input `lambda = ()` and have the program compute its own `lambda` sequence
+            is to leave the input `lambda = None` and have the program compute its own `lambda` sequence
             based on `nlambda` and `lambda_min_ratio`. Users can also specify a sequence to override this.
             Default value is from `lambda_max` to `lambda_min_ratio*lambda_max`. The default value of
             `lambda_max` is the minimum regularization parameter which yields an all-zero estimates.
-    :param nlambda: The number of values used in lambdas. Default value is 100.
+    :param nlambda: The number of values used in lambdas. Default value is 100. (useless when `lambdas` is specified)
     :param lambda_min_ratio: The smallest value for lambdas, as a fraction of the upper-bound (`MAX`) of the
             regularization parameter. The program can automatically generate `lambda` as a sequence of
             `length = nlambda` starting from `MAX` to `lambda_min_ratio` * `MAX` in log scale. The
@@ -41,12 +44,12 @@ class Solver:
             `lambda_min_raito` smaller than 0.05 for logistic/poisson regression under nonconvex penalty.
     :param lambda_min: The smallest value for `lambda`. If `lambda_min_ratio` is provided, then it is set to
             `lambda.min.ratio*MAX`, where `MAX` is the uppperbound of the regularization parameter. The default
-            value is `0.1*MAX`.
+            value is `0.05*MAX`.
     :param family: Options for model. Sparse linear regression and sparse multivariate regression is applied if
             `family = "gaussian"`, sqrt lasso is applied if `family = "sqrtlasso"`, sparse logistic regression is
             applied if `family = "binomial"` and sparse poisson regression is applied if `family = "poisson"`.
             The default value is `"gaussian"`.
-    :param method: Options for regularization. Lasso is applied if `method = "l1"`, MCP is applied if `
+    :param penalty: Options for regularization. Lasso is applied if `method = "l1"`, MCP is applied if `
             method = "mcp"` and SCAD Lasso is applied if `method = "scad"`. The default value is `"l1"`.
     :param type_gaussian: Options for updating residuals in sparse linear regression. The naive update rule is
             applied if `opt = "naive"`, and the covariance update rule is applied if `opt = "covariance"`. The
@@ -59,14 +62,54 @@ class Solver:
     :param max_ite: The iteration limit. The default value is 1000.
     :param verbose: Tracing information is disabled if `verbose = FALSE`. The default value is `FALSE`.
     """
-    def __init__(self,x, y, lambdas = (), nlambda = 100, lambda_min_ratio = 0.05,
-                 lambda_min = (), family = "gaussian", method = "l1",
-                 type_gaussian = "naive", gamma = 3, df = (), standardize = True,
+    def __init__(self, x, y, lambdas = None, nlambda = 100, lambda_min_ratio = None,
+                 lambda_min = None, family = "gaussian", penalty = "l1",
+                 type_gaussian = "naive", gamma = 3, df = None, standardize = True,
                  prec = 1e-7, max_ite = 1000,  verbose = False):
-        self.x = x
-        self.y = y
+
+        if family not in ("gaussian", "binomial", "poisson", "sqrtlasso"):
+            raise RuntimeError(r' Wrong "family" input. "family" should be one of "gaussian", "binomial" and "poisson".')
+        self.family = family
+        self.penalty = penalty
+        self.x = np.array(x)
+        self.standardize = standardize
+        if standardize:
+            self.x = ss.zscore(self.x, axis = 0, ddof = 0)
+        self.y = np.array(y)
+        if self.x.shape[0] is not self.y.shape[0]:
+            raise RuntimeErrpr(r' the size of data "x" and label "y" does not match'+ \
+                               "/nx: %i * %i, y: %i"%(self.x.shape[0],self.x.shape[1],self.y.shape[0]))
+        if df is None:
+            self.df = 2 * self.x.shape[0]
+        else:
+            self.df = df
+        self.type_gaussian = type_gaussian
+        self.gamma = gamma
+        self.max_ite = max_ite
+        self.prec = prec
+        self.verbose = verbose
+
+        if lambdas is not None:
+            self.lambdas = lambdas
+            self.nlambda = lamdas.size
+        else:
+            lambda_max = 0 # TODO
+            if lambda_min_ratio is None:
+                if lambda_min is None:
+                    lambda_min_ratio = 0.05
+                else:
+                    lambda_min_ratio = 1. * lambda_min/lambda_max
+            self.nlambda = nlambda
+            self.lambdas = np.linspace(1,math.log(lambda_min_ratio),nlambda)
+            self.lambdas = lambda_max * np.exp(self.lambdas)
 
     def __del__(self):
+        pass
+
+    def train(self):
+        """
+        The trigger function for training the model
+        """
         pass
 
     def coef(self):
@@ -79,15 +122,28 @@ class Solver:
         pass
         return {}
 
-    def lalala(self,a,b,g,s,e):
+    def plot(self):
         """
+        Visualize the solution path of regression estimate corresponding to regularization parameters.
+        """
+        pass
 
-        :param a:
-        :param b:
-        :param g:
-        :param s:
-        :param e:
-        :return sth: val
-        :type sth: int
+    def predict(self, newdata = None):
         """
-        return 1
+        Predicting responses of the new data.
+
+        :param newdata: An optional data frame in which to look for variables with which to predict.
+                        If omitted, the training data of the model are used.
+        :return: The predicted response vectors based on the estimated models.
+        """
+        pass
+        return 0
+
+    def __str__(self):
+        """
+        A summary of the information about an object
+
+        :return: a summary string
+        :rtype: string
+        """
+        return "Hi. I'm Model"
