@@ -23,6 +23,11 @@ class ActGDSolver {
 
   const std::vector<int> &get_itercnt_path() const { return itercnt_path; };
   const ModelParam &get_model_param(int i) const { return solution_path[i]; };
+
+  ~ActGDSolver() {
+    delete m_obj;
+    m_obj = nullptr;
+  }
 };
 
 }  // namespace solver

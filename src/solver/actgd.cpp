@@ -98,11 +98,8 @@ void ActGDSolver::solve() {
       }
 
       // update gradient
-      for (int j = 0; j < d; j++)
-        if (actset_idx[j]) {
-          // update gradient here
-        }
-
+      m_obj->update_auxiliary();
+      m_obj->intercept_update();
       // update intercept
     }
 

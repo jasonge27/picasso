@@ -24,6 +24,11 @@ class ActNewtonSolver {
 
   const std::vector<int> &get_itercnt_path() const { return itercnt_path; };
   const ModelParam &get_model_param(int i) const { return solution_path[i]; };
+
+  ~ActNewtonSolver() {
+    delete m_obj;
+    m_obj = nullptr;
+  }
 };
 
 }  // namespace solver
