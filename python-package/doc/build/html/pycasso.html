@@ -13,8 +13,6 @@
 
   
   
-  
-  
 
   
 
@@ -45,7 +43,6 @@
 
 <body class="wy-body-for-nav" role="document">
 
-   
   <div class="wy-grid-for-nav">
 
     
@@ -86,10 +83,7 @@
           
             
             
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+                <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="README.html">Picasso Python Package</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">pycasso package</a><ul>
@@ -111,10 +105,8 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">pycasso</a>
-        
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pycasso</a>
       </nav>
 
 
@@ -123,40 +115,23 @@
         <div class="rst-content">
           
 
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
-
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>pycasso package</li>
-    
-    
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>pycasso package</li>
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/pycasso.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -173,15 +148,14 @@
 <dl class="exception">
 <dt id="pycasso.core.PycassoError">
 <em class="property">exception </em><code class="descclassname">pycasso.core.</code><code class="descname">PycassoError</code><a class="headerlink" href="#pycasso.core.PycassoError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
 <p>Error thrown by pycasso solver.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="pycasso.core.Solver">
 <em class="property">class </em><code class="descclassname">pycasso.core.</code><code class="descname">Solver</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>lambdas=None</em>, <em>nlambda=100</em>, <em>lambda_min_ratio=None</em>, <em>lambda_min=None</em>, <em>family='gaussian'</em>, <em>penalty='l1'</em>, <em>type_gaussian='naive'</em>, <em>gamma=3</em>, <em>df=None</em>, <em>standardize=True</em>, <em>prec=1e-07</em>, <em>max_ite=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>The PICASSO Solver For GLM.</p>
+<dd><p>The PICASSO Solver For GLM.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -281,7 +255,7 @@ If omitted, the training data of the model are used.</td>
 <dl class="exception">
 <dt id="pycasso.libpath.PicassoLibraryNotFound">
 <em class="property">exception </em><code class="descclassname">pycasso.libpath.</code><code class="descname">PicassoLibraryNotFound</code><a class="headerlink" href="#pycasso.libpath.PicassoLibraryNotFound" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
 <p>Error thrown by when picasso is not found</p>
 </dd></dl>
 
@@ -326,16 +300,13 @@ If omitted, the training data of the model are used.</td>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="README.html" class="btn btn-neutral" title="Picasso Python Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="README.html" class="btn btn-neutral" title="Picasso Python Package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -369,8 +340,7 @@ If omitted, the training data of the model are used.</td>
             VERSION:'0.1dev',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
+            HAS_SOURCE:  true
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>

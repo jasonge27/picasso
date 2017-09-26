@@ -55,7 +55,7 @@ class Solver:
             applied if `opt = "naive"`, and the covariance update rule is applied if `opt = "covariance"`. The
             default value is `"naive"`.
     :param gamma: The concavity parameter for MCP and SCAD. The default value is `3`.
-    :param df: Maximum degree of freedom for the covariance update. The default value is `2*n`.
+    :param df: Maximum degree of freedom for the covariance update. The default value is `m`.
     :param standardize: Design matrix X will be standardized to have mean zero and unit standard deviation if
             `standardize = TRUE`. The default value is `TRUE`.
     :param prec: Stopping precision. The default value is 1e-7.
@@ -67,24 +67,45 @@ class Solver:
                  type_gaussian = "naive", gamma = 3, df = None, standardize = True,
                  prec = 1e-7, max_ite = 1000,  verbose = False):
 
+        # Define the model
         if family not in ("gaussian", "binomial", "poisson", "sqrtlasso"):
-            raise RuntimeError(r' Wrong "family" input. "family" should be one of "gaussian", "binomial" and "poisson".')
+            raise RuntimeError(r' Wrong "family" input. "family" should be one of "gaussian", "binomial", "poisson" and "sqrtlasso".')
         self.family = family
+        if penalty not in ("l1", "mcp", "scad"):
+            raise RuntimeError(r' Wrong "penalty" input. "penalty" should be one of "l1", "mcp" and "scad".')
         self.penalty = penalty
+
+        # Define the data
         self.x = np.array(x)
+        self.num_sample = x.shape[0]
+        self.num_feature = x.shape[1]
+        if x.size is 0:
+            raise RuntimeError("Wrong: no input!")
         self.standardize = standardize
         if standardize:
+            self.x_mean = np.mean(self.x, axis = 0)
+            self.x_std = np.mean(self.x, axis = 0)
             self.x = ss.zscore(self.x, axis = 0, ddof = 0)
         self.y = np.array(y)
         if self.x.shape[0] is not self.y.shape[0]:
-            raise RuntimeErrpr(r' the size of data "x" and label "y" does not match'+ \
+            raise RuntimeError(r' the size of data "x" and label "y" does not match'+ \
                                "/nx: %i * %i, y: %i"%(self.x.shape[0],self.x.shape[1],self.y.shape[0]))
+
+        # Define the parameters
         if df is None:
-            self.df = 2 * self.x.shape[0]
+            self.df = min(self.num_feature, self.num_sample)
         else:
             self.df = df
         self.type_gaussian = type_gaussian
         self.gamma = gamma
+        if self.penalty is "mcp":
+            if self.gamma <= 1:
+                print ("gamma have to be greater than 1 for MCP. Set to the default value 3.")
+                self.gamma = 3
+        if self.penalty is "scad":
+            if self.gamma <= 2:
+                print ("gamma have to be greater than 2 for SCAD. Set to the default value 3.")
+                self.gamma = 3
         self.max_ite = max_ite
         self.prec = prec
         self.verbose = verbose
@@ -93,7 +114,7 @@ class Solver:
             self.lambdas = lambdas
             self.nlambda = lamdas.size
         else:
-            lambda_max = 0 # TODO
+            lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y) ) )
             if lambda_min_ratio is None:
                 if lambda_min is None:
                     lambda_min_ratio = 0.05
@@ -103,14 +124,65 @@ class Solver:
             self.lambdas = np.linspace(1,math.log(lambda_min_ratio),nlambda)
             self.lambdas = lambda_max * np.exp(self.lambdas)
 
+        # register trainer
+        self.trainer = getattr(self, '_'+self.family+'_wrapper')()
+
     def __del__(self):
         pass
+
+    def _gaussian_wrapper(self):
+        """
+        A wrapper for linear regression, including some specialized parameter checks.
+
+        :return: A function which can be used for training
+        :rtype: function
+        """
+        if self.verbose:
+            print("Sparse linear regression. \n")
+        if self.type_gaussian not in ("covariance", "naive"):
+            print(r'Automatically set "type_gaussian", since "type_gaussian" is not one of "covariance", "naive"'+'\n')
+            if self.num_sample < 500:
+                self.type_gaussian = "covariance"
+            else:
+                self.type_gaussian = "naive"
+
+        return lambda:0
+
+    def _binomial_wrapper(self):
+        """
+        A wrapper for logistic regression, including some specialized parameter checks.
+
+        :return: A function which can be used for training
+        :rtype: function
+        """
+        pass
+        return lambda:0
+
+    def _poisson_wrapper(self):
+        """
+        A wrapper for poisson regression, including some specialized parameter checks.
+
+        :return: A function which can be used for training
+        :rtype: function
+        """
+        pass
+        return lambda:0
+
+    def _sqrtlasso_wrapper(self):
+        """
+        A wrapper for sqrt lasso, including some specialized parameter checks.
+
+        :return: A function which can be used for training
+        :rtype: function
+        """
+        pass
+        return lambda:0
 
     def train(self):
         """
         The trigger function for training the model
         """
-        pass
+        self.trainer()
 
     def coef(self):
         """
