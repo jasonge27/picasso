@@ -22,6 +22,9 @@ def _load_lib():
     lib = ctypes.cdll.LoadLibrary(lib_path[0])
     return lib
 
+# load the PICASSO library globally
+_PICASSO_LIB = _load_lib()
+
 class Solver:
     """
     The PICASSO Solver For GLM.
@@ -76,16 +79,19 @@ class Solver:
         self.penalty = penalty
 
         # Define the data
-        self.x = np.array(x)
-        self.num_sample = x.shape[0]
-        self.num_feature = x.shape[1]
-        if x.size is 0:
+        self.x = np.array(x, dtype = 'float64')
+        self.y = np.array(y, dtype = 'float64')
+        self.num_sample = self.x.shape[0]
+        self.num_feature = self.x.shape[1]
+        if self.x.size is 0:
             raise RuntimeError("Wrong: no input!")
         self.standardize = standardize
         if standardize:
             self.x_mean = np.mean(self.x, axis = 0)
             self.x_std = np.mean(self.x, axis = 0)
             self.x = ss.zscore(self.x, axis = 0, ddof = 0)
+            self.y_mean = np.mean(self.y)
+            self.y -= self.y_mean
         self.y = np.array(y)
         if self.x.shape[0] is not self.y.shape[0]:
             raise RuntimeError(r' the size of data "x" and label "y" does not match'+ \
@@ -126,6 +132,7 @@ class Solver:
 
         # register trainer
         self.trainer = getattr(self, '_'+self.family+'_wrapper')()
+        self.result = {'beta': [1,1,1,1,1]}
 
     def __del__(self):
         pass
@@ -138,7 +145,8 @@ class Solver:
         :rtype: function
         """
         if self.verbose:
-            print("Sparse linear regression. \n")
+            print("Sparse linear regression.")
+            print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
         if self.type_gaussian not in ("covariance", "naive"):
             print(r'Automatically set "type_gaussian", since "type_gaussian" is not one of "covariance", "naive"'+'\n')
             if self.num_sample < 500:
@@ -146,7 +154,7 @@ class Solver:
             else:
                 self.type_gaussian = "naive"
 
-        return lambda:0
+        return lambda: _PICASSO_LIB.test()
 
     def _binomial_wrapper(self):
         """
@@ -155,7 +163,9 @@ class Solver:
         :return: A function which can be used for training
         :rtype: function
         """
-        pass
+        if self.verbose:
+            print("Sparse logistic regression. \n")
+            print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
         return lambda:0
 
     def _poisson_wrapper(self):
@@ -165,7 +175,9 @@ class Solver:
         :return: A function which can be used for training
         :rtype: function
         """
-        pass
+        if self.verbose:
+            print("Sparse poisson regression. \n")
+            print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
         return lambda:0
 
     def _sqrtlasso_wrapper(self):
@@ -175,14 +187,21 @@ class Solver:
         :return: A function which can be used for training
         :rtype: function
         """
-        pass
+        if self.verbose:
+            print("Sparse logistic regression. \n")
+            print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
         return lambda:0
 
     def train(self):
         """
         The trigger function for training the model
         """
-        self.trainer()
+        self.result = self.trainer()
+        # TODO: deal wth error
+        # if (out$err == 1)
+        # cat("Error! Parameters are too dense. Please choose larger \"lambda\". \n")
+        # if (out$err == 2)
+        # cat("Warning! \"df\" may be too small. You may choose larger \"df\". \n")
 
     def coef(self):
         """
@@ -218,4 +237,7 @@ class Solver:
         :return: a summary string
         :rtype: string
         """
-        return "Hi. I'm Model"
+        return  "Model Type: " + self.family + "\n" +\
+                "Penalty Type: " + self.penalty + "\n" + \
+                "Sample Number: " + str(self.num_sample) + "\n" + \
+                "Feature Number: " + str(self.num_sample) + "\n"

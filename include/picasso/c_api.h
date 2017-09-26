@@ -3,6 +3,8 @@
 
 #include <picasso/objective.h>
 
+extern "C" void test(double *beta);
+
 extern "C" void SolveLogisticRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates

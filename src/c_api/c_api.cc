@@ -2,6 +2,12 @@
 
 using namespace picasso;
 
+void test(double *beta) {
+    int n = 5;
+    for(int i = 0;i < n; i++)
+        beta[i] = i+0.33;
+}
+
 void SolveLogisticRegression(
     double *Y,      // input: 0/1 model response 
     double *X,      // input: model covariates
