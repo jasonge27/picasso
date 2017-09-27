@@ -7,6 +7,7 @@ import math
 import numpy as np
 import scipy.stats as ss
 import ctypes
+from cutils import DoubleArrayType
 
 from .libpath import find_lib_path
 
