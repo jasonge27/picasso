@@ -91,7 +91,9 @@ class Solver:
             self.x_mean = np.mean(self.x, axis = 0)
             self.x_std = np.mean(self.x, axis = 0)
             self.x = ss.zscore(self.x, axis = 0, ddof = 0)
-            self.y_mean = np.mean(self.y)
+            if family is "gaussian":
+                self.y_mean = np.mean(self.y)
+                self.y -= self.y_mean
             self.y -= self.y_mean
         if self.x.shape[0] is not self.y.shape[0]:
             raise RuntimeError(r' the size of data "x" and label "y" does not match'+ \
@@ -236,6 +238,11 @@ class Solver:
         if self.verbose:
             print("Sparse poisson regression. \n")
             print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
+        self.y = np.array(self.y,dtpye='int')
+        levels = np.unique(self.y)
+        self.y = np.array(self.y,dtpye='double')
+        if (levels.size is not 2) or (1 not in levels) or (0 not in levels):
+            raise RuntimeError("Response vector should contains 0s and 1s.")
         return lambda:0
 
     def _sqrtlasso_wrapper(self):
