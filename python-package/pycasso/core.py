@@ -7,8 +7,8 @@ import math
 import numpy as np
 import scipy.stats as ss
 import ctypes
-from cutils import DoubleArrayType
 
+from .cutils import CDoubleArray, CIntArray
 from .libpath import find_lib_path
 
 class PycassoError(Exception):
@@ -80,8 +80,8 @@ class Solver:
         self.penalty = penalty
 
         # Define the data
-        self.x = np.array(x, dtype = 'float64')
-        self.y = np.array(y, dtype = 'float64')
+        self.x = np.array(x, dtype = 'double')
+        self.y = np.array(y, dtype = 'double')
         self.num_sample = self.x.shape[0]
         self.num_feature = self.x.shape[1]
         if self.x.size is 0:
@@ -93,7 +93,6 @@ class Solver:
             self.x = ss.zscore(self.x, axis = 0, ddof = 0)
             self.y_mean = np.mean(self.y)
             self.y -= self.y_mean
-        self.y = np.array(y)
         if self.x.shape[0] is not self.y.shape[0]:
             raise RuntimeError(r' the size of data "x" and label "y" does not match'+ \
                                "/nx: %i * %i, y: %i"%(self.x.shape[0],self.x.shape[1],self.y.shape[0]))
@@ -106,19 +105,23 @@ class Solver:
         self.type_gaussian = type_gaussian
         self.gamma = gamma
         if self.penalty is "mcp":
+            self.penaltyflag = 2
             if self.gamma <= 1:
                 print ("gamma have to be greater than 1 for MCP. Set to the default value 3.")
                 self.gamma = 3
-        if self.penalty is "scad":
+        elif self.penalty is "scad":
+            self.penaltyflag = 3
             if self.gamma <= 2:
                 print ("gamma have to be greater than 2 for SCAD. Set to the default value 3.")
                 self.gamma = 3
+        else: # self.penalty is "l1":
+            self.penaltyflag = 1
         self.max_ite = max_ite
         self.prec = prec
         self.verbose = verbose
 
         if lambdas is not None:
-            self.lambdas = lambdas
+            self.lambdas = np.array(lambdas, dtype = 'double')
             self.nlambda = lamdas.size
         else:
             lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y) ) )
@@ -128,15 +131,66 @@ class Solver:
                 else:
                     lambda_min_ratio = 1. * lambda_min/lambda_max
             self.nlambda = nlambda
-            self.lambdas = np.linspace(1,math.log(lambda_min_ratio),nlambda)
+            self.lambdas = np.linspace(1,math.log(lambda_min_ratio),nlambda, dtype = 'double')
             self.lambdas = lambda_max * np.exp(self.lambdas)
+            self.lambdas = np.array(self.lambdas, dtype = 'double')
 
         # register trainer
         self.trainer = getattr(self, '_'+self.family+'_wrapper')()
-        self.result = {'beta': [1,1,1,1,1]}
+        self.result = {'beta': np.zeros((self.nlambda,self.num_feature),dtype='double'),
+                       'intcpt': np.zeros(self.nlambda,dtype='double'),
+                       'ite_lamb': np.zeros(self.nlambda,dtype='int'),
+                       'size_act': np.zeros(self.df,dtype='int'),
+                       'runt': 0.0,
+                       'state': 'not trained'
+                       }
 
     def __del__(self):
         pass
+
+    def _decor_cinterface(self, _function):
+        """
+        Since all c functions take the same input, we can provide a unified decorator for defining the C interface
+
+        :param _function: the raw c function
+        :return: the decorated function
+        :rtype: function
+        """
+
+        """
+        C Function parameter:
+            double *Y,       // input: 0/1 model response
+            double *X,       // input: model covariates
+            int nn,          // input: number of samples
+            int dd,          // input: dimension
+            double *lambda,  // input: regularization parameter
+            int nnlambda,    // input: number of lambda on the regularization path
+            double gamma,    // input: gamma for SCAD or MCP penalty
+            int mmax_ite,    // input: max number of interations
+            double pprec,    // input: optimization precision
+            int reg_type,    // input: type of regularization
+            bool intercept,  // input: to have intercept term or not
+            double *beta,    // output: an nlambda * d dim matrix
+                             //         saving the coefficients for each lambda
+            double *intcpt,  // output: an nlambda dim array
+                             //         saving the model intercept for each lambda
+            int *ite_lamb,   // output: number of iterations for each lambda
+            int *size_act,   // output: an array of solution sparsity (model df)
+            double *runt     // output: runtime
+        """
+        _function.argtypes = [CDoubleArray, CDoubleArray, ctypes.c_int, ctypes.c_int, CDoubleArray, ctypes.c_int,
+                              ctypes.c_double, ctypes.c_int, ctypes.c_double, ctypes.c_int, ctypes.c_bool,
+                              CDoubleArray, CDoubleArray, CIntArray,
+                              CIntArray, ctypes.POINTER(ctypes.c_double)]
+        def wrapper():
+            _runt = ctypes.c_double(0)
+            _function(self.y, self.x, self.num_sample, self.num_feature, self.lambdas, self.nlambda,
+                                  self.gamma, self.max_ite,  self.prec, self.penaltyflag, self.standardize,
+                                  self.result['beta'], self.result['intcpt'], self.result['ite_lamb'],
+                                  self.result['size_act'],
+                                  _runt)
+            self.result['runt'] = _runt
+        return wrapper
 
     def _gaussian_wrapper(self):
         """
@@ -155,7 +209,10 @@ class Solver:
             else:
                 self.type_gaussian = "naive"
 
-        return lambda: _PICASSO_LIB.test()
+        if self.type_gaussian is "covariance":
+            return self._decor_cinterface(_PICASSO_LIB.SolveLinearRegressionCovUpdate)
+        else:
+            return self._decor_cinterface(_PICASSO_LIB.SolveLinearRegressionNaiveUpdate)
 
     def _binomial_wrapper(self):
         """
@@ -197,7 +254,8 @@ class Solver:
         """
         The trigger function for training the model
         """
-        self.result = self.trainer()
+        self.result['state'] = 'trained'
+        self.trainer()
         # TODO: deal wth error
         # if (out$err == 1)
         # cat("Error! Parameters are too dense. Please choose larger \"lambda\". \n")
@@ -211,8 +269,7 @@ class Solver:
         :return: a dictionary of the model coefficients.
         :rtype: dict{name : value}
         """
-        pass
-        return {}
+        return self.result
 
     def plot(self):
         """
