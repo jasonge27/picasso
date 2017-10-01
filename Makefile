@@ -119,23 +119,23 @@ clean:
 
 clean_all: clean
 
-doxygen:
-	doxygen doc/Doxyfile
-
-# create standalone python tar file.
-pypack: ${PICASSO_DYLIB}
-	cp ${PICASSO_DYLIB} python-package/picasso
-	cd python-package; tar cf picasso.tar picasso; cd ..
-
-# create pip installation pack for PyPI
-pippack:
-	$(MAKE) clean_all
-	rm -rf picasso-python
-	cp -r python-package picasso-python
-	cp -r Makefile picasso-python/picasso/
-	cp -r make picasso-python/picasso/
-	cp -r src picasso-python/picasso/
-	cp -r include picasso-python/picasso/
+#doxygen:
+#	doxygen doc/Doxyfile
+#
+## create standalone python tar file.
+#pypack: ${PICASSO_DYLIB}
+#	cp ${PICASSO_DYLIB} python-package/picasso
+#	cd python-package; tar cf picasso.tar picasso; cd ..
+#
+## create pip installation pack for PyPI
+#pippack:
+#	$(MAKE) clean_all
+#	rm -rf picasso-python
+#	cp -r python-package picasso-python
+#	cp -r Makefile picasso-python/picasso/
+#	cp -r make picasso-python/picasso/
+#	cp -r src picasso-python/picasso/
+#	cp -r include picasso-python/picasso/
 
 # Script to make a clean installable R package.
 Rpack:
