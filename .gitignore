@@ -31,7 +31,9 @@ R-package/*.Rproj
 cmake-build-debug
 
 #python build
+!python-package/lib/*
 python-package/build
+python-package/doc/build
 python-package/dist
 python-package/*.egg-info/
 

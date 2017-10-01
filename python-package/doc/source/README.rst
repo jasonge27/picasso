@@ -52,6 +52,8 @@ For Developer
 Please follow the `sphinx syntax style
 <https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html>`__
 
+To update the document: ``cd doc; make html``
+
 Copy Right
 ----------
 

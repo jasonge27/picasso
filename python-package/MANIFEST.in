@@ -1,5 +1,6 @@
 include *.md *.rst
 recursive-include lib *
+recursive-include data *
 recursive-include picasso *
 recursive-include picasso/include *
 recursive-include picasso/src *

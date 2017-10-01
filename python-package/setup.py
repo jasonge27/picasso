@@ -28,10 +28,6 @@ else:
     print("libpicasso already exists: " % LIB_PATH)
 
 VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
-# For pip
-if not os.path.exists(VERSION_PATH):
-    VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
-if
 
 setup(name='pycasso',
       version=open(VERSION_PATH).read().strip(),
@@ -40,6 +36,7 @@ setup(name='pycasso',
       long_description=open(os.path.join(CURRENT_DIR, 'README.rst')).read(),
       install_requires=[
           'numpy',
+          'math',
           'scipy',
       ],
       maintainer='Haoming Jiang',
@@ -51,6 +48,10 @@ setup(name='pycasso',
       include_package_data=True,
       license='MIT',
       classifiers=['Development Status :: 3 - Alpha',
+                   'Intended Audience :: Developers',
+                   'Intended Audience :: Science/Research',
+                   'Topic :: Scientific/Engineering :: Artificial Intelligence',
+                   'Topic :: Scientific/Engineering :: Mathematics',
                    'Programming Language :: Python :: 3 :: Only',
                    'License :: OSI Approved :: MIT License'],
       url='https://hmjianggatech.github.io/picasso/')
