@@ -1,9 +1,6 @@
 # package root
 PKGROOT=../../
 ENABLE_STD_THREAD=1
-# _*_ mode: Makefile; _*_
 
-CXX_STD = CXX11
-
-PKG_CPPFLAGS=  -I$(PKGROOT)/include -I$(PKGROOT)/dmlc-core/include  -I$(PKGROOT) 
+PKG_CPPFLAGS= -std=c++11 -I$(PKGROOT)/include -I$(PKGROOT)/dmlc-core/include  -I$(PKGROOT) 
 OBJECTS= ./picasso_R.o $(PKGROOT)/amalgamation/picasso-all0.o 

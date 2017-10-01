@@ -1,9 +1,8 @@
 # PICASSO
-## Installation in R
+## Installing R package
 
-```R
-> library(devtools)
-> devtools::install_github("jasonge27/picasso/R-package")
+```bash
+$make Rinstall
 ```
 
 

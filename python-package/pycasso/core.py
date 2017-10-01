@@ -168,7 +168,7 @@ class Solver:
 
         """
         C Function parameters:
-            double *Y,       // input: 0/1 model response
+            double *Y,       // input: model response
             double *X,       // input: model covariates
             int nn,          // input: number of samples
             int dd,          // input: dimension

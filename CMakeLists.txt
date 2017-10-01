@@ -32,6 +32,7 @@ file(GLOB_RECURSE SOURCES
         src/*.cc
         src/*.h
         include/*.h
+        include/*.hpp
         )
 # Only add main function for executable target (---no cli version yet---)
 #list(REMOVE_ITEM SOURCES ${PROJECT_SOURCE_DIR}/src/cli_main.cpp)

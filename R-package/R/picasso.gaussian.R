@@ -9,6 +9,7 @@ picasso.gaussian <- function(X,
                           gamma = 3,
                           df = NULL,
                           standardize = TRUE,
+                          intercept = TRUE,
                           prec = 1e-4,
                           max.ite = 1e4,
                           verbose = FALSE)
@@ -53,7 +54,7 @@ picasso.gaussian <- function(X,
     xx = rep(0,n*d)
     xm = rep(0,d)
     xinvc.vec = rep(0,d)
-    str = .C("standardize_design", as.double(X), as.double(xx), as.double(xm), 
+    str = .Call("standardize_design", as.double(X), as.double(xx), as.double(xm), 
               as.double(xinvc.vec), as.integer(n), as.integer(d), PACKAGE="picasso")
     xx = matrix(unlist(str[2]), nrow=n, ncol=d, byrow=FALSE)
     xm = matrix(unlist(str[3]), nrow=1)
@@ -121,7 +122,7 @@ picasso.gaussian <- function(X,
     }
 
     out = gaussian_solver(yy, xx, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
-                         standardize, method.flag, type.gaussian)
+                         standardize, intercept, method.flag, type.gaussian)
 
     if (out$err == 1)
       cat("Error! Parameters are too dense. Please choose larger \"lambda\". \n")
