@@ -1,9 +1,6 @@
 pycasso package
 ===============
 
-Submodules
-----------
-
 pycasso\.core
 -------------
 

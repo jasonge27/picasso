@@ -65,6 +65,13 @@ class Solver:
     :param prec: Stopping precision. The default value is 1e-7.
     :param max_ite: The iteration limit. The default value is 1000.
     :param verbose: Tracing information is disabled if `verbose = FALSE`. The default value is `FALSE`.
+
+
+        :param beta: A matrix of regression estimates whose columns correspond to regularization parameters
+                for sparse linear regression and sparse logistic regression. A list of matrices of regression
+                estimation corresponding to regularization parameters for sparse column inverse operator.
+        :param intercept: The value of intercepts corresponding to regularization parameters for sparse linear
+                regression, and sparse logistic regression.
     """
     def __init__(self, x, y, lambdas = None, nlambda = 100, lambda_min_ratio = None,
                  lambda_min = None, family = "gaussian", penalty = "l1",
@@ -91,7 +98,7 @@ class Solver:
             self.x_mean = np.mean(self.x, axis = 0)
             self.x_std = np.mean(self.x, axis = 0)
             self.x = ss.zscore(self.x, axis = 0, ddof = 0)
-            if family is "gaussian":
+            if self.family is "gaussian":
                 self.y_mean = np.mean(self.y)
                 self.y -= self.y_mean
             self.y -= self.y_mean
@@ -126,12 +133,20 @@ class Solver:
             self.lambdas = np.array(lambdas, dtype = 'double')
             self.nlambda = lamdas.size
         else:
-            lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y) ) )
+            if self.family is 'poisson':
+                lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y-np.mean(self.y)) ) ) /self.num_sample
+            elif self.family is 'sqrtlasso':
+                lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y) ) ) /self.num_sample \
+                             /np.sqrt(np.sum(self.y**2)/self.num_sample)
+            else:
+                lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y) ) ) /self.num_sample
             if lambda_min_ratio is None:
                 if lambda_min is None:
                     lambda_min_ratio = 0.05
                 else:
                     lambda_min_ratio = 1. * lambda_min/lambda_max
+            if lambda_min_ratio > 1:
+                raise RuntimeError(r'"lambda_min" is too small.')
             self.nlambda = nlambda
             self.lambdas = np.linspace(1,math.log(lambda_min_ratio),nlambda, dtype = 'double')
             self.lambdas = lambda_max * np.exp(self.lambdas)
@@ -144,7 +159,8 @@ class Solver:
                        'ite_lamb': np.zeros(self.nlambda,dtype='int'),
                        'size_act': np.zeros(self.df,dtype='int'),
                        'runt': 0.0,
-                       'state': 'not trained'
+                       'state': 'not trained',
+                       'error': 0
                        }
 
     def __del__(self):
@@ -160,7 +176,7 @@ class Solver:
         """
 
         """
-        C Function parameter:
+        C Function parameters:
             double *Y,       // input: 0/1 model response
             double *X,       // input: model covariates
             int nn,          // input: number of samples
@@ -226,7 +242,10 @@ class Solver:
         if self.verbose:
             print("Sparse logistic regression. \n")
             print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
-        return lambda:0
+        levels = np.unique(self.y)
+        if (levels.size is not 2) or (1 not in levels) or (0 not in levels):
+            raise RuntimeError("Response vector should contains 0s and 1s.")
+        return self._decor_cinterface(_PICASSO_LIB.SolveLogisticRegression)
 
     def _poisson_wrapper(self):
         """
@@ -238,12 +257,15 @@ class Solver:
         if self.verbose:
             print("Sparse poisson regression. \n")
             print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
-        self.y = np.array(self.y,dtpye='int')
-        levels = np.unique(self.y)
-        self.y = np.array(self.y,dtpye='double')
-        if (levels.size is not 2) or (1 not in levels) or (0 not in levels):
-            raise RuntimeError("Response vector should contains 0s and 1s.")
-        return lambda:0
+        if np.any(np.less(self.y, 0)):
+            raise RuntimeError("The response vector should be non-negative.")
+        if not np.allclose(self.y, np.round(self.y)):
+            raise RuntimeError("The response vector should be integers.")
+        if np.allclose(self.y, 0):
+            raise RuntimeError("The response vector is an all-zero vector. The problem is ill-conditioned.")
+        self.y = np.round(self.y)
+
+        return self._decor_cinterface(_PICASSO_LIB.SolvePoissonRegression)
 
     def _sqrtlasso_wrapper(self):
         """
@@ -255,7 +277,8 @@ class Solver:
         if self.verbose:
             print("Sparse logistic regression. \n")
             print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
-        return lambda:0
+
+        return self._decor_cinterface(_PICASSO_LIB.SolveSqrtLinearRegression)
 
     def train(self):
         """
@@ -263,11 +286,7 @@ class Solver:
         """
         self.result['state'] = 'trained'
         self.trainer()
-        # TODO: deal wth error
-        # if (out$err == 1)
-        # cat("Error! Parameters are too dense. Please choose larger \"lambda\". \n")
-        # if (out$err == 2)
-        # cat("Warning! \"df\" may be too small. You may choose larger \"df\". \n")
+        print('Training is over.')
 
     def coef(self):
         """
@@ -276,6 +295,8 @@ class Solver:
         :return: a dictionary of the model coefficients.
         :rtype: dict{name : value}
         """
+        if self.result['state'] is 'not trained':
+            print (r'Warning: The model has not been trained yet! ')
         return self.result
 
     def plot(self):
@@ -302,7 +323,9 @@ class Solver:
         :return: a summary string
         :rtype: string
         """
-        return  "Model Type: " + self.family + "\n" +\
-                "Penalty Type: " + self.penalty + "\n" + \
-                "Sample Number: " + str(self.num_sample) + "\n" + \
-                "Feature Number: " + str(self.num_sample) + "\n"
+        return_str = "Model Type: " + self.family + "\n" + \
+                     "Penalty Type: " + self.penalty + "\n" + \
+                     "Sample Number: " + str(self.num_sample) + "\n" + \
+                     "Feature Number: " + str(self.num_sample) + "\n"
+
+        return  return_str
