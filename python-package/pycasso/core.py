@@ -65,13 +65,6 @@ class Solver:
     :param prec: Stopping precision. The default value is 1e-7.
     :param max_ite: The iteration limit. The default value is 1000.
     :param verbose: Tracing information is disabled if `verbose = FALSE`. The default value is `FALSE`.
-
-
-        :param beta: A matrix of regression estimates whose columns correspond to regularization parameters
-                for sparse linear regression and sparse logistic regression. A list of matrices of regression
-                estimation corresponding to regularization parameters for sparse column inverse operator.
-        :param intercept: The value of intercepts corresponding to regularization parameters for sparse linear
-                regression, and sparse logistic regression.
     """
     def __init__(self, x, y, lambdas = None, nlambda = 100, lambda_min_ratio = None,
                  lambda_min = None, family = "gaussian", penalty = "l1",
@@ -101,7 +94,6 @@ class Solver:
             if self.family is "gaussian":
                 self.y_mean = np.mean(self.y)
                 self.y -= self.y_mean
-            self.y -= self.y_mean
         if self.x.shape[0] is not self.y.shape[0]:
             raise RuntimeError(r' the size of data "x" and label "y" does not match'+ \
                                "/nx: %i * %i, y: %i"%(self.x.shape[0],self.x.shape[1],self.y.shape[0]))
@@ -148,19 +140,18 @@ class Solver:
             if lambda_min_ratio > 1:
                 raise RuntimeError(r'"lambda_min" is too small.')
             self.nlambda = nlambda
-            self.lambdas = np.linspace(1,math.log(lambda_min_ratio),nlambda, dtype = 'double')
+            self.lambdas = np.linspace(1,math.log(lambda_min_ratio),self.nlambda, dtype = 'double')
             self.lambdas = lambda_max * np.exp(self.lambdas)
             self.lambdas = np.array(self.lambdas, dtype = 'double')
 
         # register trainer
         self.trainer = getattr(self, '_'+self.family+'_wrapper')()
         self.result = {'beta': np.zeros((self.nlambda,self.num_feature),dtype='double'),
-                       'intcpt': np.zeros(self.nlambda,dtype='double'),
+                       'intercept': np.zeros(self.nlambda,dtype='double'),
                        'ite_lamb': np.zeros(self.nlambda,dtype='int'),
                        'size_act': np.zeros(self.df,dtype='int'),
-                       'runt': 0.0,
-                       'state': 'not trained',
-                       'error': 0
+                       'train_time': 0.0,
+                       'state': 'not trained'
                        }
 
     def __del__(self):
@@ -204,10 +195,10 @@ class Solver:
             _runt = ctypes.c_double(0)
             _function(self.y, self.x, self.num_sample, self.num_feature, self.lambdas, self.nlambda,
                                   self.gamma, self.max_ite,  self.prec, self.penaltyflag, self.standardize,
-                                  self.result['beta'], self.result['intcpt'], self.result['ite_lamb'],
+                                  self.result['beta'], self.result['intercept'], self.result['ite_lamb'],
                                   self.result['size_act'],
                                   _runt)
-            self.result['runt'] = _runt
+            self.result['train_time'] = _runt.value
         return wrapper
 
     def _gaussian_wrapper(self):
@@ -294,6 +285,19 @@ class Solver:
 
         :return: a dictionary of the model coefficients.
         :rtype: dict{name : value}
+
+        The detail of returned list:
+
+            - **beta** - A matrix of regression estimates whose columns correspond to regularization parameters for \
+                sparse linear regression and sparse logistic regression. A list of matrices of regression estimation \
+                corresponding to regularization parameters for sparse column inverse operator.
+            - **intercept** - The value of intercepts corresponding to regularization parameters for sparse linear \
+                regression, and sparse logistic regression.
+            - **ite_lamb** - Number of iterations for each lambda.
+            - **size_act** - An array of solution sparsity (model degree of freedom).
+            - **train_time** - The training time.
+            - **state** - The training state.
+
         """
         if self.result['state'] is 'not trained':
             print (r'Warning: The model has not been trained yet! ')
@@ -303,18 +307,38 @@ class Solver:
         """
         Visualize the solution path of regression estimate corresponding to regularization parameters.
         """
-        pass
+        import matplotlib.pyplot as plt
+        plt.plot(self.lambdas, self.result['beta'] )
+        plt.ylabel('Coefficient')
+        plt.xlabel('Regularization Parameter')
+        plt.suptitle('Regularization Path')
+        plt.show()
 
-    def predict(self, newdata = None):
+    def predict(self, newdata = None, lambdidx = None):
         """
         Predicting responses of the new data.
 
         :param newdata: An optional data frame in which to look for variables with which to predict.
                         If omitted, the training data of the model are used.
+        :param lambdidx: Use the model coefficient corresponding to the `lambdidx`th lambda.
         :return: The predicted response vectors based on the estimated models.
         """
-        pass
-        return 0
+        if lambdidx is None:
+            lambdidx = self.nlambda
+
+        _beta = self.result['beta'][lambdidx,]
+        _intercept = self.result['intercept'][lambdidx]
+        if newdata is None:
+            y_pred = np.matmul(_beta, self.x) + _intercept
+        else:
+            if self.standardize:
+                if self.family is 'gaussian':
+                    _intercept += self.y_mean
+                _intercept -= np.matmul(_beta, self.x_mean/self.x_std)
+                _beta /= self.x_std
+            y_pred = np.matmul(_beta, newdata) + _intercept
+
+        return y_pred
 
     def __str__(self):
         """
@@ -326,6 +350,9 @@ class Solver:
         return_str = "Model Type: " + self.family + "\n" + \
                      "Penalty Type: " + self.penalty + "\n" + \
                      "Sample Number: " + str(self.num_sample) + "\n" + \
-                     "Feature Number: " + str(self.num_sample) + "\n"
+                     "Feature Number: " + str(self.num_feature) + "\n" + \
+                     "Lambda Number: " + str(self.nlambda) + "\n"
+        if self.result['state']:
+            return_str += "Training Time (ms): " + str(self.result['train_time']) + "\n"
 
         return  return_str
