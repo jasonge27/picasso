@@ -1,4 +1,7 @@
 # PICASSO
+## Note
+Deprecated for now. Please install from CRAN https://cran.r-project.org/package=picasso 
+
 ## Installing R package
 
 ```bash
