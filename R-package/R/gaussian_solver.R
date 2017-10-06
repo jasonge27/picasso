@@ -23,7 +23,7 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
   err = 0
 
   if (type.gaussian == "covariance"){
-     str=.Call("picasso_gaussian_cov", 
+     str=.C("picasso_gaussian_cov", 
          as.double(Y), as.double(X), 
          as.integer(n), as.integer(d),  
          as.double(lambda), as.integer(nlambda), 
@@ -34,7 +34,9 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
         as.double(runt), 
         PACKAGE="picasso")
    } else {
-     str=.Call("picasso_gaussian_naive", 
+     #print(n)
+     #print(d)
+     str=.C("picasso_gaussian_naive", 
            as.double(Y), as.double(X), 
          as.integer(n), as.integer(d),  
          as.double(lambda), as.integer(nlambda), 
@@ -50,5 +52,7 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
   runt = matrix(unlist(str[16]), ncol = nlambda, byrow = FALSE)
 
   return(list(beta = unlist(str[12]), intcpt = unlist(str[13]), beta.idx = unlist(str[15]),
-              ite = unlist(str[14]),  runt = runt))
+              ite = unlist(str[14]),  runt = runt, 
+              err=0) # TODO: adding error message
+              )
 }

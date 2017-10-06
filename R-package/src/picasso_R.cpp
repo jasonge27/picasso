@@ -122,6 +122,7 @@ extern "C" void picasso_gaussian_naive(
     int* size_act,  // output: an array of solution sparsity (model df)
     double* runt    // output: runtime
 ) {
+  Rprintf("In picasso_R.cpp. n:%d, d:%d", *nn, *dd);
   SolveLinearRegressionNaiveUpdate(
       Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite, *pprec, *reg_type,
       *include_intercept, beta, intcpt, ite_lamb, size_act, runt);

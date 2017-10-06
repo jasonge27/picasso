@@ -130,33 +130,33 @@ picasso.gaussian <- function(X,
     if (out$err == 2)
       cat("Warning! \"df\" may be too small. You may choose larger \"df\". \n")
   }
+
+  beta1 = matrix(0, nrow=d, ncol=nlambda)
+  intcpt = rep(0, nlambda)
   
-  est$beta = new("dgCMatrix", Dim = as.integer(c(d,nlambda)),
-            x = as.vector(out$beta[1:out$col.cnz[nlambda+1]]),
-             p=as.integer(out$col.cnz),
-             i = as.integer(out$beta.idx[1:out$col.cnz[nlambda+1]]))
-
-  est$df = rep(0,nlambda)
-  for (i in 1:nlambda)
-    est$df[i] = out$col.cnz[i+1] - out$col.cnz[i]
-
-  est$intercept = matrix(0, nrow=1, ncol=nlambda)
-
   if (standardize){
     for (k in 1:nlambda){
-      est$beta[,k] = xinvc.vec * est$beta[,k]*sdy
-      est$intercept[k] = ym - as.numeric(xm%*%est$beta[,k]) + out$intcpt[k]*sdy
+      tmp.beta = out$beta[[k]]
+      beta1[,k] = xinvc.vec*tmp.beta
+      intcpt[k] = -as.numeric(xm[1,]%*%beta1[,k])+out$intcpt[k]
+      est$lambda = lambda * sdy
     }
-    est$lambda = lambda * sdy
   } else {
     for (k in 1:nlambda){
-      est$intercept[k] = out$intcpt[k]
+      beta1[,k] = out$beta[[k]]
+      intcpt[k] = out$intcpt[k]
+      est$lambda = lambda 
     }
-    est$lambda = lambda
   }
 
+  est$beta = Matrix(beta1)
+  est$intercept = intcpt
+  
+  est$df = rep(0, nlambda)
+  for (i in 1:nlambda)
+    est$df[i] = sum(out$beta[[i]]!=0)
+  
   est$ite = out$ite
-  est$runt = out$runt
   
   runt = Sys.time()-begt
   

@@ -15,6 +15,9 @@ GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(const double *xmat,
     for (int i = 0; i < n; i++) XX[j] += X[j][i] * X[j][i];
     XX[j] = XX[j] / n;
   }
+
+  // saturated fvalue = 0
+  deviance = fabs(eval());
 }
 
 GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(
@@ -35,6 +38,8 @@ GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(
     for (int i = 0; i < n; i++) XX[j] += X[j][i] * X[j][i];
     XX[j] = XX[j] / n;
   }
+  // saturated fvalue = 0
+  deviance = fabs(eval());
 }
 
 double GaussianNaiveUpdateObjective::coordinate_descent(RegFunction *regfunc,
