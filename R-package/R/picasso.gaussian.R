@@ -51,10 +51,11 @@ picasso.gaussian <- function(X,
   res.sd = FALSE 
 
   if (standardize) {
-    xx = rep(0,n*d)
-    xm = rep(0,d)
-    xinvc.vec = rep(0,d)
-    str = .Call("standardize_design", as.double(X), as.double(xx), as.double(xm), 
+    xx = rep(0.0, n*d)
+    xm = rep(0.0, d)
+    xinvc.vec = rep(0.0, d)
+
+    str = .C("standardize_design", as.double(X), as.double(xx), as.double(xm), 
               as.double(xinvc.vec), as.integer(n), as.integer(d), PACKAGE="picasso")
     xx = matrix(unlist(str[2]), nrow=n, ncol=d, byrow=FALSE)
     xm = matrix(unlist(str[3]), nrow=1)

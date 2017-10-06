@@ -35,9 +35,9 @@ picasso.poisson <- function(X,
   }
 
   if (standardize){
-    xx = rep(0,n*d)
-    xm = rep(0,d)
-    xinvc.vec = rep(0,d)
+    xx = rep(0.0, n*d)
+    xm = rep(0.0, d)
+    xinvc.vec = rep(0.0, d)
     str = .Call("standardize_design", as.double(X), as.double(xx), 
               as.double(xm), as.double(xinvc.vec), 
              as.integer(n), as.integer(d), PACKAGE="picasso")

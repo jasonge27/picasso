@@ -66,6 +66,11 @@ void GaussianNaiveUpdateObjective::update_auxiliary() {
   }
 }
 
+void GaussianNaiveUpdateObjective::update_gradient(int idx) {
+  gr[idx] = 0.0;
+  for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i];
+}
+
 double GaussianNaiveUpdateObjective::get_local_change(double old, int idx) {
   assert(idx >= 0);
   double tmp = old - model_param.beta[idx];

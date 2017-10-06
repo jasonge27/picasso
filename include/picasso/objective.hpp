@@ -1,6 +1,7 @@
 #ifndef PICASSO_OBJECTIVE_H
 #define PICASSO_OBJECTIVE_H
 
+#include <R.h>
 #include <cmath>
 #include <vector>
 
@@ -114,6 +115,7 @@ class ObjFunction {
       : model_param(d) {
     this->d = d;
     this->n = n;
+    Rprintf("n:%d, d:%d", n, d);
     Y.resize(n);
     X.resize(d);
     gr.resize(d);
@@ -157,6 +159,7 @@ class ObjFunction {
   // update gradient and other aux vars
   virtual void update_key_aux() = 0;
   virtual void update_auxiliary() = 0;
+  virtual void update_gradient(int idx){};
 
   // compute quadratic change of fvalue on the idx dimension
   virtual double get_local_change(double old, int idx) = 0;
@@ -278,6 +281,7 @@ class GaussianNaiveUpdateObjective : public ObjFunction {
   void update_key_aux(){};
   void set_model_param(ModelParam &other_param);
   void update_auxiliary();
+  void update_gradient(int idx);
 
   double get_local_change(double old, int idx);
 

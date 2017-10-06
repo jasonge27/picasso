@@ -20,6 +20,7 @@ void ActGDSolver::solve() {
   std::vector<int> actset_indcat(d, 0);
   std::vector<int> actset_indcat_aux(d, 0);
   std::vector<int> actset_idx;
+  actset_idx.clear();
 
   std::vector<double> old_coef(d);
 
@@ -56,6 +57,9 @@ void ActGDSolver::solve() {
         if (actset_indcat[j] == 1) {
           double beta_old = m_obj->get_model_coef(j);
 
+          // compute thresholded coordinate
+          m_obj->update_gradient(j);
+
           double updated_coord = m_obj->coordinate_descent(regfunc, j);
 
           if (updated_coord == beta_old) continue;
@@ -77,16 +81,16 @@ void ActGDSolver::solve() {
       // Step 2 : active set minimization
       // on the active coordinates
       int loopcnt_level_1 = 0;
-      bool terminate_loop_level_1 = true;
       while (loopcnt_level_1 < m_param.max_iter) {
         loopcnt_level_1 += 1;
 
-        terminate_loop_level_1 = true;
+        bool terminate_loop_level_1 = true;
         for (int j = 0; j < actset_idx.size(); j++) {
           int idx = actset_idx[j];
           double beta_old = m_obj->get_model_coef(idx);
 
           // compute thresholded coordinate
+          m_obj->update_gradient(idx);
           double updated_coord = m_obj->coordinate_descent(regfunc, j);
 
           if (m_obj->get_local_change(beta_old, idx) > dev_thr)
