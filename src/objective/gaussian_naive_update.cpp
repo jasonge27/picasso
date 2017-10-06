@@ -16,6 +16,9 @@ GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(const double *xmat,
     XX[j] = XX[j] / n;
   }
 
+  for (int i = 0; i < n; i++) r[i] = Y[i];
+  update_auxiliary();
+
   // saturated fvalue = 0
   deviance = fabs(eval());
 }
@@ -38,6 +41,10 @@ GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(
     for (int i = 0; i < n; i++) XX[j] += X[j][i] * X[j][i];
     XX[j] = XX[j] / n;
   }
+
+  for (int i = 0; i < n; i++) r[i] = Y[i];
+  update_auxiliary();
+
   // saturated fvalue = 0
   deviance = fabs(eval());
 }
@@ -67,13 +74,13 @@ void GaussianNaiveUpdateObjective::set_model_param(ModelParam &other_param) {
 void GaussianNaiveUpdateObjective::update_auxiliary() {
   for (int idx = 0; idx < d; idx++) {
     gr[idx] = 0.0;
-    for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i];
+    for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i] / n;
   }
 }
 
 void GaussianNaiveUpdateObjective::update_gradient(int idx) {
   gr[idx] = 0.0;
-  for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i];
+  for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i] / n;
 }
 
 double GaussianNaiveUpdateObjective::get_local_change(double old, int idx) {

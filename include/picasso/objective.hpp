@@ -115,7 +115,6 @@ class ObjFunction {
       : model_param(d) {
     this->d = d;
     this->n = n;
-    Rprintf("n:%d, d:%d", n, d);
     Y.resize(n);
     X.resize(d);
     gr.resize(d);
@@ -167,7 +166,7 @@ class ObjFunction {
   // unpenalized function value
   virtual double eval() = 0;
 
-  ~ObjFunction(){};
+  virtual ~ObjFunction(){};
 };
 
 class GLMObjective : public ObjFunction {

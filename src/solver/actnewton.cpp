@@ -5,7 +5,7 @@
 namespace picasso {
 namespace solver {
 ActNewtonSolver::ActNewtonSolver(ObjFunction *obj, PicassoSolverParams param)
-    : m_obj(obj), m_param(param) {
+    : m_param(param), m_obj(obj) {
   itercnt_path.clear();
   solution_path.clear();
 }
@@ -84,7 +84,7 @@ void ActNewtonSolver::solve() {
 
             double old_beta = m_obj->get_model_coef(idx);
             regfunc->set_param(stage_lambdas[idx], 0.0);
-            double updated_coord = m_obj->coordinate_descent(regfunc, idx);
+            m_obj->coordinate_descent(regfunc, idx);
 
             if (m_obj->get_local_change(old_beta, idx) > dev_thr)
               terminate_loop_level_2 = false;

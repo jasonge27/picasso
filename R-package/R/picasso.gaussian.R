@@ -136,14 +136,14 @@ picasso.gaussian <- function(X,
   
   if (standardize){
     for (k in 1:nlambda){
-      tmp.beta = out$beta[[k]]
+      tmp.beta = out$beta[((k-1)*d+1):(k*d)]
       beta1[,k] = xinvc.vec*tmp.beta
       intcpt[k] = -as.numeric(xm[1,]%*%beta1[,k])+out$intcpt[k]
       est$lambda = lambda * sdy
     }
   } else {
     for (k in 1:nlambda){
-      beta1[,k] = out$beta[[k]]
+      beta1[,k] = out$beta[((k-1)*d+1):(k*d)]
       intcpt[k] = out$intcpt[k]
       est$lambda = lambda 
     }
@@ -154,7 +154,7 @@ picasso.gaussian <- function(X,
   
   est$df = rep(0, nlambda)
   for (i in 1:nlambda)
-    est$df[i] = sum(out$beta[[i]]!=0)
+    est$df[i] = sum(out$beta[((i-1)*d+1):(i*d)]!=0)
   
   est$ite = out$ite
   
