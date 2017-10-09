@@ -10,10 +10,9 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, df, max.ite, pre
       cat("SCAD regularization via active set identification and coordinate descent\n")
   }
  
-  maxdf = min(n, d)
-  beta = rep(0, maxdf*nlambda)
+  beta = rep(0, d*nlambda)
   beta.intcpt = rep(0, nlambda)
-  beta.idx = rep(0, maxdf*nlambda)
+  beta.idx = rep(0, d*nlambda)
   ite.lamb = rep(0, nlambda)
   ite.cyc = rep(0, nlambda)
   runt = rep(0, nlambda)

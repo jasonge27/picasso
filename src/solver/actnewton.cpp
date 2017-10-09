@@ -38,9 +38,7 @@ void ActNewtonSolver::solve() {
   std::vector<double> stage_lambdas(d, 0);
   RegFunction *regfunc = new RegL1();
   for (int i = 0; i < lambdas.size(); i++) {
-    // if (i >= 3) break;
     // start with the previous solution on the master path
-
     m_obj->set_model_param(model_master);
     for (int j = 0; j < d; j++) {
       grad[j] = grad_master[j];

@@ -7,7 +7,7 @@ GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(const double *xmat,
                                                            const double *y,
                                                            int n, int d)
     : ObjFunction(xmat, y, n, d) {
-  XX.resize(n);
+  XX.resize(d);
   r.resize(n);
 
   for (int j = 0; j < d; j++) {
@@ -26,7 +26,7 @@ GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(const double *xmat,
 GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(
     const double *xmat, const double *y, int n, int d, bool include_intercept)
     : ObjFunction(xmat, y, n, d) {
-  XX.resize(n);
+  XX.resize(d);
   r.resize(n);
 
   if (include_intercept) {
@@ -54,6 +54,10 @@ double GaussianNaiveUpdateObjective::coordinate_descent(RegFunction *regfunc,
   double beta_old = model_param.beta[idx];
   double tmp = gr[idx] + model_param.beta[idx] * XX[idx];
   model_param.beta[idx] = regfunc->threshold(tmp) / XX[idx];
+
+  // if (fabs(model_param.beta[idx]) > 0)
+  //  Rprintf("idx:%d, old beta:%f, new beta:%f\n", idx, tmp,
+  //          model_param.beta[idx]);
 
   for (int i = 0; i < n; i++)
     r[i] = r[i] - X[idx][i] * (model_param.beta[idx] - beta_old);

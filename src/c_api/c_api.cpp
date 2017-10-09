@@ -188,6 +188,7 @@ extern "C" void SolveSqrtLinearRegression(
 ) {
   picasso::ObjFunction *obj =
       new picasso::SqrtMSEObjective(X, Y, nn, dd, intercept);
+
   picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                            pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                            size_act, runt);

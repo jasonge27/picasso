@@ -207,7 +207,7 @@ class GLMObjective : public ObjFunction {
   double get_local_change(double old, int idx);
 };
 
-class LogisticObjective final : public GLMObjective {
+class LogisticObjective : public GLMObjective {
  public:
   LogisticObjective(const double *xmat, const double *y, int n, int d);
 
@@ -219,7 +219,7 @@ class LogisticObjective final : public GLMObjective {
   double eval();
 };
 
-class PoissonObjective final : public GLMObjective {
+class PoissonObjective : public GLMObjective {
  public:
   PoissonObjective(const double *xmat, const double *y, int n, int d);
 
