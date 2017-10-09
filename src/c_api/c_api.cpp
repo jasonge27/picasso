@@ -42,9 +42,7 @@ void picasso_actnewton_solver(
   param.num_relaxation_round = 3;
 
   picasso::solver::ActNewtonSolver actnewton_solver(obj, param);
-  Rprintf("solving\n");
   actnewton_solver.solve();
-  Rprintf("Sovled\n");
 
   const std::vector<int> &itercnt_path = actnewton_solver.get_itercnt_path();
 
