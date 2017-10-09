@@ -16,7 +16,7 @@ poisson_solver <- function(Y, X, lambda, nlambda, gamma, n, d,
   ite.cyc = rep(0, nlambda)
   runt = matrix(0, 1, nlambda)
   obj = matrix(0, 1, nlambda)
-  str=.Call("picasso_poisson_solver", 
+  str=.C("picasso_poisson_solver", 
     as.double(Y), as.double(X), 
          as.integer(n), as.integer(d), 
          as.double(lambda), as.integer(nlambda),
@@ -24,7 +24,7 @@ poisson_solver <- function(Y, X, lambda, nlambda, gamma, n, d,
          as.double(prec), as.integer(method.flag),
          as.integer(intercept),
          as.double(beta), as.double(beta.intcpt), 
-         as.integer(ite_lamb), as.integer(size.act), 
+         as.integer(ite.lamb), as.integer(size.act), 
          as.double(runt),
          PACKAGE="picasso")
   beta.list = vector("list", nlambda)
