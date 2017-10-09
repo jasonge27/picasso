@@ -58,10 +58,10 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   tmp = model_param.beta[idx];
   model_param.beta[idx] = regfunc->threshold(g) / a;
 
-  Rprintf(
-      "---coord desc---idx:%d, g:%f, a:%f, lambda:%f, old beta:%f, new "
-      "beta:%f\n",
-      idx, g, a, regfunc->get_lambda(), tmp, model_param.beta[idx]);
+  // Rprintf(
+  //   "---coord desc---idx:%d, g:%f, a:%f, lambda:%f, old beta:%f, new "
+  //  "beta:%f\n",
+  //  idx, g, a, regfunc->get_lambda(), tmp, model_param.beta[idx]);
 
   // Xb += delta*X[idx*n]
   for (int i = 0; i < n; i++)
@@ -90,12 +90,11 @@ void GLMObjective::intercept_update() {
 
 void GLMObjective::set_model_param(ModelParam &other_param) {
   model_param = other_param;
-  /*
+
   for (int i = 0; i < n; i++) {
     Xb[i] = 0.0;
-    for (int j = 0; j < d; j++) Xb[i] = X[j][i] * model_param.beta[j];
+    for (int j = 0; j < d; j++) Xb[i] += X[j][i] * model_param.beta[j];
   }
-  */
 }
 
 void GLMObjective::update_auxiliary() {

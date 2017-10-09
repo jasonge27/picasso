@@ -20,24 +20,32 @@ void ActNewtonSolver::solve() {
 
   // actset_indcat[i] == 1 if i is in the active set
   std::vector<int> actset_indcat(d, 0);
+  std::vector<int> actset_indcat_master(d, 0);
   // actset_idx <- which(actset_indcat==1)
   std::vector<int> actset_idx;
 
   std::vector<double> old_coef(d);
   std::vector<double> grad(d);
+  std::vector<double> grad_master(d);
 
   for (int i = 0; i < d; i++) grad[i] = fabs(m_obj->get_grad(i));
 
   // model parameters on the master path
   // each master parameter is relaxed into SCAD/MCP parameter
   ModelParam model_master = m_obj->get_model_param();
+  for (int i = 0; i < d; i++) grad_master[i] = grad[i];
 
   std::vector<double> stage_lambdas(d, 0);
   RegFunction *regfunc = new RegL1();
   for (int i = 0; i < lambdas.size(); i++) {
     // if (i >= 3) break;
     // start with the previous solution on the master path
+
     m_obj->set_model_param(model_master);
+    for (int j = 0; j < d; j++) {
+      grad[j] = grad_master[j];
+      actset_indcat[j] = actset_indcat_master[j];
+    }
 
     // init the active set
     double threshold;
@@ -46,16 +54,16 @@ void ActNewtonSolver::solve() {
     else
       threshold = 2 * lambdas[i];
 
-    Rprintf("%d:", i);
+    // Rprintf("%d:", i);
     for (int j = 0; j < d; ++j) {
       stage_lambdas[j] = lambdas[i];
 
       if (grad[j] > threshold) actset_indcat[j] = 1;
 
-      if (actset_indcat[j] == 1)
-        Rprintf("%d(%f), ", j, m_obj->get_model_coef(j));
+      // if (actset_indcat[j] == 1)
+      //  Rprintf("%d(%f), ", j, m_obj->get_model_coef(j));
     }
-    Rprintf("\n");
+    // Rprintf("\n");
 
     m_obj->update_auxiliary();
     // loop level 0: multistage convex relaxation
@@ -152,40 +160,60 @@ void ActNewtonSolver::solve() {
 
       // Rprintf("loopcnt_level_1 cnt:%d\n", loopcnt_level_1);
 
-      if (loopcnt_level_0 == 1) model_master = m_obj->get_model_param();
+      if (loopcnt_level_0 == 1) {
+        model_master = m_obj->get_model_param();
+        for (int j = 0; j < d; j++) {
+          grad_master[j] = grad[j];
+          actset_indcat_master[j] = actset_indcat[j];
+        }
+      }
 
       if (m_param.reg_type == L1) break;
 
       m_obj->update_auxiliary();
 
       // update stage lambda
+      if (m_param.reg_type == MCP)
+        Rprintf("MCP");
+      else if (m_param.reg_type == SCAD)
+        Rprintf("SCAD");
+      else
+        Rprintf("L1");
+
       for (int j = 0; j < d; j++) {
         double beta = m_obj->get_model_coef(j);
 
-        switch (m_param.reg_type) {
-          case MCP:
-            stage_lambdas[j] = (fabs(beta) > lambdas[i] * m_param.gamma)
-                                   ? 0.0
-                                   : lambdas[i] - fabs(beta) / m_param.gamma;
-          case SCAD:
-            stage_lambdas[j] =
-                (fabs(beta) > lambdas[i] * m_param.gamma)
-                    ? 0.0
-                    : ((fabs(beta) > lambdas[i])
-                           ? ((lambdas[i] * m_param.gamma - fabs(beta)) /
-                              (m_param.gamma - 1))
-                           : lambdas[i]);
-          default:
-            stage_lambdas[j] = lambdas[i];
-        }
+        if (m_param.reg_type == MCP) {
+          stage_lambdas[j] = (fabs(beta) > lambdas[i] * m_param.gamma)
+                                 ? 0.0
+                                 : lambdas[i] - fabs(beta) / m_param.gamma;
+
+        } else if (m_param.reg_type == SCAD)
+          stage_lambdas[j] =
+              (fabs(beta) > lambdas[i] * m_param.gamma)
+                  ? 0.0
+                  : ((fabs(beta) > lambdas[i])
+                         ? ((lambdas[i] * m_param.gamma - fabs(beta)) /
+                            (m_param.gamma - 1))
+                         : lambdas[i]);
+        else
+          stage_lambdas[j] = lambdas[i];
+        Rprintf("lambdas[%d]:%f,", j, stage_lambdas[j]);
       }
     }
+    // Rprintf("\n");
 
+    /*
+    double fval = m_obj->eval();
+    for (int j = 0; j < d; j++)
+      fval += lambdas[i] * fabs(m_obj->get_model_coef(j));
+    Rprintf("------fvalue %d: %f\n-------", i, fval);
+    */
     solution_path.push_back(m_obj->get_model_param());
   }
 
   delete regfunc;
-}
+}  // namespace solver
 
 }  // namespace solver
 }  // namespace picasso
