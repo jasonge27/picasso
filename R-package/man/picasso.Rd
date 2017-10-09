@@ -13,6 +13,7 @@ The function "picasso" implements the user interface.
 picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
         lambda.min = NULL, family = "gaussian", method="l1", 
         type.gaussian = "naive", gamma = 3, df = NULL, standardize = TRUE, 
+        intercept= TRUE,
         prec = 1e-7, max.ite = 1000,  verbose = FALSE)
 }
 
@@ -40,6 +41,8 @@ picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
   \item{df}{Maximum degree of freedom for the covariance update. The default value is \code{2*n}.}
   
   \item{standardize}{Design matrix X will be standardized to have mean zero and unit standard deviation if \code{standardize = TRUE}. The default value is \code{TRUE}.}
+
+  \item{intercept}{Whether or not to include intercept term. Default value is True.}
       
   \item{max.ite}{The iteration limit. The default value is 1000.}
 

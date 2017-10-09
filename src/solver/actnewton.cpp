@@ -54,16 +54,11 @@ void ActNewtonSolver::solve() {
     else
       threshold = 2 * lambdas[i];
 
-    // Rprintf("%d:", i);
     for (int j = 0; j < d; ++j) {
       stage_lambdas[j] = lambdas[i];
 
       if (grad[j] > threshold) actset_indcat[j] = 1;
-
-      // if (actset_indcat[j] == 1)
-      //  Rprintf("%d(%f), ", j, m_obj->get_model_coef(j));
     }
-    // Rprintf("\n");
 
     m_obj->update_auxiliary();
     // loop level 0: multistage convex relaxation
@@ -81,7 +76,6 @@ void ActNewtonSolver::solve() {
         double old_intcpt = m_obj->get_model_coef(-1);
         for (int j = 0; j < d; j++) old_coef[j] = m_obj->get_model_coef(j);
 
-        Rprintf("phase 1:\n");
         // initialize actset_idx
         actset_idx.clear();
         for (int j = 0; j < d; j++)
@@ -92,7 +86,6 @@ void ActNewtonSolver::solve() {
             if (fabs(updated_coord) > 0) actset_idx.push_back(j);
           }
 
-        Rprintf("phase 2:\n");
         // loop level 2: proximal newton on active set
         int loopcnt_level_2 = 0;
         bool terminate_loop_level_2 = true;
@@ -106,10 +99,7 @@ void ActNewtonSolver::solve() {
             double old_beta = m_obj->get_model_coef(idx);
             regfunc->set_param(stage_lambdas[idx], 0.0);
 
-            // if (i == 2)
-            //  Rprintf("level2 loopcnt %d, %d:%f  ", loopcnt_level_2, idx,
             m_obj->coordinate_descent(regfunc, idx);
-            //);
 
             if (m_obj->get_local_change(old_beta, idx) > dev_thr)
               terminate_loop_level_2 = false;
@@ -158,8 +148,6 @@ void ActNewtonSolver::solve() {
         if (!new_active_idx) break;
       }
 
-      // Rprintf("loopcnt_level_1 cnt:%d\n", loopcnt_level_1);
-
       if (loopcnt_level_0 == 1) {
         model_master = m_obj->get_model_param();
         for (int j = 0; j < d; j++) {
@@ -173,13 +161,6 @@ void ActNewtonSolver::solve() {
       m_obj->update_auxiliary();
 
       // update stage lambda
-      if (m_param.reg_type == MCP)
-        Rprintf("MCP");
-      else if (m_param.reg_type == SCAD)
-        Rprintf("SCAD");
-      else
-        Rprintf("L1");
-
       for (int j = 0; j < d; j++) {
         double beta = m_obj->get_model_coef(j);
 
@@ -198,17 +179,9 @@ void ActNewtonSolver::solve() {
                          : lambdas[i]);
         else
           stage_lambdas[j] = lambdas[i];
-        Rprintf("lambdas[%d]:%f,", j, stage_lambdas[j]);
       }
     }
-    // Rprintf("\n");
 
-    /*
-    double fval = m_obj->eval();
-    for (int j = 0; j < d; j++)
-      fval += lambdas[i] * fabs(m_obj->get_model_coef(j));
-    Rprintf("------fvalue %d: %f\n-------", i, fval);
-    */
     solution_path.push_back(m_obj->get_model_param());
   }
 

@@ -48,20 +48,12 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
     tmp = w[i] * X[idx][i] * X[idx][i];
     g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
     a += tmp;
-    // Rprintf("w[%d]:%f, r[%d]:%f, X[%d,%d]:%f, wXX[%d,%d]:%f\n", i, w[i], i,
-    //       r[i], idx, i, X[idx][i], idx, i, tmp);
   }
-  // Rprintf("\n");
   g = g / n;
   a = a / n;
 
   tmp = model_param.beta[idx];
   model_param.beta[idx] = regfunc->threshold(g) / a;
-
-  // Rprintf(
-  //   "---coord desc---idx:%d, g:%f, a:%f, lambda:%f, old beta:%f, new "
-  //  "beta:%f\n",
-  //  idx, g, a, regfunc->get_lambda(), tmp, model_param.beta[idx]);
 
   // Xb += delta*X[idx*n]
   for (int i = 0; i < n; i++)
@@ -152,13 +144,10 @@ LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
 };
 
 void LogisticObjective::update_key_aux() {
-  // Rprintf("\n");
   for (int i = 0; i < n; i++) {
     p[i] = 1.0 / (1.0 + exp(-model_param.intercept - Xb[i]));
     w[i] = p[i] * (1 - p[i]);
-    // Rprintf("p[%d]:%f, w[%d]:%f--", i, p[i], i, w[i]);
   }
-  // Rprintf("\n");
 }
 
 double LogisticObjective::eval() {
@@ -175,6 +164,10 @@ PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
                                    int d)
     : GLMObjective(xmat, y, n, d) {
   update_auxiliary();
+
+  for (int i = 0; i < d; i++) update_gradient(i);
+  model_param.intercept = 0.0;
+
   deviance = fabs(eval());
 };
 
@@ -182,6 +175,11 @@ PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
                                    int d, bool include_intercept)
     : GLMObjective(xmat, y, n, d, include_intercept) {
   update_auxiliary();
+  for (int i = 0; i < d; i++) update_gradient(i);
+
+  model_param.intercept = 0.0;
+  update_auxiliary();
+
   deviance = fabs(eval());
 };
 
