@@ -16,7 +16,7 @@ sqrtlasso_solver <- function(Y, X, lambda, nlambda, gamma, n, d, max.ite, prec,
   ite.cyc = rep(0, nlambda)
   runt = matrix(0, 1, nlambda)
   obj = matrix(0, 1, nlambda)
-  str=.Call("picasso_sqrt_lasso_solver", 
+  str=.C("picasso_sqrt_lasso_solver", 
       as.double(Y), as.double(X), 
          as.integer(n), as.integer(d), 
          as.double(lambda), as.integer(nlambda),
@@ -24,7 +24,7 @@ sqrtlasso_solver <- function(Y, X, lambda, nlambda, gamma, n, d, max.ite, prec,
          as.double(prec), as.integer(method.flag),
          as.integer(intercept),
          as.double(beta), as.double(beta.intcpt),
-         as.integer(ite_lamb), as.integer(size.act), 
+         as.integer(ite.lamb), as.integer(size.act), 
          as.double(runt),
          PACKAGE="picasso")
   beta.list = vector("list", nlambda)
@@ -36,6 +36,6 @@ sqrtlasso_solver <- function(Y, X, lambda, nlambda, gamma, n, d, max.ite, prec,
   ite.lamb = unlist(str[14])
   size.act = unlist(str[15])
   runt = matrix(unlist(str[16]), ncol = nlambda, byrow = FALSE)
-  return(list(beta = beta.list, intcpt = beta.intcpt, ite=ite, size.act = size.act,
+  return(list(beta = beta.list, intcpt = beta.intcpt, ite=ite.lamb, size.act = size.act,
          runt = runt))
 }
