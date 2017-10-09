@@ -5,7 +5,11 @@
 $make Rinstall
 ```
 
-
+## Benchmarking the solver
+```bash
+$cd tests
+$Rscript benchmark.R
+```
 
 ## Unleash the power of nonconvex penalty
 
