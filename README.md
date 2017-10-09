@@ -1,6 +1,6 @@
 # PICASSO
 ## Note
-The master branch is deprecated for now. Please install from CRAN https://cran.r-project.org/package=picasso 
+The master branch is going through major refactoring and is deprecated for now. Please install from CRAN https://cran.r-project.org/package=picasso 
 
 ## Installing R package
 
