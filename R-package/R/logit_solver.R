@@ -1,5 +1,4 @@
-logit_solver <- function(Y, X, lambda, nlambda, gamma, 
-n, d, max.ite, 
+logit_solver <- function(Y, X, lambda, nlambda, gamma, n, d, max.ite, 
                 prec, intercept, verbose, method.flag)
 {
   if(verbose){
@@ -10,22 +9,22 @@ n, d, max.ite,
     if(method.flag == 3)
       cat("SCAD regularization via greedy active set identification and coordinate descent\n")
   }
-  beta = matrix(0.0, nrow=d, ncol=nlambda)
-  beta.intcpt = rep(0.0, nlambda)
+  beta = matrix(0, nrow=d, ncol=nlambda)
+  beta.intcpt = rep(0, nlambda)
   size.act = rep(0, nlambda)
-  ite.lamb = rep(0.0, nlambda)
+  ite.lamb = rep(0, nlambda)
   ite.cyc = rep(0, nlambda)
-  runt = matrix(0.0, 1, nlambda)
-  obj = matrix(0.0, 1, nlambda)
-  str=.C("picasso_logit_solver", 
+  runt = matrix(0, 1, nlambda)
+  obj = matrix(0, 1, nlambda)
+  str=.Call("picasso_logit_solver", 
          as.double(Y), as.double(X), 
          as.integer(n), as.integer(d), 
          as.double(lambda), as.integer(nlambda),
          as.double(gamma), as.integer(max.ite),
          as.double(prec), as.integer(method.flag),
-         as.integer(intercept),
+         as.integer(intercpet),
          as.double(beta), as.double(beta.intcpt),
-         as.integer(ite.lamb), as.integer(size.act), 
+         as.integer(ite_lamb), as.integer(size.act), 
          as.double(runt),
          PACKAGE="picasso")
   beta.list = vector("list", nlambda)

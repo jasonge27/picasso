@@ -20,7 +20,7 @@ extern "C" void picasso_logit_solver(
     int* ite_lamb,  // output: number of iterations for each lambda
     int* size_act,  // output: an array of solution sparsity (model df)
     double* runt    // output: runtime
-) {
+    ) {
   SolveLogisticRegression(Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite,
                           *pprec, *reg_type, *include_intercept, beta, intcpt,
                           ite_lamb, size_act, runt);
@@ -45,7 +45,7 @@ extern "C" void picasso_sqrt_lasso_solver(
     int* ite_lamb,  // output: number of iterations for each lambda
     int* size_act,  // output: an array of solution sparsity (model df)
     double* runt    // output: runtime
-) {
+    ) {
   SolveSqrtLinearRegression(Y, X, *nn, *dd, lambda, *nnlambda, *gamma,
                             *mmax_ite, *pprec, *reg_type, *include_intercept,
                             beta, intcpt, ite_lamb, size_act, runt);
@@ -70,7 +70,7 @@ extern "C" void picasso_poisson_solver(
     int* ite_lamb,  // output: number of iterations for each lambda
     int* size_act,  // output: an array of solution sparsity (model df)
     double* runt    // output: runtime
-) {
+    ) {
   // call picasso c api
   SolvePoissonRegression(Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite,
                          *pprec, *reg_type, *include_intercept, beta, intcpt,
@@ -96,7 +96,7 @@ extern "C" void picasso_gaussian_cov(
     int* ite_lamb,  // output: number of iterations for each lambda
     int* size_act,  // output: an array of solution sparsity (model df)
     double* runt    // output: runtime
-) {
+    ) {
   SolveLinearRegressionCovUpdate(
       Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite, *pprec, *reg_type,
       *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
@@ -121,7 +121,7 @@ extern "C" void picasso_gaussian_naive(
     int* ite_lamb,  // output: number of iterations for each lambda
     int* size_act,  // output: an array of solution sparsity (model df)
     double* runt    // output: runtime
-) {
+    ) {
   SolveLinearRegressionNaiveUpdate(
       Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite, *pprec, *reg_type,
       *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
