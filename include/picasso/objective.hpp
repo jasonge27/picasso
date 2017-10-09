@@ -24,6 +24,8 @@ class RegFunction {
  public:
   virtual double threshold(double x) = 0;
   virtual void set_param(double lambda, double gamma) = 0;
+  virtual double get_lambda() = 0;
+
   virtual ~RegFunction(){};
 
   double threshold_l1(double x, double thr) {
@@ -42,7 +44,7 @@ class RegL1 : public RegFunction {
 
  public:
   void set_param(double lambda, double gamma) { m_lambda = lambda; }
-
+  double get_lambda() { return m_lambda; };
   double threshold(double x) { return threshold_l1(x, m_lambda); }
 };
 
@@ -56,6 +58,7 @@ class RegSCAD : public RegFunction {
     m_lambda = lambda;
     m_gamma = gamma;
   };
+  double get_lambda() { return m_lambda; };
 
   double threshold(double x) {
     if (fabs(x) > fabs(m_gamma * m_lambda)) {
@@ -81,6 +84,7 @@ class RegMCP : public RegFunction {
     m_lambda = lambda;
     m_gamma = gamma;
   }
+  double get_lambda() { return m_lambda; };
 
   double threshold(double x) {
     if (fabs(x) > fabs(m_gamma * m_lambda)) {
@@ -198,11 +202,12 @@ class GLMObjective : public ObjFunction {
   void set_model_param(ModelParam &other_param);
 
   void update_auxiliary();
+  void update_gradient(int);
 
   double get_local_change(double old, int idx);
 };
 
-class LogisticObjective : public GLMObjective {
+class LogisticObjective final : public GLMObjective {
  public:
   LogisticObjective(const double *xmat, const double *y, int n, int d);
 
@@ -214,7 +219,7 @@ class LogisticObjective : public GLMObjective {
   double eval();
 };
 
-class PoissonObjective : public GLMObjective {
+class PoissonObjective final : public GLMObjective {
  public:
   PoissonObjective(const double *xmat, const double *y, int n, int d);
 
@@ -226,7 +231,7 @@ class PoissonObjective : public GLMObjective {
   double eval();
 };
 
-class SqrtMSEObjective : public ObjFunction {
+class SqrtMSEObjective final : public ObjFunction {
  private:
   std::vector<double> w;
   std::vector<double> Xb;
@@ -263,7 +268,7 @@ class SqrtMSEObjective : public ObjFunction {
   double eval();
 };
 
-class GaussianNaiveUpdateObjective : public ObjFunction {
+class GaussianNaiveUpdateObjective final : public ObjFunction {
  private:
   std::vector<double> r;
   std::vector<double> XX;

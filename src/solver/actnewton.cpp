@@ -24,6 +24,9 @@ void ActNewtonSolver::solve() {
   std::vector<int> actset_idx;
 
   std::vector<double> old_coef(d);
+  std::vector<double> grad(d);
+
+  for (int i = 0; i < d; i++) grad[i] = fabs(m_obj->get_grad(i));
 
   // model parameters on the master path
   // each master parameter is relaxed into SCAD/MCP parameter
@@ -32,21 +35,29 @@ void ActNewtonSolver::solve() {
   std::vector<double> stage_lambdas(d, 0);
   RegFunction *regfunc = new RegL1();
   for (int i = 0; i < lambdas.size(); i++) {
+    // if (i >= 3) break;
     // start with the previous solution on the master path
     m_obj->set_model_param(model_master);
 
-    // calculating gradients and other auxiliary vars such as r
-    m_obj->update_auxiliary();
-
     // init the active set
-    double threshold = 2 * lambdas[i];
-    if (i > 0) threshold -= lambdas[i - 1];
+    double threshold;
+    if (i > 0)
+      threshold = 2 * lambdas[i] - lambdas[i - 1];
+    else
+      threshold = 2 * lambdas[i];
+
+    Rprintf("%d:", i);
     for (int j = 0; j < d; ++j) {
       stage_lambdas[j] = lambdas[i];
 
-      if (m_obj->get_grad(j) > threshold) actset_indcat[j] = 1;
-    }
+      if (grad[j] > threshold) actset_indcat[j] = 1;
 
+      if (actset_indcat[j] == 1)
+        Rprintf("%d(%f), ", j, m_obj->get_model_coef(j));
+    }
+    Rprintf("\n");
+
+    m_obj->update_auxiliary();
     // loop level 0: multistage convex relaxation
     int loopcnt_level_0 = 0;
     while (loopcnt_level_0 < m_param.num_relaxation_round) {
@@ -62,6 +73,7 @@ void ActNewtonSolver::solve() {
         double old_intcpt = m_obj->get_model_coef(-1);
         for (int j = 0; j < d; j++) old_coef[j] = m_obj->get_model_coef(j);
 
+        Rprintf("phase 1:\n");
         // initialize actset_idx
         actset_idx.clear();
         for (int j = 0; j < d; j++)
@@ -72,6 +84,7 @@ void ActNewtonSolver::solve() {
             if (fabs(updated_coord) > 0) actset_idx.push_back(j);
           }
 
+        Rprintf("phase 2:\n");
         // loop level 2: proximal newton on active set
         int loopcnt_level_2 = 0;
         bool terminate_loop_level_2 = true;
@@ -84,7 +97,11 @@ void ActNewtonSolver::solve() {
 
             double old_beta = m_obj->get_model_coef(idx);
             regfunc->set_param(stage_lambdas[idx], 0.0);
+
+            // if (i == 2)
+            //  Rprintf("level2 loopcnt %d, %d:%f  ", loopcnt_level_2, idx,
             m_obj->coordinate_descent(regfunc, idx);
+            //);
 
             if (m_obj->get_local_change(old_beta, idx) > dev_thr)
               terminate_loop_level_2 = false;
@@ -102,6 +119,7 @@ void ActNewtonSolver::solve() {
 
         itercnt_path[i] += loopcnt_level_2;
 
+        terminate_loop_level_1 = true;
         // check stopping criterion 1: fvalue change
         for (int k = 0; k < actset_idx.size(); ++k) {
           int idx = actset_idx[k];
@@ -112,24 +130,33 @@ void ActNewtonSolver::solve() {
             (m_obj->get_local_change(old_intcpt, -1) > dev_thr))
           terminate_loop_level_1 = false;
 
-        // recompute grad, second order coef w jand other aux vars
+        // update p and w
         m_obj->update_auxiliary();
 
+        if (terminate_loop_level_1) break;
+
         // check stopping criterion 2: active set change
+        bool new_active_idx = false;
         for (int k = 0; k < d; k++)
           if (actset_indcat[k] == 0) {
-            if (fabs(m_obj->get_grad(k)) > stage_lambdas[k]) {
+            m_obj->update_gradient(k);
+            grad[k] = fabs(m_obj->get_grad(k));
+            if (grad[k] > stage_lambdas[k]) {
               actset_indcat[k] = 1;
-              terminate_loop_level_1 = false;
+              new_active_idx = true;
             }
           }
 
-        if (terminate_loop_level_1) break;
+        if (!new_active_idx) break;
       }
+
+      // Rprintf("loopcnt_level_1 cnt:%d\n", loopcnt_level_1);
 
       if (loopcnt_level_0 == 1) model_master = m_obj->get_model_param();
 
       if (m_param.reg_type == L1) break;
+
+      m_obj->update_auxiliary();
 
       // update stage lambda
       for (int j = 0; j < d; j++) {

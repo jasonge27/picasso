@@ -16,7 +16,7 @@ sqrtlasso_solver <- function(Y, X, lambda, nlambda, gamma, n, d, max.ite, prec,
   ite.cyc = rep(0, nlambda)
   runt = matrix(0, 1, nlambda)
   obj = matrix(0, 1, nlambda)
-  str=.Call("picasso_sqrt_lasso_solver", 
+  str=.C("picasso_sqrt_lasso_solver", 
       as.double(Y), as.double(X), 
          as.integer(n), as.integer(d), 
          as.double(lambda), as.integer(nlambda),
