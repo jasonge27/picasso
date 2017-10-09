@@ -27,6 +27,7 @@ Install from source file (Github):
 Install from PyPI:
 
 - ``pip install pycasso``
+- **Note**: Owing to the setting on different OS, our binary distribution might not be working in your environment. Thus please build from source.
 
 You can test if the package has been successfully installed by:
 

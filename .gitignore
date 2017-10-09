@@ -29,6 +29,7 @@ R-package/*.Rproj
 
 #cmake
 cmake-build-debug
+/build/
 
 #python build
 !python-package/lib/*
