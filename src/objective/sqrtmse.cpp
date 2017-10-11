@@ -7,11 +7,13 @@ SqrtMSEObjective::SqrtMSEObjective(const double *xmat, const double *y, int n,
   a = 0.0;
   g = 0.0;
   L = 0.0;
-  w.resize(n);
-  Xb.resize(n);
-  r.resize(n);
+
+  Xb.resize(n, 0);
+  r.resize(n, 0);
 
   update_auxiliary();
+
+  for (int i = 0; i < d; i++) update_gradient(i);
 
   // saturated fvalue = 0
   deviance = fabs(eval());
@@ -23,9 +25,8 @@ SqrtMSEObjective::SqrtMSEObjective(const double *xmat, const double *y, int n,
   a = 0.0;
   g = 0.0;
   L = 0.0;
-  w.resize(n);
-  Xb.resize(n);
-  r.resize(n);
+  Xb.resize(n, 0);
+  r.resize(n, 0);
 
   if (include_intercept) {
     double avr_y = 0.0;
@@ -36,7 +37,8 @@ SqrtMSEObjective::SqrtMSEObjective(const double *xmat, const double *y, int n,
 
   update_auxiliary();
 
-  // saturated fvalue = 0
+  for (int i = 0; i < d; i++) update_gradient(i);
+
   deviance = fabs(eval());
 };
 
@@ -45,12 +47,14 @@ double SqrtMSEObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   a = 0.0;
 
   double tmp;
-  // g = (<wXX, model_param.beta> + <r, X>)/n
-  // a = sum(wXX)/n
+  sum_r2 = 0.0;
+  for (int i = 0; i < n; i++) sum_r2 += r[i] * r[i];
+  L = sqrt(sum_r2 / n);
+
   for (int i = 0; i < n; i++) {
-    tmp = w[i] * X[idx][i] * X[idx][i];
+    tmp = (1 - r[i] * r[i] / sum_r2) * X[idx][i] * X[idx][i];
     g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
-    a += wXX[idx];
+    a += tmp;
   }
   g = g / (n * L);
   a = a / (n * L);
@@ -63,22 +67,30 @@ double SqrtMSEObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   for (int i = 0; i < n; i++) Xb[i] = Xb[i] + tmp * X[idx][i];
 
   sum_r = 0.0;
+  sum_r2 = 0.0;
   // r -= delta*X
   for (int i = 0; i < n; i++) {
     r[i] = r[i] - X[idx][i] * tmp;
     sum_r += r[i];
+    sum_r2 += r[i] * r[i];
   }
+  L = sqrt(sum_r2 / n);
 
   return (model_param.beta[idx]);
 }
 
 void SqrtMSEObjective::intercept_update() {
-  double tmp = sum_r / n;
-  model_param.intercept += tmp;
+  if (include_intercept) {
+    double tmp = sum_r / n;
+    model_param.intercept += tmp;
 
-  for (int i = 0; i < n; i++) {
-    r[i] = r[i] - tmp;
+    sum_r2 = 0.0;
+    for (int i = 0; i < n; i++) {
+      r[i] = r[i] - tmp;
+      sum_r2 += r[i] * r[i];
+    }
     sum_r = 0.0;
+    L = sqrt(sum_r2 / n);
   }
 }
 
@@ -86,38 +98,40 @@ void SqrtMSEObjective::set_model_param(ModelParam &other_param) {
   model_param = other_param;
   for (int i = 0; i < n; i++) {
     Xb[i] = 0.0;
-    for (int j = 0; j < d; j++) Xb[i] = X[j][i] * model_param.beta[j];
+    for (int j = 0; j < d; j++) Xb[i] += X[j][i] * model_param.beta[j];
   }
 }
 
 void SqrtMSEObjective::update_auxiliary() {
   sum_r = 0.0;
+  sum_r2 = 0.0;
   for (int i = 0; i < n; i++) {
-    r[i] = Y[i] - Xb[i];
+    r[i] = Y[i] - Xb[i] - model_param.intercept;
     sum_r += r[i];
     sum_r2 += r[i] * r[i];
   }
   L = sqrt(sum_r2 / n);
+}
 
-  for (int i = 0; i < n; i++) {
-    w[i] = 1 - r[i] * r[i] / sum_r2;
-
-    for (int idx = 0; idx < d; idx++) {
-      wXX[idx] = 0.0;
-      gr[idx] = 0.0;
-      for (int i = 0; i < n; i++) {
-        wXX[idx] += w[i] * X[idx][i] * X[idx][i];
-        gr[idx] += r[i] * X[idx][i];
-      }
-      gr[idx] = gr[idx] / (n * L);
-    }
-  }
+void SqrtMSEObjective::update_gradient(int idx) {
+  gr[idx] = 0.0;
+  for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i];
+  gr[idx] = gr[idx] / (n * L);
 }
 
 double SqrtMSEObjective::get_local_change(double old, int idx) {
   if (idx >= 0) {
-    double tmp = old - model_param.beta[idx];
-    return (wXX[idx] * tmp * tmp / (2 * L * n));
+    double a = 0.0;
+    double tmp = 0.0;
+    for (int i = 0; i < n; i++) {
+      tmp = r[i] / L;
+      tmp = tmp * tmp / n;
+      a += X[idx][i] * X[idx][i] * (1 - tmp);
+    }
+
+    tmp = old - model_param.beta[idx];
+    a = a / (n * L);
+    return (a * tmp * tmp / (2 * L * n));
   } else {
     double tmp = old - model_param.intercept;
     return (fabs(tmp));
