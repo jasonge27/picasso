@@ -1,7 +1,9 @@
 test_sqrt_mse <- function(n = 500, p = 800, c = 0.5, nlambda = 100){
+  library(flare)
+  library(scalreg)
   set.seed(2016)
-  X = scale(matrix(rnorm(n*d),n,d)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
-  beta = c(runif(s), rep(0, d-s))
+  X = scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
+  beta = c(runif(s), rep(0, p-s))
   ## Generate response using Gaussian noise, and fit sparse linear models
   noise = rnorm(n)
   Y = X%*%beta + noise
@@ -9,71 +11,57 @@ test_sqrt_mse <- function(n = 500, p = 800, c = 0.5, nlambda = 100){
   ratio = 0.01
   trialN = 5 
 
-  for (d in c(800)){
-    obj.picasso <- rep(0, trialN)
-    time.picasso <- rep(0, trialN)
+  obj.picasso <- rep(0, trialN)
+  time.picasso <- rep(0, trialN)
 
-    obj.flare <- rep(0, trialN)
-    time.flare <- rep(0, trialN)
+  obj.flare <- rep(0, trialN)
+  time.flare <- rep(0, trialN)
 
-    obj.scalreg <- rep(0, trialN)
-    time.scalreg <- rep(0, trialN)
+  obj.scalreg <- rep(0, trialN)
+  time.scalreg <- rep(0, trialN)
 
-    cat("dimension: ")
-    cat(d)
-    cat("\n")
-
-    for (i in 1:trialN){
-        t <- system.time(
+  for (i in 1:trialN){
+    t <- system.time(
             fitp<- picasso(X, Y, family="sqrtlasso", standardize=FALSE, nlambda=100, 
                       intercept = FALSE, prec=1e-8,
                 lambda.min.ratio = 0.01))
 
-        time.picasso[i] = t[1] 
-        cat("picasso:", t[1], "\n")
-        flush.console()
-        obj.picasso[i] <- sqrt(sum((Y - X %*% fitp$beta[, nlambda] - fitp$intercept[nlambda])^2)/n) + 
+    time.picasso[i] = t[1] 
+
+    obj.picasso[i] <- sqrt(sum((Y - X %*% fitp$beta[, nlambda] - fitp$intercept[nlambda])^2)/n) + 
                                   fitp$lambda[nlambda]*sum(abs(fitp$beta[, nlambda]))
 
   
 
-        t <- system.time(fitflare <- slim(X, Y, lambda = fitp$lambda, 
+    t <- system.time(fitflare <- slim(X, Y, lambda = fitp$lambda, 
                         method='lq', q=2, prec=1e-1, verbose=FALSE))
-        time.flare[i] = t[1] 
-        cat("flare:", t[1], "\n")
-        flush.console()
+    time.flare[i] = t[1] 
+
+    t <- system.time(fits <- scalreg(X, Y, 
+              lam0 = fitp$lambda[nlambda], LSE = FALSE))
+    time.scalreg[i] = t[1]
 
 
-        t <- system.time(fits <- scalreg(X, Y, 
-                lam0 = fitp$lambda[nlambda], LSE = FALSE))
-        time.scalreg[i] = t[1]
-        cat("scalreg:", t[1], "\n")
-        flush.console()
-
-
-        obj.flare[i] <- sqrt(sum((Y - X %*% fitflare$beta[, nlambda] - fitflare$intercept[nlambda])^2)/n ) + 
+    obj.flare[i] <- sqrt(sum((Y - X %*% fitflare$beta[, nlambda] - fitflare$intercept[nlambda])^2)/n ) + 
                                         fitp$lambda[nlambda]*sum(abs(fitflare$beta[, nlambda]))
                                        
-        obj.scalreg[i] <- sqrt(sum((Y - X %*% fits$coefficients)^2)/n ) + 
+    obj.scalreg[i] <- sqrt(sum((Y - X %*% fits$coefficients)^2)/n ) + 
                                         fitp$lambda[nlambda]*sum(abs(fits$coefficients)) 
-        
-   
-    }
     
-    print("-----picasso---")
-    cat("mean time: ", mean(time.picasso), "  stdev time:", sd(time.picasso), "\n")
-    cat("mean obj:", mean(obj.picasso), "  stdev obj:", sd(obj.picasso), "\n")
-
-
-    print("------flare-----")
-    cat("mean time: ", mean(time.flare), "  stdev time:", sd(time.flare), "\n")
-    cat("mean obj:", mean(obj.flare), "  stdev obj:", sd(obj.flare), "\n")
-
-    print("-----scalreg----")
-    cat("mean time: ", mean(time.scalreg), "  stdev time:", sd(time.scalreg), "\n")
-    cat("mean obj:", mean(obj.scalreg), "  stdev obj:", sd(obj.scalreg), "\n")
-
   }
+  print("-----picasso---")
+  cat("mean time: ", mean(time.picasso), "  stdev time:", sd(time.picasso), "\n")
+  cat("mean obj:", mean(obj.picasso), "  stdev obj:", sd(obj.picasso), "\n")
+
+
+  print("------flare-----")
+  cat("mean time: ", mean(time.flare), "  stdev time:", sd(time.flare), "\n")
+  cat("mean obj:", mean(obj.flare), "  stdev obj:", sd(obj.flare), "\n")
+
+  print("-----scalreg----")
+  cat("mean time: ", mean(time.scalreg), "  stdev time:", sd(time.scalreg), "\n")
+  cat("mean obj:", mean(obj.scalreg), "  stdev obj:", sd(obj.scalreg), "\n")
+
 }
 
 test_fishnet <- function(n = 10000, p = 5000, c = 0.5, nlambda = 100){
