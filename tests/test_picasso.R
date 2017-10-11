@@ -7,7 +7,7 @@ test_sqrt_mse <- function(n = 500, p = 800, c = 0.5, nlambda = 100){
   Y = X%*%beta + noise
 
   ratio = 0.01
-  trialN = 1 
+  trialN = 5 
 
   for (d in c(800)){
     obj.picasso <- rep(0, trialN)
@@ -26,7 +26,7 @@ test_sqrt_mse <- function(n = 500, p = 800, c = 0.5, nlambda = 100){
     for (i in 1:trialN){
         t <- system.time(
             fitp<- picasso(X, Y, family="sqrtlasso", standardize=FALSE, nlambda=100, 
-                      intercept = FALSE, prec=1e-6,
+                      intercept = FALSE, prec=1e-8,
                 lambda.min.ratio = 0.01))
 
         time.picasso[i] = t[1] 
