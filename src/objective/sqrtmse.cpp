@@ -80,18 +80,16 @@ double SqrtMSEObjective::coordinate_descent(RegFunction *regfunc, int idx) {
 }
 
 void SqrtMSEObjective::intercept_update() {
-  if (include_intercept) {
-    double tmp = sum_r / n;
-    model_param.intercept += tmp;
+  double tmp = sum_r / n;
+  model_param.intercept += tmp;
 
-    sum_r2 = 0.0;
-    for (int i = 0; i < n; i++) {
-      r[i] = r[i] - tmp;
-      sum_r2 += r[i] * r[i];
-    }
-    sum_r = 0.0;
-    L = sqrt(sum_r2 / n);
+  sum_r2 = 0.0;
+  for (int i = 0; i < n; i++) {
+    r[i] = r[i] - tmp;
+    sum_r2 += r[i] * r[i];
   }
+  sum_r = 0.0;
+  L = sqrt(sum_r2 / n);
 }
 
 void SqrtMSEObjective::set_model_param(ModelParam &other_param) {
