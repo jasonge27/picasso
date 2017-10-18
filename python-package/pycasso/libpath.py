@@ -31,7 +31,10 @@ def find_lib_path(update = False):
                 # hack for pip installation when copy all parent source directory here
                 dll_path.append(os.path.join(curr_path, './windows/Release/'))
     else:
-        dll_path = [os.path.join(curr_path, '../lib/')]
+        dll_path = [curr_path, os.path.join(curr_path, '../../lib/'),
+                    os.path.join(curr_path, '../lib/'),
+                    os.path.join(curr_path, './lib/'),
+                    os.path.join(sys.prefix, 'picasso')]
 
     if sys.platform == 'win32':
         dll_path = [os.path.join(p, 'picasso.dll') for p in dll_path]
