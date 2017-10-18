@@ -230,14 +230,10 @@ class PoissonObjective : public GLMObjective {
   double eval();
 };
 
-class SqrtMSEObjective final : public ObjFunction {
+class SqrtMSEObjective : public ObjFunction {
  private:
-  std::vector<double> w;
   std::vector<double> Xb;
   std::vector<double> r;
-
-  // wXX[j] = sum(w*X[j]*X[j])
-  std::vector<double> wXX;
 
   // quadratic approx coefs for each coordinate
   // a*x^2 + g*x + constant
@@ -261,6 +257,7 @@ class SqrtMSEObjective final : public ObjFunction {
   void update_key_aux(){};
 
   void update_auxiliary();
+  void update_gradient(int idx);
 
   double get_local_change(double old, int idx);
 

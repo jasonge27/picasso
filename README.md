@@ -5,7 +5,11 @@
 $make Rinstall
 ```
 
-
+## Benchmarking the solver
+```bash
+$cd tests
+$Rscript benchmark.R
+```
 
 ## Unleash the power of nonconvex penalty
 
@@ -102,6 +106,27 @@ min(apply(abs(fitted.model$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_b
 The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.6-0. The glmnet version is 2.0-5.
 
 
+
+## Square Root Lasso Solver
+
+We also implemented sqaure root loss function with L1/SCAD/MCP penalty using the same active set based second order algorithms. With fixed sample size, we change the sample dimension and report the CPU time for pathwise square root Lasso. For fair comparisons, all three solvers follows the same solution path and their precisions are adjusted to achieve the same level of accuracy.
+
+```R
+source('tests/test_picasso.R')
+test_sqrt_mse(n=500, p =400, c=0.5)
+test_sqrt_mse(n=500, p =800, c=0.5)
+test_sqrt_mse(n=500, p =1600, c=0.5)
+```
+
+
+
+|         |     d=400     |     d=800      |     d=1600      |
+| :-----: | :-----------: | :------------: | :-------------: |
+| PICASSO | 0.51 (0.02) s | 1.41 (0.08) s  |  2.32 (0.10) s  |
+| scalreg | 3.46 (0.27) s | 22.08 (0.89) s | 49.13 (1.32) s  |
+|  flare  | 5.50 (0.25) s | 28.90 (0.26)s  | 178.65 (3.32) s |
+
+ The experiments are run in Microsoft R Open 3.3.2 on Mac OS 10.12.3 with 2.4GHz Intel Core i5 and 8GB RAM. R package flare is in version 1.5.0. R package scalreg is in version 1.0.  For each method and dataset, the experiment is repeated 10 times and we report the mean and standard deviations of the CPU time in the table. 
 
 References
 
