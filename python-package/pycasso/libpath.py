@@ -20,7 +20,7 @@ def find_lib_path(update = False):
     if update:
         dll_path = [curr_path, os.path.join(curr_path, '../../lib/'),
                     os.path.join(curr_path, './lib/'),
-                    os.path.join(sys.prefix, 'picasso')]
+                    os.path.join(sys.prefix, 'pycasso')]
         if sys.platform == 'win32':
             if platform.architecture()[0] == '64bit':
                 dll_path.append(os.path.join(curr_path, '../../windows/x64/Release/'))
@@ -34,7 +34,7 @@ def find_lib_path(update = False):
         dll_path = [curr_path,
                     os.path.join(curr_path, '../lib/'),
                     os.path.join(curr_path, './lib/'),
-                    os.path.join(sys.prefix, 'picasso')]
+                    os.path.join(sys.prefix, 'pycasso')]
 
     if sys.platform == 'win32':
         dll_path = [os.path.join(p, 'picasso.dll') for p in dll_path]

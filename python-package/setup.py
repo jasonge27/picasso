@@ -21,7 +21,8 @@ if not LIB_PATH:
     print("Install libpicasso from: %s" % LIB_PATH)
     # copy LIB_PATH to '.\\lib'
     for oldlibpath in LIB_PATH:
-        newlibpath = os.path.join('.\\lib', os.path.dirname(oldlibpath))
+        newlibpath = os.path.join('./pycasso/lib', os.path.dirname(oldlibpath))
+        print(newlibpath)
         os.makedirs(newlibpath, exist_ok=True)
         shutil.copy(oldlibpath, newlibpath)
 else:
@@ -44,8 +45,8 @@ setup(name='pycasso',
       packages=find_packages(),
       # this will use MANIFEST.in during install where we specify additional files,
       # this is the golden line
-      data_files=[('pycasso',LIB_PATH)],
       include_package_data=True,
+      # data_files=[('pycasso',LIB_PATH)],
       license='MIT',
       classifiers=['Development Status :: 3 - Alpha',
                    'Intended Audience :: Developers',

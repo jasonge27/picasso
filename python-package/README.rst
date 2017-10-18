@@ -17,7 +17,7 @@ Installation
 Install from source file (Github):
 
 - Clone ``picasso.git`` via ``git clone https://github.com/jasonge27/picasso.git``
-- Make sure `python-package/lib` is deleted before installing.
+- Make sure `python-package/pycasso/lib` is deleted before installing.
 - Build the source file first via the ``cmake`` with ``CMakeLists.txt`` in the root directory.
   (You will see a lib file under ``(root)/lib/`` )
 -  Make sure you have
