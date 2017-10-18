@@ -3,10 +3,12 @@
 Main Interface of the package
 """
 
+import time
 import math
 import numpy as np
 import scipy.stats as ss
 import ctypes
+from numpy.ctypeslib import ndpointer
 
 from .cutils import CDoubleArray, CIntArray
 from .libpath import find_lib_path
@@ -84,17 +86,17 @@ class Solver:
         self.y = np.array(y, dtype = 'double')
         self.num_sample = self.x.shape[0]
         self.num_feature = self.x.shape[1]
-        if self.x.size is 0:
+        if self.x.size == 0:
             raise RuntimeError("Wrong: no input!")
         self.standardize = standardize
         if standardize:
             self.x_mean = np.mean(self.x, axis = 0)
             self.x_std = np.mean(self.x, axis = 0)
             self.x = ss.zscore(self.x, axis = 0, ddof = 0)
-            if self.family is "gaussian":
+            if self.family == "gaussian":
                 self.y_mean = np.mean(self.y)
                 self.y -= self.y_mean
-        if self.x.shape[0] is not self.y.shape[0]:
+        if self.x.shape[0] != self.y.shape[0]:
             raise RuntimeError(r' the size of data "x" and label "y" does not match'+ \
                                "/nx: %i * %i, y: %i"%(self.x.shape[0],self.x.shape[1],self.y.shape[0]))
 
@@ -105,12 +107,12 @@ class Solver:
             self.df = df
         self.type_gaussian = type_gaussian
         self.gamma = gamma
-        if self.penalty is "mcp":
+        if self.penalty == "mcp":
             self.penaltyflag = 2
             if self.gamma <= 1:
                 print ("gamma have to be greater than 1 for MCP. Set to the default value 3.")
                 self.gamma = 3
-        elif self.penalty is "scad":
+        elif self.penalty == "scad":
             self.penaltyflag = 3
             if self.gamma <= 2:
                 print ("gamma have to be greater than 2 for SCAD. Set to the default value 3.")
@@ -125,9 +127,9 @@ class Solver:
             self.lambdas = np.array(lambdas, dtype = 'double')
             self.nlambda = lamdas.size
         else:
-            if self.family is 'poisson':
+            if self.family == 'poisson':
                 lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y-np.mean(self.y)) ) ) /self.num_sample
-            elif self.family is 'sqrtlasso':
+            elif self.family == 'sqrtlasso':
                 lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y) ) ) /self.num_sample \
                              /np.sqrt(np.sum(self.y**2)/self.num_sample)
             else:
@@ -148,9 +150,10 @@ class Solver:
         self.trainer = getattr(self, '_'+self.family+'_wrapper')()
         self.result = {'beta': np.zeros((self.nlambda,self.num_feature),dtype='double'),
                        'intercept': np.zeros(self.nlambda,dtype='double'),
-                       'ite_lamb': np.zeros(self.nlambda,dtype='int'),
-                       'size_act': np.zeros(self.df,dtype='int'),
-                       'train_time': 0.0,
+                       'ite_lamb': np.zeros(self.nlambda,dtype='int32'),
+                       'size_act': np.zeros((self.nlambda,self.num_feature),dtype='int32'),
+                       'train_time': np.zeros(self.nlambda,dtype='double'),
+                       'total_train_time': 0,
                        'state': 'not trained'
                        }
 
@@ -190,15 +193,15 @@ class Solver:
         _function.argtypes = [CDoubleArray, CDoubleArray, ctypes.c_int, ctypes.c_int, CDoubleArray, ctypes.c_int,
                               ctypes.c_double, ctypes.c_int, ctypes.c_double, ctypes.c_int, ctypes.c_bool,
                               CDoubleArray, CDoubleArray, CIntArray,
-                              CIntArray, ctypes.POINTER(ctypes.c_double)]
+                              CIntArray, CDoubleArray]
         def wrapper():
-            _runt = ctypes.c_double(0)
+            time_start = time.time()
             _function(self.y, self.x, self.num_sample, self.num_feature, self.lambdas, self.nlambda,
                                   self.gamma, self.max_ite,  self.prec, self.penaltyflag, self.standardize,
                                   self.result['beta'], self.result['intercept'], self.result['ite_lamb'],
-                                  self.result['size_act'],
-                                  _runt)
-            self.result['train_time'] = _runt.value
+                                  self.result['size_act'], self.result['train_time'])
+            time_end = time.time()
+            self.result['total_train_time'] = time_end - time_start
         return wrapper
 
     def _gaussian_wrapper(self):
@@ -218,7 +221,7 @@ class Solver:
             else:
                 self.type_gaussian = "naive"
 
-        if self.type_gaussian is "covariance":
+        if self.type_gaussian == "covariance":
             return self._decor_cinterface(_PICASSO_LIB.SolveLinearRegressionCovUpdate)
         else:
             return self._decor_cinterface(_PICASSO_LIB.SolveLinearRegressionNaiveUpdate)
@@ -234,7 +237,7 @@ class Solver:
             print("Sparse logistic regression. \n")
             print(self.penalty.upper() + "regularization via active set identification and coordinate descent. \n")
         levels = np.unique(self.y)
-        if (levels.size is not 2) or (1 not in levels) or (0 not in levels):
+        if (levels.size != 2) or (1 not in levels) or (0 not in levels):
             raise RuntimeError("Response vector should contains 0s and 1s.")
         return self._decor_cinterface(_PICASSO_LIB.SolveLogisticRegression)
 
@@ -299,7 +302,7 @@ class Solver:
             - **state** - The training state.
 
         """
-        if self.result['state'] is 'not trained':
+        if self.result['state'] == 'not trained':
             print (r'Warning: The model has not been trained yet! ')
         return self.result
 
@@ -324,7 +327,7 @@ class Solver:
         :return: The predicted response vectors based on the estimated models.
         """
         if lambdidx is None:
-            lambdidx = self.nlambda
+            lambdidx = self.nlambda-1
 
         _beta = self.result['beta'][lambdidx,]
         _intercept = self.result['intercept'][lambdidx]
@@ -332,7 +335,7 @@ class Solver:
             y_pred = np.matmul(_beta, self.x) + _intercept
         else:
             if self.standardize:
-                if self.family is 'gaussian':
+                if self.family == 'gaussian':
                     _intercept += self.y_mean
                 _intercept -= np.matmul(_beta, self.x_mean/self.x_std)
                 _beta /= self.x_std
@@ -353,6 +356,6 @@ class Solver:
                      "Feature Number: " + str(self.num_feature) + "\n" + \
                      "Lambda Number: " + str(self.nlambda) + "\n"
         if self.result['state']:
-            return_str += "Training Time (ms): " + str(self.result['train_time']) + "\n"
+            return_str += "Training Time (ms): " + str(self.result['total_train_time']) + "\n"
 
         return  return_str
