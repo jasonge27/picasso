@@ -32,7 +32,7 @@ cmake-build-debug
 /build/
 
 #python build
-!python-package/lib/*
+!python-package/pycasso/lib/*
 python-package/build
 python-package/doc/build
 python-package/dist
