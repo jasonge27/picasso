@@ -109,6 +109,7 @@ class ObjFunction {
   std::vector<double> Y;
 
   std::vector<double> gr;
+  std::vector<double> Xb;
 
   ModelParam model_param;
 
@@ -122,6 +123,7 @@ class ObjFunction {
     Y.resize(n);
     X.resize(d);
     gr.resize(d);
+    Xb.resize(n, 0);
 
     for (int i = 0; i < n; i++) Y[i] = y[i];
 
@@ -132,6 +134,7 @@ class ObjFunction {
   };
 
   int get_dim() { return d; }
+  int get_sample_num() { return n; }
 
   double get_grad(int idx) { return gr[idx]; };
 
@@ -149,9 +152,11 @@ class ObjFunction {
   }
 
   ModelParam get_model_param() { return model_param; };
+  std::vector<double> get_model_Xb() const { return Xb; };
 
   // reset model param and also update related aux vars
-  virtual void set_model_param(ModelParam &other_param) = 0;
+  void set_model_param(ModelParam &other_param) { model_param = other_param; };
+  void set_model_Xb(std::vector<double> &other_Xb) { Xb = other_Xb; };
 
   // coordinate descent
   virtual double coordinate_descent(RegFunction *regfun, int idx) = 0;
@@ -177,7 +182,6 @@ class GLMObjective : public ObjFunction {
  protected:
   std::vector<double> p;
   std::vector<double> w;
-  std::vector<double> Xb;
   std::vector<double> r;
 
   // wXX[j] = sum(w*X[j]*X[j])
@@ -198,9 +202,6 @@ class GLMObjective : public ObjFunction {
   double coordinate_descent(RegFunction *regfunc, int idx);
 
   void intercept_update();
-
-  void set_model_param(ModelParam &other_param);
-
   void update_auxiliary();
   void update_gradient(int);
 
@@ -233,7 +234,6 @@ class PoissonObjective : public GLMObjective {
 
 class SqrtMSEObjective : public ObjFunction {
  private:
-  std::vector<double> Xb;
   std::vector<double> r;
 
   // quadratic approx coefs for each coordinate
@@ -252,9 +252,6 @@ class SqrtMSEObjective : public ObjFunction {
   double coordinate_descent(RegFunction *regfunc, int idx);
 
   void intercept_update();
-
-  void set_model_param(ModelParam &other_param);
-
   void update_key_aux(){};
 
   void update_auxiliary();
@@ -280,7 +277,6 @@ class GaussianNaiveUpdateObjective final : public ObjFunction {
 
   void intercept_update();
   void update_key_aux(){};
-  void set_model_param(ModelParam &other_param);
   void update_auxiliary();
   void update_gradient(int idx);
 

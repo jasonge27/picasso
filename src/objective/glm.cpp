@@ -9,7 +9,6 @@ GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d)
   p.resize(n);
   w.resize(n);
 
-  Xb.resize(n, 0.0);
   r.resize(n);
   wXX.resize(d);
 }
@@ -22,7 +21,6 @@ GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d,
 
   p.resize(n);
   w.resize(n);
-  Xb.resize(n, 0.0);
   r.resize(n);
 
   wXX.resize(d);
@@ -55,39 +53,44 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   tmp = model_param.beta[idx];
   model_param.beta[idx] = regfunc->threshold(g) / a;
 
+  tmp = model_param.beta[idx] - tmp;
   // Xb += delta*X[idx*n]
-  for (int i = 0; i < n; i++)
-    Xb[i] = Xb[i] + (model_param.beta[idx] - tmp) * X[idx][i];
-
-  sum_r = 0.0;
+  for (int i = 0; i < n; i++) Xb[i] = Xb[i] + tmp * X[idx][i];
+  // sum_r = 0.0;
   // r -= delta*w*X
   for (int i = 0; i < n; i++) {
-    r[i] = r[i] - w[i] * X[idx][i] * (model_param.beta[idx] - tmp);
-    sum_r += r[i];
+    r[i] = r[i] - w[i] * X[idx][i] * tmp;
+    // sum_r += r[i];
   }
-
   return (model_param.beta[idx]);
 }
 
 void GLMObjective::intercept_update() {
+  sum_r = 0.0;
+  for (int i = 0; i < n; i++) sum_r += r[i];
   double tmp = sum_r / sum_w;
   model_param.intercept += tmp;
 
-  sum_r = 0.0;
+  // sum_r = 0.0;
   for (int i = 0; i < n; i++) {
     r[i] = r[i] - tmp * w[i];
-    sum_r += r[i];
+    // sum_r += r[i];
   }
 }
 
-void GLMObjective::set_model_param(ModelParam &other_param) {
+/*
+void GLMObjective::set_model_param(ModelParam &other_param,
+                                   const std::vector<double> &old_Xb) {
   model_param = other_param;
+
 
   for (int i = 0; i < n; i++) {
     Xb[i] = 0.0;
     for (int j = 0; j < d; j++) Xb[i] += X[j][i] * model_param.beta[j];
   }
+  for (int i = 0; i < n; i++) Xb[i] = old_Xb[i];
 }
+*/
 
 void GLMObjective::update_auxiliary() {
   update_key_aux();
@@ -99,10 +102,11 @@ void GLMObjective::update_auxiliary() {
     sum_r += r[i];
   }
 
-  for (int idx = 0; idx < d; idx++) {
-    wXX[idx] = 0.0;
-    for (int i = 0; i < n; i++) wXX[idx] += w[i] * X[idx][i] * X[idx][i];
-  }
+  /*
+    for (int idx = 0; idx < d; idx++) {
+      wXX[idx] = 0.0;
+      for (int i = 0; i < n; i++) wXX[idx] += w[i] * X[idx][i] * X[idx][i];
+    }*/
 }
 
 void GLMObjective::update_gradient(int idx) {
@@ -113,7 +117,9 @@ void GLMObjective::update_gradient(int idx) {
 double GLMObjective::get_local_change(double old, int idx) {
   if (idx >= 0) {
     double tmp = old - model_param.beta[idx];
-    return (wXX[idx] * tmp * tmp / (2 * n));
+    double wXX_idx = 0.0;
+    for (int i = 0; i < n; i++) wXX_idx += w[i] * X[idx][i] * X[idx][i];
+    return (wXX_idx * tmp * tmp / (2 * n));
   } else {
     double tmp = old - model_param.intercept;
     return (sum_w * tmp * tmp / (2 * n));

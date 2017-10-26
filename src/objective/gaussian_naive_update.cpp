@@ -70,11 +70,6 @@ void GaussianNaiveUpdateObjective::intercept_update() {
   for (int i = 0; i < n; i++) sum_r += r[i];
   model_param.intercept = sum_r / n;
 }
-
-void GaussianNaiveUpdateObjective::set_model_param(ModelParam &other_param) {
-  model_param = other_param;
-}
-
 void GaussianNaiveUpdateObjective::update_auxiliary() {
   for (int idx = 0; idx < d; idx++) {
     gr[idx] = 0.0;

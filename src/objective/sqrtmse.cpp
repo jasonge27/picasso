@@ -8,7 +8,6 @@ SqrtMSEObjective::SqrtMSEObjective(const double *xmat, const double *y, int n,
   g = 0.0;
   L = 0.0;
 
-  Xb.resize(n, 0);
   r.resize(n, 0);
 
   update_auxiliary();
@@ -91,14 +90,14 @@ void SqrtMSEObjective::intercept_update() {
   sum_r = 0.0;
   L = sqrt(sum_r2 / n);
 }
-
+/*
 void SqrtMSEObjective::set_model_param(ModelParam &other_param) {
   model_param = other_param;
   for (int i = 0; i < n; i++) {
     Xb[i] = 0.0;
     for (int j = 0; j < d; j++) Xb[i] += X[j][i] * model_param.beta[j];
   }
-}
+}*/
 
 void SqrtMSEObjective::update_auxiliary() {
   sum_r = 0.0;
