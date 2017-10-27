@@ -154,9 +154,19 @@ class ObjFunction {
   ModelParam get_model_param() { return model_param; };
   std::vector<double> get_model_Xb() const { return Xb; };
 
+  const ModelParam &get_model_param_ref() { return model_param; };
+  const std::vector<double> &get_model_Xb_ref() const { return Xb; };
+
   // reset model param and also update related aux vars
-  void set_model_param(ModelParam &other_param) { model_param = other_param; };
-  void set_model_Xb(std::vector<double> &other_Xb) { Xb = other_Xb; };
+  void set_model_param(ModelParam &other_param) {
+    model_param.d = other_param.d;
+    for (int i = 0; i < d; i++) model_param.beta[i] = other_param.beta[i];
+    model_param.intercept = other_param.intercept;
+  };
+
+  void set_model_Xb(std::vector<double> &other_Xb) {
+    for (int i = 0; i < n; i++) Xb[i] = other_Xb[i];
+  };
 
   // coordinate descent
   virtual double coordinate_descent(RegFunction *regfun, int idx) = 0;

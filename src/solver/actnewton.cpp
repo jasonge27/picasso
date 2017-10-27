@@ -159,13 +159,19 @@ void ActNewtonSolver::solve() {
       // Rprintf("---loop level 1 cnt:%d\n", loopcnt_level_1);
 
       if (loopcnt_level_0 == 1) {
-        model_master = m_obj->get_model_param();
-        Xb_master = m_obj->get_model_Xb();
+        const ModelParam &model_master_ref = m_obj->get_model_param_ref();
+        const std::vector<double> &Xb_master_ref = m_obj->get_model_Xb_ref();
+
+        model_master.intercept = model_master_ref.intercept;
 
         for (int j = 0; j < d; j++) {
+          model_master.beta[j] = model_master_ref.beta[j];
+
           grad_master[j] = grad[j];
           actset_indcat_master[j] = actset_indcat[j];
         }
+
+        for (int j = 0; j < n; j++) Xb_master[j] = Xb_master_ref[j];
       }
 
       if (m_param.reg_type == L1) break;

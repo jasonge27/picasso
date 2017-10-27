@@ -54,13 +54,15 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   model_param.beta[idx] = regfunc->threshold(g) / a;
 
   tmp = model_param.beta[idx] - tmp;
-  // Xb += delta*X[idx*n]
-  for (int i = 0; i < n; i++) Xb[i] = Xb[i] + tmp * X[idx][i];
-  // sum_r = 0.0;
-  // r -= delta*w*X
-  for (int i = 0; i < n; i++) {
-    r[i] = r[i] - w[i] * X[idx][i] * tmp;
-    // sum_r += r[i];
+  if (fabs(tmp) > 1e-8) {
+    // Xb += delta*X[idx*n]
+    for (int i = 0; i < n; i++) Xb[i] = Xb[i] + tmp * X[idx][i];
+    // sum_r = 0.0;
+    // r -= delta*w*X
+    for (int i = 0; i < n; i++) {
+      r[i] = r[i] - w[i] * X[idx][i] * tmp;
+      // sum_r += r[i];
+    }
   }
   return (model_param.beta[idx]);
 }
@@ -95,11 +97,9 @@ void GLMObjective::set_model_param(ModelParam &other_param,
 void GLMObjective::update_auxiliary() {
   update_key_aux();
   sum_w = 0.0;
-  // sum_r = 0.0;
   for (int i = 0; i < n; i++) {
     r[i] = Y[i] - p[i];
     sum_w += w[i];
-    sum_r += r[i];
   }
 
   /*

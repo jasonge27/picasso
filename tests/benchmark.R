@@ -22,7 +22,7 @@ min(apply(abs(fitp$beta-true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
 cat("\n-----------------------------------------------------------\n")
 cat("-------Testing Logistic Regression with L1 Penalty------\n")
 source("test_picasso.R")
-if (FALSE){
+
 cat("------Comparisions of estimation errors.------\n")
 cat("-----------------------\n")
 cat("---------n=2000, p=1000, c=0.1---------\n")
@@ -45,7 +45,7 @@ test_lognet_nonlinear(n=3000, p =3000, c=0.5)
 cat("-----------------------\n")
 cat("---------n=3000, p=3000, c=1.0---------\n")
 test_lognet_nonlinear(n=3000, p =3000, c=1.0)
-}
+
 
 cat("\n-----------------------------------------------------------\n")
 cat("-------Testing Square Root Lasso------\n")
