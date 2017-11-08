@@ -1,3 +1,4 @@
+#include <Eigen/Dense>
 #include <picasso/actnewton.hpp>
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
@@ -28,7 +29,9 @@ void ActNewtonSolver::solve() {
   std::vector<double> old_coef(d);
   std::vector<double> grad(d);
   std::vector<double> grad_master(d);
-  std::vector<double> Xb_master(n);
+
+  // std::vector<double> Xb_master(n);
+  Eigen::ArrayXd Xb_master(n);
 
   for (int i = 0; i < d; i++) grad[i] = fabs(m_obj->get_grad(i));
 
@@ -160,7 +163,7 @@ void ActNewtonSolver::solve() {
 
       if (loopcnt_level_0 == 1) {
         const ModelParam &model_master_ref = m_obj->get_model_param_ref();
-        const std::vector<double> &Xb_master_ref = m_obj->get_model_Xb_ref();
+        const Eigen::VectorXd &Xb_master_ref = m_obj->get_model_Xb_ref();
 
         model_master.intercept = model_master_ref.intercept;
 
