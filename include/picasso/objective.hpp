@@ -1,7 +1,6 @@
 #ifndef PICASSO_OBJECTIVE_H
 #define PICASSO_OBJECTIVE_H
 
-#include <R.h>
 #include <Eigen/Dense>
 #include <cmath>
 #include <vector>
