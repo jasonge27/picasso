@@ -36,5 +36,6 @@ cmake-build-debug
 python-package/build
 python-package/doc/build
 python-package/dist
+python-package/pycasso.tar
 python-package/*.egg-info/
-
+picasso_*.tar.gz
