@@ -10,13 +10,10 @@ GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(const double *xmat,
   XX.resize(d);
   r.resize(n);
 
-  for (int j = 0; j < d; j++) {
-    XX[j] = 0.0;
-    for (int i = 0; i < n; i++) XX[j] += X[j][i] * X[j][i];
-    XX[j] = XX[j] / n;
-  }
-
-  for (int i = 0; i < n; i++) r[i] = Y[i];
+  for (int j = 0; j < d; j++)
+    XX[j] = (X.col(j)*X.col(j)).sum()/n;
+  
+  r =  Y;
   update_auxiliary();
 
   // saturated fvalue = 0
@@ -30,19 +27,14 @@ GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(
   r.resize(n);
 
   if (include_intercept) {
-    double avr_y = 0.0;
-    for (int i = 0; i < n; i++) avr_y += Y[i];
-    avr_y = avr_y / n;
+    double avr_y = Y.sum()/n;
     model_param.intercept = avr_y;
   }
 
-  for (int j = 0; j < d; j++) {
-    XX[j] = 0.0;
-    for (int i = 0; i < n; i++) XX[j] += X[j][i] * X[j][i];
-    XX[j] = XX[j] / n;
-  }
+  for (int j = 0; j < d; j++)
+    XX[j] = (X.col(j)*X.col(j)).sum()/n;
 
-  for (int i = 0; i < n; i++) r[i] = Y[i];
+  r = Y;
   update_auxiliary();
 
   // saturated fvalue = 0
@@ -55,36 +47,21 @@ double GaussianNaiveUpdateObjective::coordinate_descent(RegFunction *regfunc,
   double tmp = gr[idx] + model_param.beta[idx] * XX[idx];
   model_param.beta[idx] = regfunc->threshold(tmp) / XX[idx];
 
-  // if (fabs(model_param.beta[idx]) > 0)
-  //  Rprintf("idx:%d, old beta:%f, new beta:%f\n", idx, tmp,
-  //          model_param.beta[idx]);
-
-  for (int i = 0; i < n; i++)
-    r[i] = r[i] - X[idx][i] * (model_param.beta[idx] - beta_old);
-
+  r = r - X.col(idx) * (model_param.beta[idx] - beta_old);
   return model_param.beta[idx];
 }
 
 void GaussianNaiveUpdateObjective::intercept_update() {
-  double sum_r = 0.0;
-  for (int i = 0; i < n; i++) sum_r += r[i];
+  double sum_r = r.sum();
   model_param.intercept = sum_r / n;
 }
-
-void GaussianNaiveUpdateObjective::set_model_param(ModelParam &other_param) {
-  model_param = other_param;
-}
-
 void GaussianNaiveUpdateObjective::update_auxiliary() {
-  for (int idx = 0; idx < d; idx++) {
-    gr[idx] = 0.0;
-    for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i] / n;
-  }
+  for (int idx = 0; idx < d; idx++) 
+    update_gradient(idx);
 }
 
 void GaussianNaiveUpdateObjective::update_gradient(int idx) {
-  gr[idx] = 0.0;
-  for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i] / n;
+  gr[idx] = (r*X.col(idx)).sum()/n;
 }
 
 double GaussianNaiveUpdateObjective::get_local_change(double old, int idx) {
@@ -96,10 +73,7 @@ double GaussianNaiveUpdateObjective::get_local_change(double old, int idx) {
 double GaussianNaiveUpdateObjective::eval() {
   double v = 0.0;
   for (int i = 0; i < n; i++) {
-    double pred = model_param.intercept;
-    for (int j = 0; j < d; j++) {
-      pred += model_param.beta[j] * X[j][i];
-    }
+    double pred = model_param.intercept + model_param.beta.matrix().dot(X.row(i).matrix());
     v += (Y[i] - pred) * (Y[i] - pred);
   }
   v = v / n;

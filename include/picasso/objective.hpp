@@ -1,20 +1,26 @@
 #ifndef PICASSO_OBJECTIVE_H
 #define PICASSO_OBJECTIVE_H
 
+#include <R.h>
+#include <Eigen/Dense>
 #include <cmath>
 #include <vector>
+
+#include <ctime>
+
 
 namespace picasso {
 
 class ModelParam {
  public:
   int d;
-  std::vector<double> beta;
+  Eigen::ArrayXd beta;
   double intercept;
 
   ModelParam(int dim) {
     d = dim;
-    beta.resize(d, 0);
+    beta.resize(d);
+    beta.setZero();
     intercept = 0.0;
   }
 };
@@ -104,10 +110,11 @@ class ObjFunction {
   int n;  // sample number
   int d;  // sample dimension
 
-  std::vector<std::vector<double> > X;
-  std::vector<double> Y;
+  Eigen::ArrayXXd X;
+  Eigen::ArrayXd Y;
 
-  std::vector<double> gr;
+  Eigen::ArrayXd gr;
+  Eigen::ArrayXd Xb;
 
   ModelParam model_param;
 
@@ -119,18 +126,21 @@ class ObjFunction {
     this->d = d;
     this->n = n;
     Y.resize(n);
-    X.resize(d);
     gr.resize(d);
+
+    Xb.resize(n);
+    Xb.setZero();
 
     for (int i = 0; i < n; i++) Y[i] = y[i];
 
+    X.resize(n, d);
     for (int j = 0; j < d; j++) {
-      X[j].resize(n);
-      for (int i = 0; i < n; i++) X[j][i] = xmat[j * n + i];
+      for (int i = 0; i < n; i++) X(i, j) = xmat[j * n + i];
     }
   };
 
   int get_dim() { return d; }
+  int get_sample_num() { return n; }
 
   double get_grad(int idx) { return gr[idx]; };
 
@@ -148,9 +158,19 @@ class ObjFunction {
   }
 
   ModelParam get_model_param() { return model_param; };
+  Eigen::ArrayXd get_model_Xb() const { return Xb; };
+
+  const ModelParam &get_model_param_ref() { return model_param; };
+  const Eigen::ArrayXd &get_model_Xb_ref() const { return Xb; };
 
   // reset model param and also update related aux vars
-  virtual void set_model_param(ModelParam &other_param) = 0;
+  void set_model_param(ModelParam &other_param) {
+    model_param.d = other_param.d;
+    model_param.beta = other_param.beta;
+    model_param.intercept = other_param.intercept;
+  };
+
+  void set_model_Xb(Eigen::ArrayXd &other_Xb) { Xb = other_Xb; };
 
   // coordinate descent
   virtual double coordinate_descent(RegFunction *regfun, int idx) = 0;
@@ -159,7 +179,6 @@ class ObjFunction {
   virtual void intercept_update() = 0;
 
   // update gradient and other aux vars
-  virtual void update_key_aux() = 0;
   virtual void update_auxiliary() = 0;
   virtual void update_gradient(int idx){};
 
@@ -174,13 +193,10 @@ class ObjFunction {
 
 class GLMObjective : public ObjFunction {
  protected:
-  std::vector<double> p;
-  std::vector<double> w;
-  std::vector<double> Xb;
-  std::vector<double> r;
+  Eigen::ArrayXd p, w, r;
 
   // wXX[j] = sum(w*X[j]*X[j])
-  std::vector<double> wXX;
+  Eigen::ArrayXd wXX;
 
   // quadratic approx coefs for each coordinate
   // a*x^2 + g*x + constant
@@ -197,10 +213,6 @@ class GLMObjective : public ObjFunction {
   double coordinate_descent(RegFunction *regfunc, int idx);
 
   void intercept_update();
-
-  void set_model_param(ModelParam &other_param);
-
-  void update_auxiliary();
   void update_gradient(int);
 
   double get_local_change(double old, int idx);
@@ -213,7 +225,7 @@ class LogisticObjective : public GLMObjective {
   LogisticObjective(const double *xmat, const double *y, int n, int d,
                     bool include_intercept);
 
-  void update_key_aux();
+  void update_auxiliary();
 
   double eval();
 };
@@ -225,15 +237,15 @@ class PoissonObjective : public GLMObjective {
   PoissonObjective(const double *xmat, const double *y, int n, int d,
                    bool include_intercept);
 
-  void update_key_aux();
+  void update_auxiliary();
 
   double eval();
 };
 
+
 class SqrtMSEObjective : public ObjFunction {
  private:
-  std::vector<double> Xb;
-  std::vector<double> r;
+  Eigen::ArrayXd r;
 
   // quadratic approx coefs for each coordinate
   // a*x^2 + g*x + constant
@@ -252,10 +264,6 @@ class SqrtMSEObjective : public ObjFunction {
 
   void intercept_update();
 
-  void set_model_param(ModelParam &other_param);
-
-  void update_key_aux(){};
-
   void update_auxiliary();
   void update_gradient(int idx);
 
@@ -266,8 +274,7 @@ class SqrtMSEObjective : public ObjFunction {
 
 class GaussianNaiveUpdateObjective final : public ObjFunction {
  private:
-  std::vector<double> r;
-  std::vector<double> XX;
+  Eigen::ArrayXd r, XX;
 
  public:
   GaussianNaiveUpdateObjective(const double *xmat, const double *y, int n,
@@ -278,8 +285,6 @@ class GaussianNaiveUpdateObjective final : public ObjFunction {
   double coordinate_descent(RegFunction *regfunc, int idx);
 
   void intercept_update();
-  void update_key_aux(){};
-  void set_model_param(ModelParam &other_param);
   void update_auxiliary();
   void update_gradient(int idx);
 

@@ -9,7 +9,6 @@ GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d)
   p.resize(n);
   w.resize(n);
 
-  Xb.resize(n, 0.0);
   r.resize(n);
   wXX.resize(d);
 }
@@ -22,17 +21,13 @@ GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d,
 
   p.resize(n);
   w.resize(n);
-  Xb.resize(n, 0.0);
   r.resize(n);
 
   wXX.resize(d);
 
   if (include_intercept) {
-    double avr_y = 0.0;
-    for (int i = 0; i < n; i++) {
-      avr_y += Y[i];
-    }
-    avr_y = avr_y / n;
+    double avr_y = Y.sum() / n;
+
     model_param.intercept = log(avr_y / (1 - avr_y));
   }
 }
@@ -41,79 +36,44 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   g = 0.0;
   a = 0.0;
 
-  double tmp;
   // g = (<wXX, model_param.beta> + <r, X>)/n
   // a = sum(wXX)/n
-  for (int i = 0; i < n; i++) {
-    tmp = w[i] * X[idx][i] * X[idx][i];
-    g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
-    a += tmp;
-  }
-  g = g / n;
-  a = a / n;
+  Eigen::ArrayXd wXX = w * X.col(idx) * X.col(idx);
+  a = wXX.sum() / n;
 
+  g = (model_param.beta[idx] * wXX + r * X.col(idx)).sum()/n;
+
+  double tmp;
   tmp = model_param.beta[idx];
   model_param.beta[idx] = regfunc->threshold(g) / a;
 
-  // Xb += delta*X[idx*n]
-  for (int i = 0; i < n; i++)
-    Xb[i] = Xb[i] + (model_param.beta[idx] - tmp) * X[idx][i];
+  tmp = model_param.beta[idx] - tmp;
+  if (fabs(tmp) > 1e-8) {
+    // Xb += delta*X[idx*n]
+    Xb = Xb + tmp * X.col(idx);
 
-  sum_r = 0.0;
-  // r -= delta*w*X
-  for (int i = 0; i < n; i++) {
-    r[i] = r[i] - w[i] * X[idx][i] * (model_param.beta[idx] - tmp);
-    sum_r += r[i];
+    // r -= delta*w*X
+    r = r - tmp * w * X.col(idx);
   }
-
   return (model_param.beta[idx]);
 }
 
 void GLMObjective::intercept_update() {
-  double tmp = sum_r / sum_w;
-  model_param.intercept += tmp;
-
-  sum_r = 0.0;
-  for (int i = 0; i < n; i++) {
-    r[i] = r[i] - tmp * w[i];
-    sum_r += r[i];
-  }
-}
-
-void GLMObjective::set_model_param(ModelParam &other_param) {
-  model_param = other_param;
-
-  for (int i = 0; i < n; i++) {
-    Xb[i] = 0.0;
-    for (int j = 0; j < d; j++) Xb[i] += X[j][i] * model_param.beta[j];
-  }
-}
-
-void GLMObjective::update_auxiliary() {
-  update_key_aux();
-  sum_w = 0.0;
-  // sum_r = 0.0;
-  for (int i = 0; i < n; i++) {
-    r[i] = Y[i] - p[i];
-    sum_w += w[i];
-    sum_r += r[i];
-  }
-
-  for (int idx = 0; idx < d; idx++) {
-    wXX[idx] = 0.0;
-    for (int i = 0; i < n; i++) wXX[idx] += w[i] * X[idx][i] * X[idx][i];
-  }
+  double sum_r = r.sum();
+  model_param.intercept += sum_r/sum_w;
+  r = r - sum_r/sum_w * w;
+  sum_r = 0;
 }
 
 void GLMObjective::update_gradient(int idx) {
-  gr[idx] = 0.0;
-  for (int i = 0; i < n; i++) gr[idx] += (Y[i] - p[i]) * X[idx][i] / n;
+  Eigen::ArrayXd tmp = (Y - p) * X.col(idx) / n;
+  gr[idx] = tmp.sum();
 }
 
 double GLMObjective::get_local_change(double old, int idx) {
   if (idx >= 0) {
     double tmp = old - model_param.beta[idx];
-    return (wXX[idx] * tmp * tmp / (2 * n));
+    return ((w*X.col(idx)*X.col(idx)).sum() * tmp * tmp / (2 * n));
   } else {
     double tmp = old - model_param.intercept;
     return (sum_w * tmp * tmp / (2 * n));
@@ -143,11 +103,14 @@ LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
   deviance = fabs(eval());
 };
 
-void LogisticObjective::update_key_aux() {
-  for (int i = 0; i < n; i++) {
-    p[i] = 1.0 / (1.0 + exp(-model_param.intercept - Xb[i]));
-    w[i] = p[i] * (1 - p[i]);
-  }
+void LogisticObjective::update_auxiliary() {
+  p = -model_param.intercept - Xb;
+  p = p.exp();
+  p = 1.0 / (1.0 + p);
+  r = Y - p;
+
+  w = p * (1 - p);
+  sum_w = w.sum();
 }
 
 double LogisticObjective::eval() {
@@ -183,11 +146,12 @@ PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
   deviance = fabs(eval());
 };
 
-void PoissonObjective::update_key_aux() {
-  for (int i = 0; i < n; i++) {
-    p[i] = exp(model_param.intercept + Xb[i]);
-    w[i] = p[i];
-  }
+void PoissonObjective::update_auxiliary() {
+  p = model_param.intercept + Xb;
+  p = p.exp();
+  r = Y - p;
+  w = p;
+  sum_w = w.sum();
 }
 
 double PoissonObjective::eval() {

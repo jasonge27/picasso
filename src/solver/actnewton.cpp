@@ -1,3 +1,4 @@
+#include <Eigen/Dense>
 #include <picasso/actnewton.hpp>
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
@@ -12,6 +13,7 @@ ActNewtonSolver::ActNewtonSolver(ObjFunction *obj, PicassoSolverParams param)
 
 void ActNewtonSolver::solve() {
   unsigned int d = m_obj->get_dim();
+  unsigned int n = m_obj->get_sample_num();
 
   const std::vector<double> &lambdas = m_param.get_lambda_path();
   itercnt_path.resize(lambdas.size(), 0);
@@ -28,18 +30,26 @@ void ActNewtonSolver::solve() {
   std::vector<double> grad(d);
   std::vector<double> grad_master(d);
 
+  // std::vector<double> Xb_master(n);
+  Eigen::ArrayXd Xb_master(n);
+
   for (int i = 0; i < d; i++) grad[i] = fabs(m_obj->get_grad(i));
 
   // model parameters on the master path
   // each master parameter is relaxed into SCAD/MCP parameter
   ModelParam model_master = m_obj->get_model_param();
+  Xb_master = m_obj->get_model_Xb();
+
   for (int i = 0; i < d; i++) grad_master[i] = grad[i];
 
   std::vector<double> stage_lambdas(d, 0);
   RegFunction *regfunc = new RegL1();
   for (int i = 0; i < lambdas.size(); i++) {
+    // Rprintf("lambda[%d]:%f\n", i, lambdas[i]);
     // start with the previous solution on the master path
     m_obj->set_model_param(model_master);
+    m_obj->set_model_Xb(Xb_master);
+
     for (int j = 0; j < d; j++) {
       grad[j] = grad_master[j];
       actset_indcat[j] = actset_indcat_master[j];
@@ -61,6 +71,8 @@ void ActNewtonSolver::solve() {
     m_obj->update_auxiliary();
     // loop level 0: multistage convex relaxation
     int loopcnt_level_0 = 0;
+    int idx;
+    double old_beta, old_intcpt, updated_coord, beta;
     while (loopcnt_level_0 < m_param.num_relaxation_round) {
       loopcnt_level_0++;
 
@@ -71,7 +83,7 @@ void ActNewtonSolver::solve() {
         loopcnt_level_1++;
         terminate_loop_level_1 = true;
 
-        double old_intcpt = m_obj->get_model_coef(-1);
+        old_intcpt = m_obj->get_model_coef(-1);
         for (int j = 0; j < d; j++) old_coef[j] = m_obj->get_model_coef(j);
 
         // initialize actset_idx
@@ -79,7 +91,7 @@ void ActNewtonSolver::solve() {
         for (int j = 0; j < d; j++)
           if (actset_indcat[j]) {
             regfunc->set_param(stage_lambdas[j], 0.0);
-            double updated_coord = m_obj->coordinate_descent(regfunc, j);
+            updated_coord = m_obj->coordinate_descent(regfunc, j);
 
             if (fabs(updated_coord) > 0) actset_idx.push_back(j);
           }
@@ -92,9 +104,9 @@ void ActNewtonSolver::solve() {
           terminate_loop_level_2 = true;
 
           for (int k = 0; k < actset_idx.size(); k++) {
-            int idx = actset_idx[k];
+            idx = actset_idx[k];
 
-            double old_beta = m_obj->get_model_coef(idx);
+            old_beta = m_obj->get_model_coef(idx);
             regfunc->set_param(stage_lambdas[idx], 0.0);
 
             m_obj->coordinate_descent(regfunc, idx);
@@ -104,7 +116,7 @@ void ActNewtonSolver::solve() {
           }
 
           if (m_param.include_intercept) {
-            double old_intcpt = m_obj->get_model_coef(-1);
+            old_intcpt = m_obj->get_model_coef(-1);
             m_obj->intercept_update();
             if (m_obj->get_local_change(old_intcpt, -1) > dev_thr)
               terminate_loop_level_2 = false;
@@ -112,13 +124,14 @@ void ActNewtonSolver::solve() {
 
           if (terminate_loop_level_2) break;
         }
+        // Rprintf("---------loopcnt cnt level 2:%d\n", loopcnt_level_2);
 
         itercnt_path[i] += loopcnt_level_2;
 
         terminate_loop_level_1 = true;
         // check stopping criterion 1: fvalue change
         for (int k = 0; k < actset_idx.size(); ++k) {
-          int idx = actset_idx[k];
+          idx = actset_idx[k];
           if (m_obj->get_local_change(old_coef[idx], idx) > dev_thr)
             terminate_loop_level_1 = false;
         }
@@ -146,12 +159,22 @@ void ActNewtonSolver::solve() {
         if (!new_active_idx) break;
       }
 
+      // Rprintf("---loop level 1 cnt:%d\n", loopcnt_level_1);
+
       if (loopcnt_level_0 == 1) {
-        model_master = m_obj->get_model_param();
+        const ModelParam &model_master_ref = m_obj->get_model_param_ref();
+        const Eigen::VectorXd &Xb_master_ref = m_obj->get_model_Xb_ref();
+
+        model_master.intercept = model_master_ref.intercept;
+
         for (int j = 0; j < d; j++) {
+          model_master.beta[j] = model_master_ref.beta[j];
+
           grad_master[j] = grad[j];
           actset_indcat_master[j] = actset_indcat[j];
         }
+
+        for (int j = 0; j < n; j++) Xb_master[j] = Xb_master_ref[j];
       }
 
       if (m_param.reg_type == L1) break;
@@ -160,7 +183,7 @@ void ActNewtonSolver::solve() {
 
       // update stage lambda
       for (int j = 0; j < d; j++) {
-        double beta = m_obj->get_model_coef(j);
+        beta = m_obj->get_model_coef(j);
 
         if (m_param.reg_type == MCP) {
           stage_lambdas[j] = (fabs(beta) > lambdas[i] * m_param.gamma)
