@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pycasso package &mdash; pycasso 0.0.6.dev2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pycasso 0.0.6.dev2 documentation" href="index.html"/>
+        <link rel="prev" title="Picasso Python Package" href="README.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pycasso
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.6.dev2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Picasso Python Package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pycasso package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pycasso">pycasso</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pycasso.core">pycasso.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pycasso.libpath">pycasso.libpath</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pycasso</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>pycasso package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/pycasso.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pycasso-package">
+<h1>pycasso package<a class="headerlink" href="#pycasso-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pycasso">
+<span id="pycasso"></span><h2>pycasso<a class="headerlink" href="#module-pycasso" title="Permalink to this headline">¶</a></h2>
+<p>PICASSO: Penalized Generalized Linear Model Solver - Unleash the Power of Non-convex Penalty</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Jason(Jian) Ge, Haoming Jiang</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Maintainer:</th><td class="field-body">Haoming Jiang &lt;<a class="reference external" href="mailto:jianghm&#37;&#52;&#48;gatech&#46;edu">jianghm<span>&#64;</span>gatech<span>&#46;</span>edu</a>&gt;</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="pycasso.test">
+<code class="descclassname">pycasso.</code><code class="descname">test</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show welcome information.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pycasso.core">
+<span id="pycasso-core"></span><h2>pycasso.core<a class="headerlink" href="#module-pycasso.core" title="Permalink to this headline">¶</a></h2>
+<p>Main Interface of the package</p>
+<dl class="exception">
+<dt id="pycasso.core.PycassoError">
+<em class="property">exception </em><code class="descclassname">pycasso.core.</code><code class="descname">PycassoError</code><a class="headerlink" href="#pycasso.core.PycassoError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Error thrown by pycasso solver.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pycasso.core.Solver">
+<em class="property">class </em><code class="descclassname">pycasso.core.</code><code class="descname">Solver</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>lambdas=None</em>, <em>nlambda=100</em>, <em>lambda_min_ratio=None</em>, <em>lambda_min=None</em>, <em>family='gaussian'</em>, <em>penalty='l1'</em>, <em>type_gaussian='naive'</em>, <em>gamma=3</em>, <em>df=None</em>, <em>standardize=True</em>, <em>useintercept=True</em>, <em>prec=1e-07</em>, <em>max_ite=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>The PICASSO Solver For GLM.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> &#8211; An <cite>n*m</cite> design matrix where n is the sample size and d is the data dimension.</li>
+<li><strong>y</strong> &#8211; The <em>n</em> dimensional response vector. <cite>y</cite> is numeric vector for <cite>gaussian</cite> and <cite>sqrtlasso</cite>,
+or a two-level factor for <cite>binomial</cite>, or a non-negative integer vector representing counts
+for <cite>gaussian</cite>.</li>
+<li><strong>lambdas</strong> &#8211; A sequence of decreasing positive values to control the regularization. Typical usage
+is to leave the input <cite>lambda = None</cite> and have the program compute its own <cite>lambda</cite> sequence
+based on <cite>nlambda</cite> and <cite>lambda_min_ratio</cite>. Users can also specify a sequence to override this.
+Default value is from <cite>lambda_max</cite> to <cite>lambda_min_ratio*lambda_max</cite>. The default value of
+<cite>lambda_max</cite> is the minimum regularization parameter which yields an all-zero estimates.</li>
+<li><strong>nlambda</strong> &#8211; The number of values used in lambdas. Default value is 100. (useless when <cite>lambdas</cite> is specified)</li>
+<li><strong>lambda_min_ratio</strong> &#8211; The smallest value for lambdas, as a fraction of the upper-bound (<cite>MAX</cite>) of the
+regularization parameter. The program can automatically generate <cite>lambda</cite> as a sequence of
+<cite>length = nlambda</cite> starting from <cite>MAX</cite> to <cite>lambda_min_ratio</cite> * <cite>MAX</cite> in log scale. The
+default value is <cite>0.05</cite>. <strong>Caution</strong>: logistic and poisson regression can be ill-conditioned
+if lambda is too small for nonconvex penalty. We suggest the user to avoid using any
+<cite>lambda_min_raito</cite> smaller than 0.05 for logistic/poisson regression under nonconvex penalty.</li>
+<li><strong>lambda_min</strong> &#8211; The smallest value for <cite>lambda</cite>. If <cite>lambda_min_ratio</cite> is provided, then it is set to
+<cite>lambda.min.ratio*MAX</cite>, where <cite>MAX</cite> is the uppperbound of the regularization parameter. The default
+value is <cite>0.05*MAX</cite>.</li>
+<li><strong>family</strong> &#8211; Options for model. Sparse linear regression and sparse multivariate regression is applied if
+<cite>family = &#8220;gaussian&#8221;</cite>, sqrt lasso is applied if <cite>family = &#8220;sqrtlasso&#8221;</cite>, sparse logistic regression is
+applied if <cite>family = &#8220;binomial&#8221;</cite> and sparse poisson regression is applied if <cite>family = &#8220;poisson&#8221;</cite>.
+The default value is <cite>&#8220;gaussian&#8221;</cite>.</li>
+<li><strong>penalty</strong> &#8211; Options for regularization. Lasso is applied if <cite>method = &#8220;l1&#8221;</cite>, MCP is applied if `
+method = &#8220;mcp&#8221;` and SCAD Lasso is applied if <cite>method = &#8220;scad&#8221;</cite>. The default value is <cite>&#8220;l1&#8221;</cite>.</li>
+<li><strong>type_gaussian</strong> &#8211; Options for updating residuals in sparse linear regression. The naive update rule is
+applied if <cite>opt = &#8220;naive&#8221;</cite>, and the covariance update rule is applied if <cite>opt = &#8220;covariance&#8221;</cite>. The
+default value is <cite>&#8220;naive&#8221;</cite>.</li>
+<li><strong>gamma</strong> &#8211; The concavity parameter for MCP and SCAD. The default value is <cite>3</cite>.</li>
+<li><strong>df</strong> &#8211; Maximum degree of freedom for the covariance update. The default value is <cite>m</cite>.</li>
+<li><strong>standardize</strong> &#8211; Design matrix X will be standardized to have mean zero and unit standard deviation if
+<cite>standardize = TRUE</cite>. The default value is <cite>TRUE</cite>.</li>
+<li><strong>useintercept</strong> &#8211; Whether or not to include intercept term. Default value is True.</li>
+<li><strong>prec</strong> &#8211; Stopping precision. The default value is 1e-7.</li>
+<li><strong>max_ite</strong> &#8211; The iteration limit. The default value is 1000.</li>
+<li><strong>verbose</strong> &#8211; Tracing information is disabled if <cite>verbose = FALSE</cite>. The default value is <cite>FALSE</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pycasso.core.Solver.coef">
+<code class="descname">coef</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver.coef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract model coefficients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a dictionary of the model coefficients.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict{name : value}</td>
+</tr>
+</tbody>
+</table>
+<p>The detail of returned list:</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>beta</strong> - A matrix of regression estimates whose columns correspond to regularization parameters for                 sparse linear regression and sparse logistic regression. A list of matrices of regression estimation                 corresponding to regularization parameters for sparse column inverse operator.</li>
+<li><strong>intercept</strong> - The value of intercepts corresponding to regularization parameters for sparse linear                 regression, and sparse logistic regression.</li>
+<li><strong>ite_lamb</strong> - Number of iterations for each lambda.</li>
+<li><strong>size_act</strong> - An array of solution sparsity (model degree of freedom).</li>
+<li><strong>train_time</strong> - The training time.</li>
+<li><strong>state</strong> - The training state.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycasso.core.Solver.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize the solution path of regression estimate corresponding to regularization parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycasso.core.Solver.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>newdata=None</em>, <em>lambdidx=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predicting responses of the new data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>newdata</strong> &#8211; An optional data frame in which to look for variables with which to predict.
+If omitted, the training data of the model are used.</li>
+<li><strong>lambdidx</strong> &#8211; Use the model coefficient corresponding to the <cite>lambdidx</cite> th lambda.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The predicted response vectors based on the estimated models.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycasso.core.Solver.train">
+<code class="descname">train</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>The trigger function for training the model</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pycasso.libpath">
+<span id="pycasso-libpath"></span><h2>pycasso.libpath<a class="headerlink" href="#module-pycasso.libpath" title="Permalink to this headline">¶</a></h2>
+<p>Find the path to picasso dynamic library files.</p>
+<dl class="exception">
+<dt id="pycasso.libpath.PicassoLibraryNotFound">
+<em class="property">exception </em><code class="descclassname">pycasso.libpath.</code><code class="descname">PicassoLibraryNotFound</code><a class="headerlink" href="#pycasso.libpath.PicassoLibraryNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Error thrown by when picasso is not found</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycasso.libpath.find_lib_path">
+<code class="descclassname">pycasso.libpath.</code><code class="descname">find_lib_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.libpath.find_lib_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the path to picasso dynamic library files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of all found library path to picasso</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list(string)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="README.html" class="btn btn-neutral" title="Picasso Python Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Haoming Jiang, Jian Ge.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.6.dev2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

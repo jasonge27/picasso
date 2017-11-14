@@ -1,21 +1,10 @@
 #include <picasso/objective.hpp>
 
 namespace picasso {
-GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d)
-    : ObjFunction(xmat, y, n, d) {
-  a = 0.0;
-  g = 0.0;
-
-  p.resize(n);
-  w.resize(n);
-
-  r.resize(n);
-  wXX.resize(d);
-}
 
 GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d,
-                           bool include_intercept)
-    : ObjFunction(xmat, y, n, d) {
+                           bool include_intercept, bool usePypthon)
+    : ObjFunction(xmat, y, n, d, usePypthon) {
   a = 0.0;
   g = 0.0;
 
@@ -81,19 +70,8 @@ double GLMObjective::get_local_change(double old, int idx) {
 }
 
 LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
-                                     int d)
-    : GLMObjective(xmat, y, n, d) {
-  update_auxiliary();
-
-  for (int i = 0; i < d; i++) update_gradient(i);
-  model_param.intercept = 0.0;
-
-  deviance = fabs(eval());
-};
-
-LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
-                                     int d, bool include_intercept)
-    : GLMObjective(xmat, y, n, d, include_intercept) {
+                                     int d, bool include_intercept, bool usePypthon)
+    : GLMObjective(xmat, y, n, d, include_intercept, usePypthon) {
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 
@@ -124,19 +102,8 @@ double LogisticObjective::eval() {
 }
 
 PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
-                                   int d)
-    : GLMObjective(xmat, y, n, d) {
-  update_auxiliary();
-
-  for (int i = 0; i < d; i++) update_gradient(i);
-  model_param.intercept = 0.0;
-
-  deviance = fabs(eval());
-};
-
-PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
-                                   int d, bool include_intercept)
-    : GLMObjective(xmat, y, n, d, include_intercept) {
+                                   int d, bool include_intercept, bool usePypthon)
+    : GLMObjective(xmat, y, n, d, include_intercept, usePypthon) {
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 

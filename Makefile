@@ -61,7 +61,7 @@ ifeq ($(UNAME), Linux)
 endif
 
 # specify tensor path
-.PHONY: clean all lint clean_all doxygen rcpplint pypack Rpack Rbuild Rcheck pylint
+.PHONY: clean all lint clean_all doxygen rcpplint Pypack Pyinstall Rpack Rbuild Rcheck pylint
 
 
 all: lib/libpicasso.a $(PICASSO_DYLIB) picasso
@@ -98,14 +98,15 @@ lib/libpicasso.dll lib/libpicasso.so: $(ALL_DEP)
 picasso:  $(CLI_OBJ) $(ALL_DEP)
 	$(CXX) $(CFLAGS) -o $@  $(filter %.o %.a, $^)  $(LDFLAGS)
 
-rcpplint:
-	python2  picasso ${LINT_LANG} R-package/src
-
-lint: rcpplint
-	python2 picasso ${LINT_LANG} include src  python-package
-
-pylint:
-	flake8 --ignore E501 python-package
+# TODO: lint check
+# rcpplint:
+# 	python2  picasso ${LINT_LANG} R-package/src
+#
+# lint: rcpplint
+# 	python2 picasso ${LINT_LANG} include src  python-package
+#
+# pylint:
+# 	flake8 --ignore E501 python-package
 
 ifeq ($(TEST_COVER), 1)
 cover: check
@@ -124,18 +125,23 @@ doxygen:
 
 # create standalone python tar file.
 pypack: ${PICASSO_DYLIB}
-	cp ${PICASSO_DYLIB} python-package/picasso
-	cd python-package; tar cf picasso.tar picasso; cd ..
+	cp ${PICASSO_DYLIB} python-package/pycasso
+	cd python-package; tar cf pycasso.tar pycasso; tar rf pycasso.tar data; cd ..
 
-# create pip installation pack for PyPI
-pippack:
-	$(MAKE) clean_all
-	rm -rf picasso-python
-	cp -r python-package picasso-python
-	cp -r Makefile picasso-python/picasso/
-	cp -r make picasso-python/picasso/
-	cp -r src picasso-python/picasso/
-	cp -r include picasso-python/picasso/
+# install python-package
+Pyinstall: ${PICASSO_DYLIB}
+	cp ${PICASSO_DYLIB} python-package/pycasso/lib/
+	cd python-package; python setup.py install; cd ..
+
+# create pip installation pack for PyPI (TODO: not supported yet)
+# pippack:
+# 	$(MAKE) clean_all
+# 	rm -rf picasso-python
+# 	cp -r python-package picasso-python
+# 	cp -r Makefile picasso-python/picasso/
+# 	cp -r make picasso-python/picasso/
+# 	cp -r src picasso-python/picasso/
+# 	cp -r include picasso-python/picasso/
 
 # Script to make a clean installable R package.
 Rpack:

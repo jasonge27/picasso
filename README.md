@@ -5,6 +5,9 @@
 $make Rinstall
 ```
 
+## Python package
+Details can be found in [document](https://hmjianggatech.github.io/picasso/)
+
 ## Benchmarking the solver
 ```bash
 $cd tests
@@ -20,7 +23,7 @@ L1 penalized regression (LASSO) is great for feature selection. However when you
 > library(glmnet)
 > n <- 1000; p <- 1000; c <- 0.1
 > # n sample number, p dimension, c correlation parameter
-> X <- scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n) # n is smaple number, 
+> X <- scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n) # n is smaple number,
 > s <- 20  # sparsity level
 > true_beta <- c(runif(s), rep(0, p-s))
 > Y <- X%*%true_beta + rnorm(n)
@@ -32,9 +35,9 @@ L1 penalized regression (LASSO) is great for feature selection. However when you
 
 
 
-Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum. 
+Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum.
 
-The PICASSO package [3, 4]  solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below). 
+The PICASSO package [3, 4]  solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below).
 
 Let's see PICASSO in action — the estimation error drops to **6.06%** using SCAD penalty from **16.41%** error produced by LASSO.
 
@@ -78,7 +81,7 @@ test_lognet(n=2000, p=1000, c=1.0)
 
 As glmnet does not provide nonconvex penalty solver, we will compare with ncvreg for run-time and best estimation error along the regularization path.
 
-For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly increases. Nonconvex penalty can be very helpful when some columns of the data are highly correlated. 
+For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly increases. Nonconvex penalty can be very helpful when some columns of the data are highly correlated.
 
 ```R
 source('tests/test_picasso.R')
@@ -126,7 +129,7 @@ test_sqrt_mse(n=500, p =1600, c=0.5)
 | scalreg | 3.46 (0.27) s | 22.08 (0.89) s | 49.13 (1.32) s  |
 |  flare  | 5.50 (0.25) s | 28.90 (0.26)s  | 178.65 (3.32) s |
 
- The experiments are run in Microsoft R Open 3.3.2 on Mac OS 10.12.3 with 2.4GHz Intel Core i5 and 8GB RAM. R package flare is in version 1.5.0. R package scalreg is in version 1.0.  For each method and dataset, the experiment is repeated 10 times and we report the mean and standard deviations of the CPU time in the table. 
+ The experiments are run in Microsoft R Open 3.3.2 on Mac OS 10.12.3 with 2.4GHz Intel Core i5 and 8GB RAM. R package flare is in version 1.5.0. R package scalreg is in version 1.0.  For each method and dataset, the experiment is repeated 10 times and we report the mean and standard deviations of the CPU time in the table.
 
 References
 
