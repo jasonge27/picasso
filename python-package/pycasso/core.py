@@ -327,7 +327,7 @@ class Solver:
 
         :param newdata: An optional data frame in which to look for variables with which to predict.
                         If omitted, the training data of the model are used.
-        :param lambdidx: Use the model coefficient corresponding to the `lambdidx`th lambda.
+        :param lambdidx: Use the model coefficient corresponding to the `lambdidx` th lambda.
 
         :return: The predicted response vectors based on the estimated models.
         :rtype: np.array

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Picasso Python Package &mdash; pycasso 0.1dev documentation</title>
+  <title>Picasso Python Package &mdash; pycasso 0.0.6.dev2 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pycasso 0.1dev documentation" href="index.html"/>
+    <link rel="top" title="pycasso 0.0.6.dev2 documentation" href="index.html"/>
         <link rel="next" title="pycasso package" href="pycasso.html"/>
         <link rel="prev" title="Welcome to pycasso’s documentation!" href="index.html"/> 
 
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.1
+                0.0.6.dev2
               </div>
             
           
@@ -177,18 +177,25 @@ the lowest estimation error among all the lambdas computed is as high as <strong
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Install from source file (Github):</p>
-<ul class="simple">
-<li>Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></li>
-<li>Build the source file first via the <code class="docutils literal"><span class="pre">cmake</span></code> with <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> in the root directory.
-(You will see a lib file under <code class="docutils literal"><span class="pre">(root)/lib/</span></code> )</li>
-<li>Make sure you have
-<a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a></li>
-<li>Install with <code class="docutils literal"><span class="pre">cd</span> <span class="pre">python-package;</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> command from this directory.</li>
-<li><strong>Note</strong>: If you are installing in this way, make sure <cite>python-package/lib</cite> is deleted before installing.</li>
+<ul>
+<li><p class="first">Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></p>
+</li>
+<li><p class="first">Make sure you have <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a></p>
+<p>Using <strong>Makefile</strong></p>
+</li>
+<li><p class="first">Run <code class="docutils literal"><span class="pre">make</span> <span class="pre">Pyinstall</span></code> command.</p>
+<p>Using <strong>CMAKE</strong></p>
+</li>
+<li><p class="first">Build the source file first via the <code class="docutils literal"><span class="pre">cmake</span></code> with <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> in the root directory.
+(You will see a <code class="docutils literal"><span class="pre">.so</span></code> or <code class="docutils literal"><span class="pre">.lib</span></code> file under <code class="docutils literal"><span class="pre">(root)/lib/</span></code> )</p>
+</li>
+<li><p class="first">Run <code class="docutils literal"><span class="pre">cd</span> <span class="pre">python-package;</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> command.</p>
+</li>
 </ul>
 <p>Install from PyPI:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pycasso</span></code></li>
+<li><strong>Note</strong>: Owing to the setting on different OS, our binary distribution might not be working in your environment. Thus please build from source.</li>
 </ul>
 <p>You can test if the package has been successfully installed by:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pycasso</span>
@@ -198,14 +205,19 @@ the lowest estimation error among all the lambdas computed is as high as <strong
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pycasso</span>
-<span class="n">picasso</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycasso</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">]]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.1</span><span class="p">,</span><span class="mf">6.9</span><span class="p">,</span><span class="mf">11.3</span><span class="p">]</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Solver</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="n">s</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="for-developer">
 <h2>For Developer<a class="headerlink" href="#for-developer" title="Permalink to this headline">¶</a></h2>
 <p>Please follow the <a class="reference external" href="https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html">sphinx syntax style</a></p>
+<p>To update the document: <code class="docutils literal"><span class="pre">cd</span> <span class="pre">doc;</span> <span class="pre">make</span> <span class="pre">html</span></code></p>
 </div>
 <div class="section" id="copy-right">
 <h2>Copy Right<a class="headerlink" href="#copy-right" title="Permalink to this headline">¶</a></h2>
@@ -266,7 +278,7 @@ the lowest estimation error among all the lambdas computed is as high as <strong
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1dev',
+            VERSION:'0.0.6.dev2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

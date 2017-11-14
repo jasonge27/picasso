@@ -1,6 +1,14 @@
 pycasso package
 ===============
 
+pycasso
+---------------
+
+.. automodule:: pycasso
+    :members: test
+    :undoc-members:
+    :show-inheritance:
+
 pycasso\.core
 -------------
 
@@ -18,10 +26,3 @@ pycasso\.libpath
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: pycasso
-    :members: test
-    :undoc-members:
-    :show-inheritance:

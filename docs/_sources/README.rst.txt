@@ -17,16 +17,21 @@ Installation
 Install from source file (Github):
 
 - Clone ``picasso.git`` via ``git clone https://github.com/jasonge27/picasso.git``
+- Make sure you have `setuptools <https://pypi.python.org/pypi/setuptools>`__
+
+  Using **Makefile**
+- Run ``make Pyinstall`` command.
+
+  Using **CMAKE**
 - Build the source file first via the ``cmake`` with ``CMakeLists.txt`` in the root directory.
-  (You will see a lib file under ``(root)/lib/`` )
--  Make sure you have
-   `setuptools <https://pypi.python.org/pypi/setuptools>`__
--  Install with ``cd python-package; python setup.py install`` command from this directory.
--  **Note**: If you are installing in this way, make sure `python-package/lib` is deleted before installing.
+  (You will see a ``.so`` or ``.lib`` file under ``(root)/lib/`` )
+- Run ``cd python-package; python setup.py install`` command.
+
 
 Install from PyPI:
 
 - ``pip install pycasso``
+- **Note**: Owing to the setting on different OS, our binary distribution might not be working in your environment. Thus please build from source.
 
 You can test if the package has been successfully installed by:
 
@@ -42,15 +47,21 @@ Usage
 
 .. code-block:: python
 
-        import pycasso
-        picasso.test()
-
+        from pycasso import *
+        x = [[1,2,3,4,5,0],[3,4,1,7,0,1],[5,6,2,1,4,0]]
+        y = [3.1,6.9,11.3]
+        s = core.Solver(x,y)
+        s.train()
+        s.predict()
+        
 ..
 
 For Developer
 -------------
 Please follow the `sphinx syntax style
 <https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html>`__
+
+To update the document: ``cd doc; make html``
 
 Copy Right
 ----------
