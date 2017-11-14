@@ -2,27 +2,9 @@
 #include <picasso/objective.hpp>
 
 namespace picasso {
-
-GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(const double *xmat,
-                                                           const double *y,
-                                                           int n, int d)
-    : ObjFunction(xmat, y, n, d) {
-  XX.resize(d);
-  r.resize(n);
-
-  for (int j = 0; j < d; j++)
-    XX[j] = (X.col(j)*X.col(j)).sum()/n;
-  
-  r =  Y;
-  update_auxiliary();
-
-  // saturated fvalue = 0
-  deviance = fabs(eval());
-}
-
 GaussianNaiveUpdateObjective::GaussianNaiveUpdateObjective(
-    const double *xmat, const double *y, int n, int d, bool include_intercept)
-    : ObjFunction(xmat, y, n, d) {
+    const double *xmat, const double *y, int n, int d, bool include_intercept, bool usePypthon)
+    : ObjFunction(xmat, y, n, d, usePypthon) {
   XX.resize(d);
   r.resize(n);
 
@@ -56,7 +38,7 @@ void GaussianNaiveUpdateObjective::intercept_update() {
   model_param.intercept = sum_r / n;
 }
 void GaussianNaiveUpdateObjective::update_auxiliary() {
-  for (int idx = 0; idx < d; idx++) 
+  for (int idx = 0; idx < d; idx++)
     update_gradient(idx);
 }
 

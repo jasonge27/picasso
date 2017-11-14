@@ -2,26 +2,8 @@
 
 namespace picasso {
 SqrtMSEObjective::SqrtMSEObjective(const double *xmat, const double *y, int n,
-                                   int d)
-    : ObjFunction(xmat, y, n, d) {
-  a = 0.0;
-  g = 0.0;
-  L = 0.0;
-
-  r.resize(n);
-  r.setZero();
-
-  update_auxiliary();
-
-  for (int i = 0; i < d; i++) update_gradient(i);
-
-  // saturated fvalue = 0
-  deviance = fabs(eval());
-};
-
-SqrtMSEObjective::SqrtMSEObjective(const double *xmat, const double *y, int n,
-                                   int d, bool include_intercept)
-    : ObjFunction(xmat, y, n, d) {
+                                   int d, bool include_intercept, bool usePypthon)
+    : ObjFunction(xmat, y, n, d, usePypthon) {
   a = 0.0;
   g = 0.0;
   L = 0.0;
@@ -52,7 +34,7 @@ double SqrtMSEObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   sum_r2 = r.matrix().dot(r.matrix());
   L = sqrt(sum_r2 / n);
 
-  Eigen::ArrayXd wXX  = (1 - r*r/sum_r2) * X.col(idx) * X.col(idx); 
+  Eigen::ArrayXd wXX  = (1 - r*r/sum_r2) * X.col(idx) * X.col(idx);
   g = (wXX * model_param.beta[idx] + r * X.col(idx)).sum()/(n*L);
   a = wXX.sum()/(n*L);
 

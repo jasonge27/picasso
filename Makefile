@@ -130,7 +130,7 @@ pypack: ${PICASSO_DYLIB}
 
 # install python-package
 Pyinstall: ${PICASSO_DYLIB}
-	cp ${PICASSO_DYLIB} python-package/pycasso
+	cp ${PICASSO_DYLIB} python-package/pycasso/lib/
 	cd python-package; python setup.py install; cd ..
 
 # create pip installation pack for PyPI (TODO: not supported yet)

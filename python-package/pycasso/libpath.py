@@ -9,32 +9,14 @@ class PicassoLibraryNotFound(Exception):
     """Error thrown by when picasso is not found"""
     pass
 
-def find_lib_path(update = False):
+def find_lib_path():
     """Find the path to picasso dynamic library files.
 
     :return: List of all found library path to picasso
     :rtype: list(string)
     """
     curr_path = os.path.dirname(os.path.abspath(os.path.expanduser(__file__)))
-    # make pythonpack hack: copy this directory one level upper for setup.py
-    if update:
-        dll_path = [curr_path, os.path.join(curr_path, '../../lib/'),
-                    os.path.join(curr_path, './lib/'),
-                    os.path.join(sys.prefix, 'pycasso')]
-        if sys.platform == 'win32':
-            if platform.architecture()[0] == '64bit':
-                dll_path.append(os.path.join(curr_path, '../../windows/x64/Release/'))
-                # hack for pip installation when copy all parent source directory here
-                dll_path.append(os.path.join(curr_path, './windows/x64/Release/'))
-            else:
-                dll_path.append(os.path.join(curr_path, '../../windows/Release/'))
-                # hack for pip installation when copy all parent source directory here
-                dll_path.append(os.path.join(curr_path, './windows/Release/'))
-    else:
-        dll_path = [curr_path,
-                    os.path.join(curr_path, '../lib/'),
-                    os.path.join(curr_path, './lib/'),
-                    os.path.join(sys.prefix, 'pycasso')]
+    dll_path = [os.path.join(curr_path, './lib/')]
 
     if sys.platform == 'win32':
         dll_path = [os.path.join(p, 'picasso.dll') for p in dll_path]

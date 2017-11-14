@@ -64,6 +64,7 @@ class Solver:
     :param df: Maximum degree of freedom for the covariance update. The default value is `m`.
     :param standardize: Design matrix X will be standardized to have mean zero and unit standard deviation if
             `standardize = TRUE`. The default value is `TRUE`.
+    :param useintercept: Whether or not to include intercept term. Default value is True.
     :param prec: Stopping precision. The default value is 1e-7.
     :param max_ite: The iteration limit. The default value is 1000.
     :param verbose: Tracing information is disabled if `verbose = FALSE`. The default value is `FALSE`.
@@ -71,7 +72,7 @@ class Solver:
     def __init__(self, x, y, lambdas = None, nlambda = 100, lambda_min_ratio = None,
                  lambda_min = None, family = "gaussian", penalty = "l1",
                  type_gaussian = "naive", gamma = 3, df = None, standardize = True,
-                 prec = 1e-7, max_ite = 1000,  verbose = False):
+                 useintercept = True, prec = 1e-7, max_ite = 1000,  verbose = False):
 
         # Define the model
         if family not in ("gaussian", "binomial", "poisson", "sqrtlasso"):
@@ -80,6 +81,7 @@ class Solver:
         if penalty not in ("l1", "mcp", "scad"):
             raise RuntimeError(r' Wrong "penalty" input. "penalty" should be one of "l1", "mcp" and "scad".')
         self.penalty = penalty
+        self.use_intercept = useintercept;
 
         # Define the data
         self.x = np.array(x, dtype = 'double')
@@ -91,8 +93,8 @@ class Solver:
         self.standardize = standardize
         if standardize:
             self.x_mean = np.mean(self.x, axis = 0)
-            self.x_std = np.mean(self.x, axis = 0)
-            self.x = ss.zscore(self.x, axis = 0, ddof = 0)
+            self.x_std = np.std(self.x, axis = 0, ddof = 1)
+            self.x = ss.zscore(self.x, axis = 0, ddof = 1)
             if self.family == "gaussian":
                 self.y_mean = np.mean(self.y)
                 self.y -= self.y_mean
@@ -142,7 +144,7 @@ class Solver:
             if lambda_min_ratio > 1:
                 raise RuntimeError(r'"lambda_min" is too small.')
             self.nlambda = nlambda
-            self.lambdas = np.linspace(1,math.log(lambda_min_ratio),self.nlambda, dtype = 'double')
+            self.lambdas = np.linspace(math.log(1),math.log(lambda_min_ratio),self.nlambda, dtype = 'double')
             self.lambdas = lambda_max * np.exp(self.lambdas)
             self.lambdas = np.array(self.lambdas, dtype = 'double')
 
@@ -189,17 +191,19 @@ class Solver:
             int *ite_lamb,   // output: number of iterations for each lambda
             int *size_act,   // output: an array of solution sparsity (model df)
             double *runt     // output: runtime
+            // default settings
+            bool usePypthon
         """
         _function.argtypes = [CDoubleArray, CDoubleArray, ctypes.c_int, ctypes.c_int, CDoubleArray, ctypes.c_int,
                               ctypes.c_double, ctypes.c_int, ctypes.c_double, ctypes.c_int, ctypes.c_bool,
                               CDoubleArray, CDoubleArray, CIntArray,
-                              CIntArray, CDoubleArray]
+                              CIntArray, CDoubleArray, ctypes.c_bool]
         def wrapper():
             time_start = time.time()
             _function(self.y, self.x, self.num_sample, self.num_feature, self.lambdas, self.nlambda,
-                                  self.gamma, self.max_ite,  self.prec, self.penaltyflag, self.standardize,
+                                  self.gamma, self.max_ite,  self.prec, self.penaltyflag, self.use_intercept,
                                   self.result['beta'], self.result['intercept'], self.result['ite_lamb'],
-                                  self.result['size_act'], self.result['train_time'])
+                                  self.result['size_act'], self.result['train_time'], True)
             time_end = time.time()
             self.result['total_train_time'] = time_end - time_start
         return wrapper
@@ -324,22 +328,25 @@ class Solver:
         :param newdata: An optional data frame in which to look for variables with which to predict.
                         If omitted, the training data of the model are used.
         :param lambdidx: Use the model coefficient corresponding to the `lambdidx`th lambda.
+
         :return: The predicted response vectors based on the estimated models.
+        :rtype: np.array
         """
         if lambdidx is None:
             lambdidx = self.nlambda-1
 
         _beta = self.result['beta'][lambdidx,]
         _intercept = self.result['intercept'][lambdidx]
+        if self.standardize:
+            if self.family == 'gaussian':
+                _intercept += self.y_mean
         if newdata is None:
-            y_pred = np.matmul(_beta, self.x) + _intercept
+            y_pred = np.matmul(self.x, _beta) + _intercept
         else:
             if self.standardize:
-                if self.family == 'gaussian':
-                    _intercept += self.y_mean
                 _intercept -= np.matmul(_beta, self.x_mean/self.x_std)
                 _beta /= self.x_std
-            y_pred = np.matmul(_beta, newdata) + _intercept
+            y_pred = np.matmul(newdata, _beta) + _intercept
 
         return y_pred
 

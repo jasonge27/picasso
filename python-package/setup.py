@@ -15,18 +15,11 @@ CURRENT_DIR = os.path.dirname(__file__)
 libpath_py = os.path.join(CURRENT_DIR, 'pycasso/libpath.py')
 libpath = {'__file__': libpath_py}
 exec(compile(open(libpath_py, "rb").read(), libpath_py, 'exec'), libpath, libpath)
-LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path'](False)]
+LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path']()]
 if not LIB_PATH:
-    LIB_PATH = [os.path.relpath(libfile, CURRENT_DIR) for libfile in libpath['find_lib_path'](True)]
-    print("Install libpicasso from: %s" % LIB_PATH)
-    # copy LIB_PATH to '.\\lib'
-    for oldlibpath in LIB_PATH:
-        newlibpath = os.path.join('./pycasso/lib', os.path.dirname(oldlibpath))
-        print(newlibpath)
-        os.makedirs(newlibpath, exist_ok=True)
-        shutil.copy(oldlibpath, newlibpath)
+    raise RuntimeError("libpicasso does not exists")
 else:
-    print("libpicasso already exists: " % LIB_PATH)
+    print("libpicasso already exists: %s" % LIB_PATH)
 
 VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
 

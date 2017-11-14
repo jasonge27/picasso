@@ -70,3 +70,10 @@ endif()
 
 # Group sources
 auto_source_group("${SOURCES}")
+
+# copy lib file for python-package
+add_custom_target(cp_lib_to_pypkg ALL
+         "cp"
+        ${PROJECT_SOURCE_DIR}/lib/* ${PROJECT_SOURCE_DIR}/python-package/pycasso/lib
+        DEPENDS picasso
+        )
