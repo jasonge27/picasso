@@ -84,8 +84,8 @@ class Solver:
         self.use_intercept = useintercept;
 
         # Define the data
-        self.x = np.array(x, dtype = 'double')
-        self.y = np.array(y, dtype = 'double')
+        self.x = np.ascontiguousarray(x, dtype = 'double')
+        self.y = np.ascontiguousarray(y, dtype = 'double')
         self.num_sample = self.x.shape[0]
         self.num_feature = self.x.shape[1]
         if self.x.size == 0:
