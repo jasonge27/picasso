@@ -9,6 +9,10 @@ very noisy setting, especially when some columns in your data have strong coline
 tends to give biased estimator due to the penalty term. As demonstrated in the example below,
 the lowest estimation error among all the lambdas computed is as high as **16.41%**.
 
+Requirements
+------------
+- Python3
+- Linux or MacOS
 
 
 Installation
@@ -20,12 +24,12 @@ Install from source file (Github):
 - Make sure you have `setuptools <https://pypi.python.org/pypi/setuptools>`__
 
   Using **Makefile**
-- Run ``make Pyinstall`` command.
+- Run ``sudo make Pyinstall`` command.
 
   Using **CMAKE**
 - Build the source file first via the ``cmake`` with ``CMakeLists.txt`` in the root directory.
   (You will see a ``.so`` or ``.lib`` file under ``(root)/lib/`` )
-- Run ``cd python-package; python setup.py install`` command.
+- Run ``cd python-package; sudo python setup.py install`` command.
 
 
 Install from PyPI:
@@ -53,7 +57,7 @@ Usage
         s = core.Solver(x,y)
         s.train()
         s.predict()
-        
+
 ..
 
 For Developer

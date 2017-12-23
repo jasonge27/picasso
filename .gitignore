@@ -39,3 +39,6 @@ python-package/dist
 python-package/pycasso.tar
 python-package/*.egg-info/
 picasso_*.tar.gz
+
+#MacOS
+.DS_Store
