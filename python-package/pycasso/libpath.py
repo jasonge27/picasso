@@ -23,10 +23,11 @@ def find_lib_path():
     elif sys.platform.startswith('linux'):
         dll_path = [os.path.join(p, 'libpicasso.so') for p in dll_path]
     elif sys.platform == 'darwin':
-        dll_path = [os.path.join(p, 'libpicasso.so') for p in dll_path]
+        dll_path = [os.path.join(p, 'libpicasso.so') for p in dll_path] \
+                    +[os.path.join(p, 'libpicasso.dylib') for p in dll_path]
 
     lib_path = [p for p in dll_path if os.path.exists(p) and os.path.isfile(p)]
-
+    
     if not lib_path:
         print('Library file does not exist. Need to be updated!')
         return lib_path

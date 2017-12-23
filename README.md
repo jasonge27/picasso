@@ -6,7 +6,7 @@ $make Rinstall
 ```
 
 ## Python package
-Details can be found in [document](https://hmjianggatech.github.io/picasso/)
+Details can be found in [document](https://hmjianggatech.github.io/picasso/) or [github](https://github.com/jasonge27/picasso/tree/master/python-package)
 
 ## Benchmarking the solver
 ```bash

@@ -10,6 +10,22 @@ sys.path.insert(0, '.')
 
 CURRENT_DIR = os.path.dirname(__file__)
 
+#try to copy the complied lib files
+libdir_candidate = [os.path.join(CURRENT_DIR, '../lib/')]
+
+if sys.platform == 'win32':
+    libcand_path = [os.path.join(p, 'picasso.dll') for p in libdir_candidate]
+elif sys.platform.startswith('linux'):
+    libcand_path = [os.path.join(p, 'libpicasso.so') for p in libdir_candidate]
+elif sys.platform == 'darwin':
+    libcand_path = [os.path.join(p, 'libpicasso.so') for p in libdir_candidate]
+    libcand_path = libcand_path + [os.path.join(p, 'libpicasso.dylib') for p in libdir_candidate]
+
+lib_path = [p for p in libcand_path if os.path.exists(p) and os.path.isfile(p)]
+for lib_file in lib_path:
+    shutil.copy(lib_file,os.path.join(CURRENT_DIR, './pycasso/lib/'))
+
+
 # We can not import `picasso.libpath` in setup.py directly, since it will automatically import other package
 # and case conflict to `install_requires`
 libpath_py = os.path.join(CURRENT_DIR, 'pycasso/libpath.py')
