@@ -32,6 +32,7 @@ cmake-build-debug
 /build/
 
 #python build
+/picasso-python/
 python-package/build
 python-package/doc/build
 python-package/dist

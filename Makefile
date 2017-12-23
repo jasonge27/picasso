@@ -66,6 +66,7 @@ endif
 
 all: lib/libpicasso.a $(PICASSO_DYLIB) picasso
 
+dylib: $(PICASSO_DYLIB)
 
 SRC = $(wildcard src/*.cpp src/*/*.cpp)
 ALL_OBJ = $(patsubst src/%.cpp, build/%.o, $(SRC)) $(PLUGIN_OBJS)
@@ -130,18 +131,30 @@ pypack: ${PICASSO_DYLIB}
 
 # install python-package
 Pyinstall: ${PICASSO_DYLIB}
-	cp ${PICASSO_DYLIB} python-package/pycasso/lib/
+	mkdir python-package/pycasso/lib/
+	cp -rf ${PICASSO_DYLIB} python-package/pycasso/lib/
 	cd python-package; python setup.py install; cd ..
 
-# create pip installation pack for PyPI (TODO: not supported yet)
-# pippack:
-# 	$(MAKE) clean_all
-# 	rm -rf picasso-python
-# 	cp -r python-package picasso-python
-# 	cp -r Makefile picasso-python/picasso/
-# 	cp -r make picasso-python/picasso/
-# 	cp -r src picasso-python/picasso/
-# 	cp -r include picasso-python/picasso/
+# create pip installation pack for PyPI
+pippack:
+	$(MAKE) clean_all
+	rm -rf picasso-python
+	cp -rf python-package picasso-python
+	rm -rf picasso-python/doc
+	mkdir picasso-python/pycasso/src/
+	cp -rf amalgamation picasso-python/pycasso/src/
+	cp -rf Makefile picasso-python/pycasso/src/
+	cp -rf make picasso-python/pycasso/src/
+	cp -rf src picasso-python/pycasso/src/
+	cp -rf include picasso-python/pycasso/src/
+	cp picasso-python/setup-pip.py picasso-python/setup.py
+	rm picasso-python/setup-pip.py
+	cd picasso-python; python setup.py sdist; cd ..
+
+# run pippack first!
+pipupload:
+	cd picasso-python; python setup.py register upload; cd ..
+
 
 # Script to make a clean installable R package.
 Rpack:
