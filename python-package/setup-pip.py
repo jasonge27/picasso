@@ -12,9 +12,9 @@ CURRENT_DIR = os.path.dirname(__file__)
 
 # complie c code
 if os.name != 'nt':
-    os.system('cd pycasso/src/; make dylib; cd ../../;')
+    os.system('cd pycasso/src/; make clean; make dylib; cd ../../;')
 else:
-    raise RuntimeError('Windows users please install from source')    
+    raise RuntimeError('Windows users please install from source')
 
 
 #try to copy the complied lib files
@@ -48,7 +48,6 @@ VERSION_PATH = os.path.join(CURRENT_DIR, 'pycasso/VERSION')
 
 setup(name='pycasso',
       version=open(VERSION_PATH).read().strip(),
-      # version='0.4a23',
       description="Picasso Python Package",
       long_description=open(os.path.join(CURRENT_DIR, 'README.rst')).read(),
       install_requires=[

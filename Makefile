@@ -149,11 +149,10 @@ pippack:
 	cp -rf include picasso-python/pycasso/src/
 	cp picasso-python/setup-pip.py picasso-python/setup.py
 	rm picasso-python/setup-pip.py
-	cd picasso-python; python setup.py sdist; cd ..
 
 # run pippack first!
 pipupload:
-	cd picasso-python; python setup.py register upload; cd ..
+	cd picasso-python; python setup.py register sdist upload; cd ..
 
 
 # Script to make a clean installable R package.
