@@ -1,5 +1,5 @@
 # PICASSO
-PICASSO implements a unified framework of pathwise coordinate optimization for a variety of sparse learning problems (e.g., sparse linear regression, sparse logistic regression, sparse Poisson regression and scaled sparse linear regression) implemented with efficient active set selection strategies. 
+PICASSO implements a unified framework of pathwise coordinate optimization for a variety of sparse learning problems (e.g., sparse linear regression, sparse logistic regression, sparse Poisson regression and scaled sparse linear regression) combined with efficient active set selection strategies. 
 
 ## Installing R package
 The R package is hosted on CRAN. The easiest way to install R package is by running the following command in R
