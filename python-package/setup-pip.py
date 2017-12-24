@@ -10,8 +10,15 @@ sys.path.insert(0, '.')
 
 CURRENT_DIR = os.path.dirname(__file__)
 
+# complie c code
+if os.name != 'nt':
+    os.system('cd pycasso/src/; make clean; make dylib; cd ../../;')
+else:
+    raise RuntimeError('Windows users please install from source')
+
+
 #try to copy the complied lib files
-libdir_candidate = [os.path.join(CURRENT_DIR, '../lib/')]
+libdir_candidate = [os.path.join(CURRENT_DIR, './pycasso/src/lib/')]
 
 if sys.platform == 'win32':
     libcand_path = [os.path.join(p, 'picasso.dll') for p in libdir_candidate]

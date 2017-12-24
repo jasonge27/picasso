@@ -9,7 +9,9 @@ msvc_use_static_runtime()
 # Compiler flags
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+if(OpenMP_CXX_FOUND OR OPENMP_FOUND)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(BUILD_USE_64BITS on)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
@@ -70,10 +72,3 @@ endif()
 
 # Group sources
 auto_source_group("${SOURCES}")
-
-# copy lib file for python-package
-add_custom_target(cp_lib_to_pypkg ALL
-         "cp"
-        ${PROJECT_SOURCE_DIR}/lib/* ${PROJECT_SOURCE_DIR}/python-package/pycasso/lib
-        DEPENDS picasso
-        )

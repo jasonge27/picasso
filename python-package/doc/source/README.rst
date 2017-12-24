@@ -9,10 +9,19 @@ very noisy setting, especially when some columns in your data have strong coline
 tends to give biased estimator due to the penalty term. As demonstrated in the example below,
 the lowest estimation error among all the lambdas computed is as high as **16.41%**.
 
+Requirements
+------------
+
+- Linux or MacOS
+
+It may take lots of effort to build on Windows. One way to do it is using CMAKE and MSVC.
+Be careful of issues like the system bits.
 
 
 Installation
 ------------
+
+In the following process, you may need to be root (``sudo``).
 
 Install from source file (Github):
 
@@ -20,25 +29,25 @@ Install from source file (Github):
 - Make sure you have `setuptools <https://pypi.python.org/pypi/setuptools>`__
 
   Using **Makefile**
-- Run ``make Pyinstall`` command.
+- Run ``sudo make Pyinstall`` command.
 
   Using **CMAKE**
 - Build the source file first via the ``cmake`` with ``CMakeLists.txt`` in the root directory.
   (You will see a ``.so`` or ``.lib`` file under ``(root)/lib/`` )
-- Run ``cd python-package; python setup.py install`` command.
+- Run ``cd python-package; sudo python setup.py install`` command.
 
 
 Install from PyPI:
 
 - ``pip install pycasso``
-- **Note**: Owing to the setting on different OS, our binary distribution might not be working in your environment. Thus please build from source.
+- **Note**: Owing to the setting on different OS, our distribution might not be working in your environment (especially in **Windows**). Thus please build from source.
 
 You can test if the package has been successfully installed by:
 
 .. code-block:: python
 
         import pycasso
-        picasso.test()
+        pycasso.test()
 
 ..
 
@@ -53,7 +62,7 @@ Usage
         s = core.Solver(x,y)
         s.train()
         s.predict()
-        
+
 ..
 
 For Developer

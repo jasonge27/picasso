@@ -23,12 +23,13 @@ def find_lib_path():
     elif sys.platform.startswith('linux'):
         dll_path = [os.path.join(p, 'libpicasso.so') for p in dll_path]
     elif sys.platform == 'darwin':
-        dll_path = [os.path.join(p, 'libpicasso.dylib') for p in dll_path]
+        dll_path = [os.path.join(p, 'libpicasso.so') for p in dll_path] \
+                    +[os.path.join(p, 'libpicasso.dylib') for p in dll_path]
 
     lib_path = [p for p in dll_path if os.path.exists(p) and os.path.isfile(p)]
-
-    if not lib_path and not update:
-        print('Library file does not exist. There is no need to be updated!')
+    
+    if not lib_path:
+        print('Library file does not exist. Need to be updated!')
         return lib_path
     # From github issues, most of installation errors come from machines w/o compilers
     if not lib_path and not os.environ.get('PICASSO_BUILD_DOC', False):

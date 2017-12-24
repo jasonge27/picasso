@@ -32,10 +32,14 @@ cmake-build-debug
 /build/
 
 #python build
-!python-package/pycasso/lib/*
+/picasso-python/
 python-package/build
 python-package/doc/build
 python-package/dist
 python-package/pycasso.tar
 python-package/*.egg-info/
 picasso_*.tar.gz
+
+#MacOS
+.DS_Store
+*/.DS_Store

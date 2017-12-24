@@ -94,6 +94,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Picasso Python Package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#unleash-the-power-of-nonconvex-penalty">Unleash the power of nonconvex penalty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#for-developer">For Developer</a></li>
@@ -174,8 +175,17 @@ very noisy setting, especially when some columns in your data have strong coline
 tends to give biased estimator due to the penalty term. As demonstrated in the example below,
 the lowest estimation error among all the lambdas computed is as high as <strong>16.41%</strong>.</p>
 </div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Linux or MacOS</li>
+</ul>
+<p>It may take lots of effort to build on Windows. One way to do it is using CMAKE and MSVC.
+Be careful of issues like the system bits.</p>
+</div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>In the following process, you may need to be root (<code class="docutils literal"><span class="pre">sudo</span></code>).</p>
 <p>Install from source file (Github):</p>
 <ul>
 <li><p class="first">Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></p>
@@ -183,23 +193,23 @@ the lowest estimation error among all the lambdas computed is as high as <strong
 <li><p class="first">Make sure you have <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a></p>
 <p>Using <strong>Makefile</strong></p>
 </li>
-<li><p class="first">Run <code class="docutils literal"><span class="pre">make</span> <span class="pre">Pyinstall</span></code> command.</p>
+<li><p class="first">Run <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">Pyinstall</span></code> command.</p>
 <p>Using <strong>CMAKE</strong></p>
 </li>
 <li><p class="first">Build the source file first via the <code class="docutils literal"><span class="pre">cmake</span></code> with <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> in the root directory.
 (You will see a <code class="docutils literal"><span class="pre">.so</span></code> or <code class="docutils literal"><span class="pre">.lib</span></code> file under <code class="docutils literal"><span class="pre">(root)/lib/</span></code> )</p>
 </li>
-<li><p class="first">Run <code class="docutils literal"><span class="pre">cd</span> <span class="pre">python-package;</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> command.</p>
+<li><p class="first">Run <code class="docutils literal"><span class="pre">cd</span> <span class="pre">python-package;</span> <span class="pre">sudo</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> command.</p>
 </li>
 </ul>
 <p>Install from PyPI:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pycasso</span></code></li>
-<li><strong>Note</strong>: Owing to the setting on different OS, our binary distribution might not be working in your environment. Thus please build from source.</li>
+<li><strong>Note</strong>: Owing to the setting on different OS, our distribution might not be working in your environment (especially in <strong>Windows</strong>). Thus please build from source.</li>
 </ul>
 <p>You can test if the package has been successfully installed by:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pycasso</span>
-<span class="n">picasso</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+<span class="n">pycasso</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -288,7 +298,7 @@ the lowest estimation error among all the lambdas computed is as high as <strong
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
