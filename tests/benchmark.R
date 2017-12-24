@@ -1,11 +1,17 @@
-set.seed(1024)
+if (!require('glmnet')) install.packages('glmnet')
+if (!require('picasso')) install.packages('picasso')
+if (!require('ncvreg')) install.packages('ncvreg')
+if (!require('scalreg')) install.packages('scalreg')
+if (!require('flare')) install.packages('flare')
+
 library(glmnet)
 library(picasso)
 library(ncvreg)
+library(scalreg)
+library(flare)
 
 source("test_picasso.R")
 
-if (TRUE){
 cat("\n-----------------------------------------------------------\n")
 cat("\n-----------------------------------------------------------\n")
 cat("-------Testing Linear Regression with L1 Penalty------\n")
@@ -22,9 +28,7 @@ test_elnet(n=500, p=5000, c=0.75)
 cat("-----------------------\n")
 cat("---------n=1000, p=10000, c=0.75---------\n")
 test_elnet(n=1000, p=10000, c=0.75)
-}
 
-if (TRUE){
 cat("\n-----------------------------------------------------------\n")
 cat("\n-----------------------------------------------------------\n")
 cat("-------Testing Linear Regression with SCAD/MCP Penalty------\n")
@@ -40,11 +44,9 @@ test_elnet_nonlinear(n=500, p=5000, c=0.75, penalty='scad')
 cat("-----------------------\n")
 cat("---------n=1000, p=10000, c=0.75---------\n")
 test_elnet_nonlinear(n=1000, p=10000, c=0.75, penalty='scad')
-}
 
 
 
-if (TRUE){
 cat("\n-----------------------------------------------------------\n")
 cat("\n-----------------------------------------------------------\n")
 cat("-------Testing Logistic Regression with L1 Penalty------\n")
@@ -62,9 +64,7 @@ test_lognet(n=500, p=2000, c=0.75)
 cat("-----------------------\n")
 cat("---------n=1000, p=5000, c=0.75---------\n")
 test_lognet(n=1000, p=5000, c=0.75)
-}
 
-if (TRUE){
 
 cat("\n-----------------------------------------------------------\n")
 cat("\n-----------------------------------------------------------\n")
@@ -81,10 +81,8 @@ test_lognet_nonlinear(n=500, p =200, c=0.75, penalty='scad')
 cat("-----------------------\n")
 cat("---------n=1000, p=5000, c=0.75---------\n")
 test_lognet_nonlinear(n=1000, p =500, c=0.75, penalty='scad')
-}
 
 
-if(TRUE){
 cat("\n-----------------------------------------------------------\n")
 cat("-------Testing Square Root Lasso------\n")
 cat("-----------------------\n")
@@ -99,4 +97,3 @@ cat("---------n=200, p=1000, c=0.75---------\n")
 test_sqrt_mse(n=200, p =1000, c=0.75)
 cat("---------n=500, p=2000, c=0.75---------\n")
 test_sqrt_mse(n=500, p =2000, c=0.75)
-}

@@ -45,8 +45,6 @@ esterror <- function(b0, beta){
 
 
 test_sqrt_mse <- function(n = 500, p = 800, c = 0.5, nlambda = 20){
-  library(flare)
-  library(scalreg)
   set.seed(1024)
   df <- generate_sim(n, p, c)
 
@@ -106,10 +104,7 @@ test_sqrt_mse <- function(n = 500, p = 800, c = 0.5, nlambda = 20){
 }
 
 test_elnet<- function(n = 10000, p = 5000, c = 0.5, nlambda = 20){
-  library(picasso)
-  library(glmnet)
-  library(ncvreg)
-  
+
   df <- generate_sim(n, p, c)
 
   ratio = 0.1
@@ -168,9 +163,6 @@ test_elnet<- function(n = 10000, p = 5000, c = 0.5, nlambda = 20){
 
 
 test_elnet_nonlinear <- function(n = 10000, p = 5000, c = 0.5, nlambda = 20, penalty='scad'){
-  library(picasso)
-  library(ncvreg)
-  
   df <- generate_sim(n, p, c)
   
   ratio = 0.1
@@ -221,10 +213,6 @@ test_elnet_nonlinear <- function(n = 10000, p = 5000, c = 0.5, nlambda = 20, pen
 
 
 test_lognet <- function(n = 10000, p = 5000, c = 1.0, nlambda = 20, ratio=0.1){
-  library(glmnet)
-  library(picasso)
-  library(ncvreg)
-  
   df <- generate_sim_lognet(n, p, c)
   
   ratio = 0.1
@@ -321,10 +309,7 @@ calc.penalty <- function(lambda, gamma, beta, penalty){
 }
 
 test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 20, penalty){
-  library(picasso)
-  library(ncvreg)
-  library(cvplogistic)
-  
+
   df <- generate_sim_lognet(n, p, c)
   
   ratio = 0.1
@@ -376,13 +361,14 @@ test_lognet_nonlinear <- function(n = 10000, p = 5000, c = 1.0, nlambda = 20, pe
     )
 
  
-    t <- system.time(fitcvp <- cvplogistic(df$Y, df$X, penalty=tolower(penalty), epsilon=1e-2, 
-            nlambda=nlambda, lambda.min=fitp$lambda[nlambda]))
-    time.cvp[i] <- t[1]  
+    #cvplogistic is too slow and we are not comparing with it here
+    #t <- system.time(fitcvp <- cvplogistic(df$Y, df$X, penalty=tolower(penalty), epsilon=1e-2, 
+    #        nlambda=nlambda, lambda.min=fitp$lambda[nlambda]))
+    #time.cvp[i] <- t[1]  
 
-    rp <- df$X%*%fitcvp[[1]][2:(p+1),idx]+fitcvp[[1]][1, idx]
-    obj.cvp[i] <- sum(log(1+exp(rp))-df$Y*rp)/n +
-                      calc.penalty(fitcvp[[2]][idx], gamma=3, fitcvp[[1]][2:(p+1),idx], penalty)
+    #rp <- df$X%*%fitcvp[[1]][2:(p+1),idx]+fitcvp[[1]][1, idx]
+    #obj.cvp[i] <- sum(log(1+exp(rp))-df$Y*rp)/n +
+    #                 calc.penalty(fitcvp[[2]][idx], gamma=3, fitcvp[[1]][2:(p+1),idx], penalty)
     
   }
   
