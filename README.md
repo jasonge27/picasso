@@ -1,8 +1,8 @@
 # PICASSO
 ## Installing R package
-
-```bash
-$make Rinstall
+The R package is hosted on CRAN. The easiest way to install R package is by running the following command in R
+```R
+>install.packages("picasso")
 ```
 
 ## Python package
