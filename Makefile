@@ -131,6 +131,7 @@ pypack: ${PICASSO_DYLIB}
 
 # install python-package
 Pyinstall: ${PICASSO_DYLIB}
+	rm -rf python-package/pycasso/lib/
 	mkdir python-package/pycasso/lib/
 	cp -rf ${PICASSO_DYLIB} python-package/pycasso/lib/
 	cd python-package; python setup.py install; cd ..
@@ -149,6 +150,8 @@ pippack:
 	cp -rf include picasso-python/pycasso/src/
 	cp picasso-python/setup-pip.py picasso-python/setup.py
 	rm picasso-python/setup-pip.py
+	rm -rf picasso-python/pycasso/lib/
+	mkdir picasso-python/pycasso/lib/
 
 # run pippack first!
 pipupload:

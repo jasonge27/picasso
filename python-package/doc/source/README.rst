@@ -75,5 +75,5 @@ To update the document: ``cd doc; make html``
 Copy Right
 ----------
 
-:Author: Jason(Jian) Ge, Haoming Jiang
+:Author: Jason Ge, Haoming Jiang
 :Maintainer: Haoming Jiang <jianghm@gatech.edu>
