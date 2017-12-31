@@ -194,15 +194,9 @@ Install from PyPI:
 - ``pip install pycasso``
 - **Note**: Owing to the setting on different OS, our distribution might not be working in your environment (especially in **Windows**). Thus please build from source.
 
-You can test if the package has been successfully installed by:
+You can test if the package has been successfully installed by ``python -c "import pycasso; pycasso.test() ``
 
-```python
-
-        import pycasso
-        pycasso.test()
-```
-
-Details can also be found in [document](https://hmjianggatech.github.io/picasso/) or [github](https://github.com/jasonge27/picasso/tree/master/python-package)
+Details for installing python package can also be found in [document](https://hmjianggatech.github.io/picasso/) or [github](https://github.com/jasonge27/picasso/tree/master/python-package)
 
 ## Tutorials
 Check the R tutorial in tutorials/tutorial.R and Python tutorial in tutorials/tutorial.py. Let us know if anything is hard to use or if you want any other features. 
