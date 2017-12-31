@@ -47,7 +47,7 @@ The pathwise coordinate optimization is undoubtedly one the of the most popular 
 We recently developed a new library named PICASSO, which implements a unified toolkit of pathwise coordinate optimization for solving a large class of convex and nonconvex regularized sparse learning problems. Efficient active set selection strategies are provided to guarantee superior statistical and computational preference.
 
 
-The pathwise coordinate optimization framework with 3 nested loops : (1) Warm start initialization; (2) Active set selection, and strong rule for coordinate preselection; (3) Active coordinate minimization. Please refer to tutorials/PICASSO.pdf((https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/PICASSO.pdf) for details of the algorithm design.
+The pathwise coordinate optimization framework with 3 nested loops : (1) Warm start initialization; (2) Active set selection, and strong rule for coordinate preselection; (3) Active coordinate minimization. Please refer to [tutorials/PICASSO.pdf](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/PICASSO.pdf) for details of the algorithm design.
 
 ![The pathwise coordinate optimization framework](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/picasso_flow.png)
 
