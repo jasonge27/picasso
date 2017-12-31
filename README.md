@@ -196,12 +196,11 @@ Install from PyPI:
 
 You can test if the package has been successfully installed by:
 
-.. code-block:: python
+```python
 
         import pycasso
         pycasso.test()
-
-..
+```
 
 Details can also be found in [document](https://hmjianggatech.github.io/picasso/) or [github](https://github.com/jasonge27/picasso/tree/master/python-package)
 
