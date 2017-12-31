@@ -9,16 +9,16 @@ CalibrAted Sparse Shooting algOrithm) implements a unified framework of pathwise
 - [Directory structure](#directory-structure)
 - [Introduction](#introduction)
 - [Background](#background)
-- [Solvers](#solvers)
-  - [GLM Linear Regression](#glmlinear)
-  - [GLM Logistic Regression](#glmlogistic)
-  - [GLM Poisson Regression](#glmpoisson)
+- [Objetives](#objectives)
+  - [Linear Regression](#glmlinear)
+  - [Logistic Regression](#glmlogistic)
+  - [Poisson Regression](#glmpoisson)
   - [Scaled Linear Regression](#glmscaled)
 - [Penalties](#penalties)
   - [L1 penalty](#l1)
   - [SCAD penalty](#scad)
   - [MCP penalty](#mcp)
-- [Power of Nonconvex Penalties](#ncvpenalty)
+- [Power of Nonconvex Penalties](#power-of-nonconvex-penalties)
 - [Performance](#performance)
 - [Installation](#installation)
 - [Tutorials](#tutorials)
@@ -53,7 +53,7 @@ The pathwise coordinate optimization framework with 3 nested loops : (1) Warm st
 
 ## Background
 
-## Solvers
+## Objectives 
 
 ## Penalties
 
