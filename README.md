@@ -9,15 +9,7 @@ CalibrAted Sparse Shooting algOrithm) implements a unified framework of pathwise
 - [Directory structure](#directory-structure)
 - [Introduction](#introduction)
 - [Background](#background)
-- [Objetives](#objectives)
-  - [Linear Regression](#glmlinear)
-  - [Logistic Regression](#glmlogistic)
-  - [Poisson Regression](#glmpoisson)
-  - [Scaled Linear Regression](#glmscaled)
-- [Penalties](#penalties)
-  - [L1 penalty](#l1)
-  - [SCAD penalty](#scad)
-  - [MCP penalty](#mcp)
+- [Objetives and Penalties](#objectives-and-penalties)
 - [Power of Nonconvex Penalties](#power-of-nonconvex-penalties)
 - [Performance](#performance)
 - [Installation](#installation)
@@ -52,16 +44,14 @@ The pathwise coordinate optimization framework with 3 nested loops : (1) Warm st
 ![The pathwise coordinate optimization framework](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/picasso_flow.png)
 
 ## Background
+There exists several R pakcages (such as ncvreg and glmnet) which implement state-of-the-art heuristic optimization algorithms for sparse learning. However they either lack support for nonconvex penalties or becomes very unstable when there are multi-colinear features. PICASSO combines pathwise coordinate optimization and multi-stage convex relaxation for nonconvex optimization and finds a 'good' local minimal which has provable statistical property.
 
-## Objectives 
-
-## Penalties
-
-
+## Objectives and Penalties 
+PICASSO supports four types of objective functions: linear regression, logistic regression, poission regression and scaled linear regression. Three types of penalties are supported: L1, MCP (minimax concave penalty) and SCAD (smoothly clipped absolute deviation) penalty.
 
 ## Power of Nonconvex Penalties 
 
-L1 penalized regression (LASSO) is great for feature selection. However when you use LASSO in very noisy setting, especially when some columns in your data have strong colinearity, LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **16.41%**.
+L1 penalized regression (LASSO) is a useful tool for feature selection. However when you use LASSO in very noisy setting, especially when some columns in your data have strong colinearity, LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **16.41%**.
 
 ```R
 > set.seed(2016)
@@ -82,7 +72,7 @@ L1 penalized regression (LASSO) is great for feature selection. However when you
 
 Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum.
 
-The PICASSO package [3, 4]  solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below).
+The PICASSO package [3, 4] solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistcal property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below).
 
 Let's see PICASSO in action — the estimation error drops to **6.06%** using SCAD penalty from **16.41%** error produced by LASSO.
 
@@ -92,7 +82,6 @@ Let's see PICASSO in action — the estimation error drops to **6.06%** using SC
 > min(apply(abs(fitp$beta-true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
 [1] 0.06064173
 ```
-
 
 
 
