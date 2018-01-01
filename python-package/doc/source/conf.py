@@ -55,8 +55,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pycasso'
-copyright = '2017, Haoming Jiang, Jian Ge'
-author = 'Haoming Jiang, Jian Ge'
+copyright = '2017, Haoming Jiang, Jason Ge'
+author = 'Haoming Jiang, Jason Ge'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -161,6 +161,3 @@ texinfo_documents = [
      author, 'pycasso', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-

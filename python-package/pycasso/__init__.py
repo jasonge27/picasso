@@ -18,3 +18,5 @@ def test():
     print(r"Version: "+open(os.path.join(current_file, r'./VERSION')).read().strip())
 
 __all__ = ["core"]
+
+from .core import Solver
