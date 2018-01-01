@@ -47,7 +47,7 @@ There exists several R pakcages (such as ncvreg and glmnet) which implement stat
 
 ## Power of Nonconvex Penalties 
 
-L1 penalized regression (LASSO) is a useful tool for feature selection. However when you use LASSO in very noisy setting, especially when some columns in your data have strong colinearity, LASSO tends to give biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **16.41%**.
+L1 penalized regression (LASSO) is a useful tool for feature selection but it tends to give very biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **16.41%**.
 
 ```R
 > set.seed(2016)
@@ -63,8 +63,6 @@ L1 penalized regression (LASSO) is a useful tool for feature selection. However 
 > min(apply(abs(fitg$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
 [1] 0.1641195
 ```
-
-
 
 Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum.
 
@@ -138,6 +136,8 @@ Check the R tutorial in tutorials/tutorial.R and Python tutorial in tutorials/tu
 
 [2] Cun-Hui Zhang, Nearly Unbiased Variable Selection Under Minimax Concave Penalty, 2010
 
-[3] Jason Ge, Mingyi Hong, Mengdi Wang, Han Liu, and Tuo Zhao, Homotopy Active Set Proximal Newton Algorithm for Sparse Learning, 2016
+[3] Xingguo Li, Jason Ge, Haoming Jiang, Mingyi Hong, Mengdi Wang, and Tuo Zhao, Boosting Pathwise Coordinate Optimization in High Dimensions: Sequential Screening and Proximal Sub-sampled Newton Algorithm, 2016
 
 [4] Tuo Zhao, Han Liu, and Tong Zhang, Pathwise Coordinate Optimization for Nonconvex Sparse Learning: Algorithm and Theory, 2014
+
+[5] Xingguo Li,Lin F. Yang, Jason Ge, Jarvis Haupt, Tong Zhang and Tuo Zhao, On Quadratic Convergence of DC Proximal Newton Algorithm in Nonconvex Sparse Learning, 2017
