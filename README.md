@@ -90,82 +90,14 @@ Let's see PICASSO in action — the estimation error drops to **6.06%** using SC
 $cd tests
 $Rscript benchmark.R
 ```
-As a traditional LASSO solver, our package achieves state-of-the-art performance. For SCAD regularzied linear/logistic regression, it can be shown that our package is much faster and more stable than the alternative ncvreg. (The experiments can also be done with MCP penalty.)  More experiments can be found in vignettes/PICASSO.pdf
+ - Sparse linear regression. picasso achieves similar timing and optimization performance to glmnet and ncvreg.
+ - Sparse logistic regression. When using the l1 regularizer, picasso, glmnet and ncvreg achieves similar optimization performance. When using the nonconvex regularizers, picasso achieves significantly better optimization performance than ncvreg, especially in ill-conditioned cases.
+ - Scaled sparse linear regression. Picasso significantly outperforms scalreg and flare in timing performance. In Table 5.3 in [tutorials/PICASSO.pdf](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/PICASSO.pdf), picasso is 20 − 100 times faster and achieves smaller objective function values.
 
-For the experiments, sample number is denoted by n and sample dimension is denoted by p. The parameter c is used to control the column-wise correlation of the desgin matrix X as before.
+Details of our benmarking process is documented in [tutorials/PICASSO.pdf](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/PICASSO.pdf).
 
-### State-of-the-art LASSO Solver
+![Performance](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/performance.jpeg)
 
-We're as fast as glmnet for L1 regularized linear/logistic regression. Here we benchmark logistic regression as an example. Parameter c is used to add correlation between columns of X to mimic multi-colinearity. PICASSO is the best solver when we have multi-colinearity in the data.
-
-```R
-source("tests/test_picasso.R")
-test_lognet(n=2000, p=1000, c=0.1)
-test_lognet(n=2000, p=1000, c=0.5)
-test_lognet(n=2000, p=1000, c=1.0)
-```
-
-|         |     c=0.1     |    c=0.5     |    c= 1.0    |
-| :-----: | :-----------: | :----------: | :----------: |
-| PICASSO |   1.526(s)    |   0.721(s)   |   0.718(s)   |
-| glmnet  |   1.494(s)    |   0.845(s)   |   1.743(s)   |
-| ncvreg  | 10.564(s) [*] | 7.825(s) [#] | 5.458(s) [#] |
-
-'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
-
-'[#]': Package exited with error messages.
-
-### Nonconvex Penalty
-
-As glmnet does not provide nonconvex penalty solver, we will compare with ncvreg for run-time and best estimation error along the regularization path.
-
-For well-conditioned cases when there's no multi-colinearity, LASSO tends to have lower estimation error. However, as c becomes larger, LASSO's estimation error quickly increases. Nonconvex penalty can be very helpful when some columns of the data are highly correlated.
-
-```R
-source('tests/test_picasso.R')
-test_lognet_nonlinear(n=3000, p =3000, c=0.1)
-test_lognet_nonlinear(n=3000, p =3000, c=0.5)
-test_lognet_nonlinear(n=3000, p =3000, c=1.0)
-```
-
-Timing for SCAD regularized logistic regression. Estimation error is calculated by finding the best approximation to the true regression coefficient across all regularization parameter.
-
-```R
-min(apply(abs(fitted.model$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
-```
-
-
-
-|                                        |     c = 0.1     |    c = 0.5     |       c = 1.0        |
-| :------------------------------------: | :-------------: | :------------: | :------------------: |
-|          PICASSO (time/error)          | 10.98(s) / 5.0% | 5.16(s) / 1.5% |    7.17(s) / 8.6%    |
-|          ncvreg (time/error)           | 8.05(s) / 5.6%  | 7.08(s) / 6.0% | 56.16(s) / 35.3% [*] |
-| Estimation Error using LASSO in glmnet |      1.3%       |     14.0%      |        36.6%         |
-
-'[*]': Package exited with warning: Algorithm failed to converge for some values of lambda.
-
-The experiments are conducted on a MacBook Pro with 2.4GHz Intel Core i5 and 8GB RAM. R version is 3.3.0. The ncvreg version is 3.6-0. The glmnet version is 2.0-5.
-
-
-
-### Square Root Lasso Solver
-
-We also implemented sqaure root loss function with L1/SCAD/MCP penalty using the same active set based second order algorithms. With fixed sample size, we change the sample dimension and report the CPU time for pathwise square root Lasso. For fair comparisons, all three solvers follows the same solution path and their precisions are adjusted to achieve the same level of accuracy.
-
-```R
-source('tests/test_picasso.R')
-test_sqrt_mse(n=500, p =400, c=0.5)
-test_sqrt_mse(n=500, p =800, c=0.5)
-test_sqrt_mse(n=500, p =1600, c=0.5)
-```
-
-|         |     d=400     |     d=800      |     d=1600      |
-| :-----: | :-----------: | :------------: | :-------------: |
-| PICASSO | 0.51 (0.02) s | 1.41 (0.08) s  |  2.32 (0.10) s  |
-| scalreg | 3.46 (0.27) s | 22.08 (0.89) s | 49.13 (1.32) s  |
-|  flare  | 5.50 (0.25) s | 28.90 (0.26)s  | 178.65 (3.32) s |
-
- The experiments are run in Microsoft R Open 3.3.2 on Mac OS 10.12.3 with 2.4GHz Intel Core i5 and 8GB RAM. R package flare is in version 1.5.0. R package scalreg is in version 1.0.  For each method and dataset, the experiment is repeated 10 times and we report the mean and standard deviations of the CPU time in the table.
 
 ## Installation
 ### Installing R package
