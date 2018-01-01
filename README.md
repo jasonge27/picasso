@@ -10,7 +10,7 @@ CalibrAted Sparse Shooting algOrithm) implements a unified framework of pathwise
 - [Introduction](#introduction)
 - [Background](#background)
 - [Objetives and Penalties](#objectives-and-penalties)
-- [Power of Nonconvex Penalties](#power-of-nonconvex-penalties)
+- [The Power of Nonconvex Penalties](#power-of-nonconvex-penalties)
 - [Performance](#performance)
 - [Installation](#installation)
 - [Tutorials](#tutorials)
@@ -101,30 +101,26 @@ Details of our benmarking process are documented in [tutorials/PICASSO.pdf](http
 
 ## Installation
 ### Installing R package
-The R package is hosted on CRAN. The easiest way to install R package is by running the following command in R
+There are two ways to install the picasso R package.
+- Installing from CRAN (recommended). The R package is hosted on CRAN. The easiest way to install R package is by running the following command in R
 ```R
 install.packages("picasso")
 ```
 
+- Installing from source code. 
+```bash
+$ git clone https://github.com/jasonge27/picasso.git
+$ cd picasso; make Rinstall
+```
+
 ### Installing Python package
-Install from source file (Github):
-
-- Clone ``picasso.git`` via ``git clone https://github.com/jasonge27/picasso.git``
-- Make sure you have `setuptools <https://pypi.python.org/pypi/setuptools>`__
-
-  Using **Makefile**
-- Run ``sudo make Pyinstall`` command.
-
-  Using **CMAKE**
-- Build the source file first via the ``cmake`` with ``CMakeLists.txt`` in the root directory.
-  (You will see a ``.so`` or ``.lib`` file under ``(root)/lib/`` )
-- Run ``cd python-package; sudo python setup.py install`` command.
-
-
-Install from PyPI:
-
-- ``pip install pycasso``
-- **Note**: Owing to the setting on different OS, our distribution might not be working in your environment (especially in **Windows**). Thus please build from source.
+There are two ways to install the picasso python package.
+- Installing from PyPi (recommended). ``pip install pycasso --user``. 
+- Installing from source code. 
+ ```bash
+ $git clone https://github.com/jasonge27/picasso.git
+ $cd picasso; make Pyinstall
+ ```
 
 You can test if the package has been successfully installed by ``python -c "import pycasso; pycasso.test() ``
 
