@@ -88,7 +88,7 @@ $Rscript benchmark.R
 $python benchmark.py
 ```
 
-## R package
+### R package
  - Sparse linear regression. picasso achieves similar timing and optimization performance to glmnet and ncvreg.
  - Sparse logistic regression. When using the l1 regularizer, picasso, glmnet and ncvreg achieves similar optimization performance. When using the nonconvex regularizers, picasso achieves significantly better optimization performance than ncvreg, especially in ill-conditioned cases.
  - Scaled sparse linear regression. Picasso significantly outperforms scalreg and flare in timing performance. In Table 5.3 in [tutorials/PICASSO.pdf](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/PICASSO.pdf), picasso is 20 − 100 times faster and achieves smaller objective function values.
@@ -97,7 +97,7 @@ Details of our benmarking process are documented in [tutorials/PICASSO.pdf](http
 
 ![Performance_R](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/performance_R.jpeg)
 
-## Python package
+### Python package
 We compared with sklearn (version 0.19.1) for L1 regularized linear and logistic regression. For linear regression, we compare against  ``sklearn.linear_model.lasso_path`` and for logistic regression, we compare against ``sklearn.linear_model.LogisticRegression`` (with liblinear backend). Details of the experiments can be found in the script [profiling/benchmark.py](https://raw.githubusercontent.com/jasonge27/picasso/master/profiling/benchmark.py). Fixing sample number as 500 and we change sample dimension, PICASSO's run time also most does not depend on dimension thanks to the active set strategy. Precision parameters of the optimization are adjusted so that equal objective function values are achieved.
 
 ![Performance_Python](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/performance_python.jpeg)
