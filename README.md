@@ -9,7 +9,6 @@ CalibrAted Sparse Shooting algOrithm) implements a unified framework of pathwise
 - [Directory structure](#directory-structure)
 - [Introduction](#introduction)
 - [Background](#background)
-- [Objetives and Penalties](#objectives-and-penalties)
 - [The Power of Nonconvex Penalties](#power-of-nonconvex-penalties)
 - [Performance](#performance)
 - [Installation](#installation)
@@ -45,9 +44,6 @@ The pathwise coordinate optimization framework with 3 nested loops : (1) Warm st
 
 ## Background
 There exists several R pakcages (such as ncvreg and glmnet) which implement state-of-the-art heuristic optimization algorithms for sparse learning. However they either lack support for nonconvex penalties or becomes very unstable when there are multi-colinear features. PICASSO combines pathwise coordinate optimization and multi-stage convex relaxation for nonconvex optimization and finds a 'good' local minimal which has provable statistical property.
-
-## Objectives and Penalties 
-PICASSO supports four types of objective functions: linear regression, logistic regression, poission regression and scaled linear regression. Three types of penalties are supported: L1, MCP (minimax concave penalty) and SCAD (smoothly clipped absolute deviation) penalty.
 
 ## Power of Nonconvex Penalties 
 
