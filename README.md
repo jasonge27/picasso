@@ -98,7 +98,7 @@ Details of our benmarking process are documented in [tutorials/PICASSO.pdf](http
 ![Performance_R](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/performance_R.jpeg)
 
 ## Python package
-We compared with sklearn for L1 regularized linear and logistic regression. For linear regression, we compare against  ``sklearn.linear_model.lasso_path`` and for logistic regression, we compare against ``sklearn.linear_model.LogisticRegression`` (with liblinear backend). Details of the experiments can be found in the script [profiling/benchmark.py](https://raw.githubusercontent.com/jasonge27/picasso/master/profiling/benchmark.py). Fixing sample number as 500 and we change sample dimension, PICASSO's run time also most does not depend on dimension thanks to the active set strategy. Precision parameters of the optimization are adjusted so that equal objective function values are achieved.
+We compared with sklearn (version 0.19.1) for L1 regularized linear and logistic regression. For linear regression, we compare against  ``sklearn.linear_model.lasso_path`` and for logistic regression, we compare against ``sklearn.linear_model.LogisticRegression`` (with liblinear backend). Details of the experiments can be found in the script [profiling/benchmark.py](https://raw.githubusercontent.com/jasonge27/picasso/master/profiling/benchmark.py). Fixing sample number as 500 and we change sample dimension, PICASSO's run time also most does not depend on dimension thanks to the active set strategy. Precision parameters of the optimization are adjusted so that equal objective function values are achieved.
 
 ![Performance_Python](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/performance_python.jpeg)
 
