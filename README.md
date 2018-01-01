@@ -1,5 +1,5 @@
 <h1 align="center">PICASSO</h1>
-<h4 align="center">R and Python Library for Pathwise Coordinate Optimization for Sparse Learning</h4>
+<h4 align="center">High Performance R and Python Library for Sparse Learning</h4>
 
 ___PICASSO___ (PathwIse
 CalibrAted Sparse Shooting algOrithm) implements a unified framework of pathwise coordinate optimization for a variety of sparse learning problems (e.g., sparse linear regression, sparse logistic regression, sparse Poisson regression and scaled sparse linear regression) combined with efficient active set selection strategies. The core algorithm is implemented in C++ with Eigen3 support for portable high performance linear algebra. Runtime profiling is documented in the [__Performance__](#performance) section.
