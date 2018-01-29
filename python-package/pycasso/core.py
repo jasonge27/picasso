@@ -388,8 +388,8 @@ class Solver:
     if lambdidx is None:
       lambdidx = self.nlambda - 1
 
-    _beta = self.result['beta'][lambdidx,]
-    _intercept = self.result['intercept'][lambdidx]
+    _beta = np.copy(self.result['beta'][lambdidx,])
+    _intercept = np.copy(self.result['intercept'][lambdidx])
     if self.standardize:
       if self.family == 'gaussian':
         _intercept += self.y_mean
