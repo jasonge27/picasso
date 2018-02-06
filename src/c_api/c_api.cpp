@@ -253,6 +253,7 @@ extern "C" void SolveLinearRegressionCovUpdate(
 ) {
   picasso::ObjFunction *obj =
       new picasso::GaussianNaiveUpdateObjective(X, Y, nn, dd, intercept, usePypthon);
+//      new picasso::GaussianNaiveUpdateObjective(X, Y, nn, dd, intercept, usePypthon);
   picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                        pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                        size_act, runt);

@@ -1,5 +1,8 @@
 #include <picasso/objective.hpp>
 
+#include <Rcpp.h>
+using namespace Rcpp;
+
 namespace picasso {
 
 GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d,
@@ -28,8 +31,9 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   // g = (<wXX, model_param.beta> + <r, X>)/n
   // a = sum(wXX)/n
   Eigen::ArrayXd wXX = w * X.col(idx) * X.col(idx);
-  a = wXX.sum() / n;
 
+  a = wXX.sum() / n;
+  //Rcout << wXX << "\n--------\nX.col:" << X.col(idx) << "\nw:" << w<< "\nw*X.col:" << w*X.col(idx) <<"\n**************\n";
   g = (model_param.beta[idx] * wXX + r * X.col(idx)).sum()/n;
 
   double tmp;
@@ -125,6 +129,31 @@ double PoissonObjective::eval() {
   double v = 0.0;
   for (int i = 0; i < n; i++)
     v = v + p[i] - Y[i] * (model_param.intercept + Xb[i]);
+  return (v / n);
+}
+
+
+GaussianObjective::GaussianObjective(const double *xmat, const double *y, int n,
+                                   int d, bool include_intercept, bool usePypthon)
+    : GLMObjective(xmat, y, n, d, include_intercept, usePypthon) {
+  update_auxiliary();
+  for (int i = 0; i < d; i++) update_gradient(i);
+
+  model_param.intercept = 0.0;
+  update_auxiliary();
+
+  deviance = fabs(eval());
+};
+
+void GaussianObjective::update_auxiliary() {
+  p = model_param.intercept + Xb;
+  r = Y - p;
+  w = p;
+  sum_w = w.sum();
+}
+
+double GaussianObjective::eval() {
+  double v = r.abs2().sum();
   return (v / n);
 }
 
