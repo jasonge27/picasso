@@ -1,8 +1,5 @@
 #include <picasso/objective.hpp>
 
-#include <Rcpp.h>
-using namespace Rcpp;
-
 namespace picasso {
 
 GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d,
@@ -136,6 +133,10 @@ double PoissonObjective::eval() {
 GaussianObjective::GaussianObjective(const double *xmat, const double *y, int n,
                                    int d, bool include_intercept, bool usePypthon)
     : GLMObjective(xmat, y, n, d, include_intercept, usePypthon) {
+
+  w.setOnes();
+  sum_w = w.sum();
+
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 
@@ -148,8 +149,6 @@ GaussianObjective::GaussianObjective(const double *xmat, const double *y, int n,
 void GaussianObjective::update_auxiliary() {
   p = model_param.intercept + Xb;
   r = Y - p;
-  w = p;
-  sum_w = w.sum();
 }
 
 double GaussianObjective::eval() {
