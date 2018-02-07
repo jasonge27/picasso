@@ -120,12 +120,8 @@ class ObjFunction {
   double deviance;
 
  public:
-   double hessian_time;
-
- public:
   ObjFunction(const double *xmat, const double *y, int n, int d, bool usePypthon=false)
       : model_param(d) {
-        hessian_time = 0;
     this->d = d;
     this->n = n;
     Y.resize(n);
@@ -237,16 +233,6 @@ class LogisticObjective : public GLMObjective {
 class PoissonObjective : public GLMObjective {
  public:
   PoissonObjective(const double *xmat, const double *y, int n, int d,
-                   bool include_intercept=false, bool usePypthon=false);
-
-  void update_auxiliary();
-
-  double eval();
-};
-
-class GaussianObjective : public GLMObjective {
- public:
-  GaussianObjective(const double *xmat, const double *y, int n, int d,
                    bool include_intercept=false, bool usePypthon=false);
 
   void update_auxiliary();
