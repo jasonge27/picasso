@@ -223,8 +223,8 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
     bool usePypthon
 ) {
   picasso::ObjFunction *obj =
-      new picasso::GaussianObjective(X, Y, nn, dd, intercept, usePypthon);
-  picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
+      new picasso::GaussianNaiveUpdateObjective(X, Y, nn, dd, intercept, usePypthon);
+  picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                        pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                        size_act, runt);
 }
