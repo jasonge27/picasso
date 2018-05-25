@@ -11,7 +11,7 @@ The function "picasso" implements the user interface.
 
 \usage{
 picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
-        lambda.min = NULL, family = "gaussian", method="l1", 
+         family = "gaussian", method="l1", 
         type.gaussian = "naive", gamma = 3, df = NULL, standardize = TRUE, 
         intercept= TRUE,
         prec = 1e-7, max.ite = 1000,  verbose = FALSE)
@@ -27,8 +27,6 @@ picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
   \item{nlambda}{The number of values used in \code{lambda}. Default value is 100.}
 
   \item{lambda.min.ratio}{The smallest value for \code{lambda}, as a fraction of the uppperbound (\code{MAX}) of the regularization parameter. The program can automatically generate \code{lambda} as a sequence of length = \code{nlambda} starting from \code{MAX} to \code{lambda.min.ratio*MAX} in log scale. The default value is \code{0.05}.} Caution: logistic and poisson regression can be ill-conditioned if lambda is too small for nonconvex penalty. We suggest the user to avoid using any lambda.min.raito smaller than 0.05 for logistic/poisson regression under nonconvex penalty.
-  
-  \item{lambda.min}{The smallest value for \code{lambda}. If $\code{lambda.min.ratio} is provided, then it is set to \code{lambda.min.ratio*MAX}, where \code{MAX} is the uppperbound of the regularization parameter. The default value is \code{0.1*MAX}.}
   
   \item{family}{Options for model. Sparse linear regression and sparse multivariate regression is applied if \code{family = "gaussian"}, sqrt lasso is applied if \code{family = "sqrtlasso"}, sparse logistic regression is applied if \code{family = "binomial"} and sparse poisson regression is applied if \code{family = "poisson"}. The default value is \code{"gaussian"}.}
   

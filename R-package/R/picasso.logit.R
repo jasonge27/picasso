@@ -3,7 +3,6 @@ picasso.logit <- function(X,
                           lambda = NULL,
                           nlambda = NULL,
                           lambda.min.ratio = NULL,
-                          lambda.min = NULL,
                           method="l1",
                           gamma = 3,
                           standardize = TRUE,
@@ -61,12 +60,10 @@ picasso.logit <- function(X,
 
     lambda.max = max(abs(crossprod(xx,yy/n)))
 
-    if (is.null(lambda.min)){
-      if (is.null(lambda.min.ratio)){
+    if (is.null(lambda.min.ratio)){
         lambda.min = 0.05*lambda.max
-      }else{
+    } else {
         lambda.min = min(lambda.min.ratio*lambda.max, lambda.max)
-      }
     }
 
     if (lambda.min >= lambda.max) 
