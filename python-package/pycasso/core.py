@@ -69,7 +69,7 @@ class Solver:
     :param df: Maximum degree of freedom for the covariance update. The default value is `m`.
     :param standardize: Design matrix X will be standardized to have mean zero and unit standard deviation if
             `standardize = TRUE`. The default value is `TRUE`.
-    :param useintercept: Whether or not to include intercept term. Default value is True.
+    :param useintercept: Whether or not to include intercept term. Default value is False.
     :param prec: Stopping precision. The default value is 1e-7.
     :param max_ite: The iteration limit. The default value is 1000.
     :param verbose: Tracing information is disabled if `verbose = FALSE`. The default value is `FALSE`.
@@ -88,8 +88,8 @@ class Solver:
                gamma=3,
                df=None,
                standardize=True,
-               useintercept=True,
-               prec=1e-7,
+               useintercept=False,
+               prec=1e-4,
                max_ite=1000,
                verbose=False):
 
@@ -159,7 +159,7 @@ class Solver:
       if self.family == 'poisson':
         lambda_max = np.max(
             np.abs(np.matmul(self.x.T,
-                             self.y - np.mean(self.y)))) / self.num_sample
+                             (self.y - np.mean(self.y))/ self.num_sample )))
       elif self.family == 'sqrtlasso':
         lambda_max = np.max( np.abs( np.matmul(self.x.T, self.y) ) ) /self.num_sample \
                      /np.sqrt(np.sum(self.y**2)/self.num_sample)
@@ -186,6 +186,7 @@ class Solver:
         'intercept': np.zeros(self.nlambda, dtype='double'),
         'ite_lamb': np.zeros(self.nlambda, dtype='int32'),
         'size_act': np.zeros((self.nlambda, self.num_feature), dtype='int32'),
+        'df': np.zeros(self.nlambda, dtype='int32'),
         'train_time': np.zeros(self.nlambda, dtype='double'),
         'total_train_time': 0,
         'state': 'not trained'
@@ -241,6 +242,7 @@ class Solver:
                 self.result['size_act'], self.result['train_time'], True)
       time_end = time.time()
       self.result['total_train_time'] = time_end - time_start
+      self.result['df'] = sum(self.result['beta'].T!=0)
 
     return wrapper
 
@@ -351,8 +353,10 @@ class Solver:
                 regression, and sparse logistic regression.
             - **ite_lamb** - Number of iterations for each lambda.
             - **size_act** - An array of solution sparsity (model degree of freedom).
-            - **train_time** - The training time.
+            - **train_time** - The training time on each lambda.
+            - **total_train_time** - The total training time.
             - **state** - The training state.
+            - **df** - The number of nonzero coefficients
 
         """
     if self.result['state'] == 'not trained':
@@ -384,8 +388,8 @@ class Solver:
     if lambdidx is None:
       lambdidx = self.nlambda - 1
 
-    _beta = self.result['beta'][lambdidx,]
-    _intercept = self.result['intercept'][lambdidx]
+    _beta = np.copy(self.result['beta'][lambdidx,])
+    _intercept = np.copy(self.result['intercept'][lambdidx])
     if self.standardize:
       if self.family == 'gaussian':
         _intercept += self.y_mean

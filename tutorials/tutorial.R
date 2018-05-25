@@ -1,6 +1,8 @@
+library(picasso)
+
 ## Sparse linear regression
 ## Generate the design matrix and regression coefficient vector
-n = 100 # sample number 
+n = 100 # sample number
 d = 80 # sample dimension
 c = 0.5 # correlation parameter
 s = 20  # support size of coefficient
@@ -10,7 +12,7 @@ beta = c(runif(s), rep(0, d-s))
 
 ## Generate response using Gaussian noise, and fit sparse linear models
 noise = rnorm(n)
-Y = X\%*\%beta + noise
+Y = X%*%beta + noise
 
 ## l1 regularization solved with naive update
 fitted.l1.naive = picasso(X, Y, nlambda=100, type.gaussian="naive")
@@ -24,7 +26,7 @@ fitted.mcp = picasso(X, Y, nlambda=100, method="mcp")
 ## scad regularization
 fitted.scad = picasso(X, Y, nlambda=100, method="scad")
 
-## lambdas used 
+## lambdas used
 print(fitted.l1.naive$lambda)
 
 ## number of nonzero coefficients for each lambda
@@ -46,7 +48,7 @@ plot(fitted.scad)
 ################################################################
 ## Sparse logistic regression
 ## Generate the design matrix and regression coefficient vector
-n <- 100  # sample number 
+n <- 100  # sample number
 d <- 80   # sample dimension
 c <- 0.5   # parameter controlling the correlation between columns of X
 s <- 20    # support size of coefficient
@@ -55,7 +57,7 @@ X <- scale(matrix(rnorm(n*d),n,d)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
 beta <- c(runif(s), rep(0, d-s))
 
 ## Generate response and fit sparse logistic models
-p = 1/(1+exp(-X\%*\%beta))
+p = 1/(1+exp(-X%*%beta))
 Y = rbinom(n, rep(1,n), p)
 
 ## l1 regularization
@@ -67,7 +69,7 @@ fitted.mcp = picasso(X, Y, nlambda=100, family="binomial", method="mcp")
 ## scad regularization
 fitted.scad = picasso(X, Y, nlambda=100, family="binomial", method="scad")
 
-## lambdas used 
+## lambdas used
 print(fitted.l1$lambda)
 
 ## number of nonzero coefficients for each lambda
@@ -89,7 +91,7 @@ param.l1 = fitted.l1$p
 ################################################################
 ## Sparse poisson regression
 ## Generate the design matrix and regression coefficient vector
-n <- 100  # sample number 
+n <- 100  # sample number
 d <- 80   # sample dimension
 c <- 0.5   # parameter controlling the correlation between columns of X
 s <- 20    # support size of coefficient
@@ -98,7 +100,7 @@ X <- scale(matrix(rnorm(n*d),n,d)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
 beta <- c(runif(s), rep(0, d-s))/sqrt(s)
 
 ## Generate response and fit sparse poisson models
-p = X\%*\%beta+rnorm(n)
+p = X%*%beta+rnorm(n)
 Y = rpois(n, exp(p))
 
 ## l1 regularization
@@ -110,7 +112,7 @@ fitted.mcp = picasso(X, Y, nlambda=100, family="poisson", method="mcp")
 ## scad regularization
 fitted.scad = picasso(X, Y, nlambda=100, family="poisson", method="scad")
 
-## lambdas used 
+## lambdas used
 print(fitted.l1$lambda)
 
 ## number of nonzero coefficients for each lambda
