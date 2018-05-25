@@ -68,11 +68,11 @@ class Solver:
     :param gamma: The concavity parameter for MCP and SCAD. The default value is `3`.
     :param df: Maximum degree of freedom for the covariance update. The default value is `m`.
     :param standardize: Design matrix X will be standardized to have mean zero and unit standard deviation if
-            `standardize = TRUE`. The default value is `TRUE`.
+            `standardize = True`. The default value is `True`.
     :param useintercept: Whether or not to include intercept term. Default value is False.
     :param prec: Stopping precision. The default value is 1e-7.
     :param max_ite: The iteration limit. The default value is 1000.
-    :param verbose: Tracing information is disabled if `verbose = FALSE`. The default value is `FALSE`.
+    :param verbose: Tracing information is disabled if `verbose = False`. The default value is `False`.
     """
 
   def __init__(self,
