@@ -3,7 +3,6 @@ picasso.gaussian <- function(X,
                           lambda = NULL,
                           nlambda = NULL,
                           lambda.min.ratio = NULL,
-                          lambda.min = NULL,
                           method = "l1",
                           type.gaussian = NULL,
                           gamma = 3,
@@ -91,13 +90,12 @@ picasso.gaussian <- function(X,
     xy = crossprod(xx,yy)
     lambda.max = max(abs(xy/n))
 
-    if (is.null(lambda.min)){
-      if (is.null(lambda.min.ratio)){
+    if (is.null(lambda.min.ratio)){
         lambda.min = 0.05*lambda.max
-      } else {
+    } else {
         lambda.min = min(lambda.min.ratio*lambda.max, lambda.max)
-      }
     }
+
     if (lambda.min >= lambda.max) 
       cat("\"lambda.min\" is too small. \n")
     lambda = exp(seq(log(lambda.max), log(lambda.min), length = nlambda))

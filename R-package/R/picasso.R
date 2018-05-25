@@ -3,7 +3,6 @@ picasso <- function(X,
                     lambda = NULL,
                     nlambda = 100,
                     lambda.min.ratio = 0.05,
-                    lambda.min = NULL,
                     family = "gaussian",
                     method = "l1",
                     type.gaussian = "naive",
@@ -27,7 +26,7 @@ picasso <- function(X,
     p = ncol(Y)
     if (p == 1)
       out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
-                          lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
+                          lambda.min.ratio = lambda.min.ratio, 
                           method = method, type.gaussian = type.gaussian, gamma = gamma, df = df, 
                           standardize = standardize,  intercept= intercept, 
                            prec = prec, 
@@ -39,7 +38,7 @@ picasso <- function(X,
       Y = as.matrix(Y)
     
     out = picasso.logit(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
-                        lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
+                        lambda.min.ratio = lambda.min.ratio, 
                         method = method, gamma = gamma, standardize = standardize, intercept=intercept, 
                         prec = prec, max.ite = max.ite, verbose = verbose)
   }
@@ -49,7 +48,7 @@ picasso <- function(X,
       Y = as.matrix(Y)
     
     out = picasso.sqrtlasso(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
-                        lambda.min.ratio = lambda.min.ratio, lambda.min = lambda.min, 
+                        lambda.min.ratio = lambda.min.ratio,
                         method = method, gamma = gamma, standardize = standardize, intercept=intercept, 
                         prec = prec, max.ite = max.ite, verbose = verbose)
   }
@@ -57,7 +56,7 @@ picasso <- function(X,
   if(family=="poisson"){
     out = picasso.poisson(X = X, Y=Y, lambda = lambda, nlambda = nlambda, 
                         lambda.min.ratio = lambda.min.ratio,
-                       lambda.min = lambda.min, method = method, gamma = gamma, 
+                       method = method, gamma = gamma, 
                        standardize = standardize, 
                        intercept = intercept,
                        prec = prec, max.ite = max.ite, 

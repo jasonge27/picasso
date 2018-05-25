@@ -1,4 +1,4 @@
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include <picasso/actnewton.hpp>
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
@@ -12,8 +12,8 @@ ActNewtonSolver::ActNewtonSolver(ObjFunction *obj, PicassoSolverParams param)
 }
 
 void ActNewtonSolver::solve() {
-  unsigned int d = m_obj->get_dim();
-  unsigned int n = m_obj->get_sample_num();
+  int d = m_obj->get_dim();
+  int n = m_obj->get_sample_num();
 
   const std::vector<double> &lambdas = m_param.get_lambda_path();
   itercnt_path.resize(lambdas.size(), 0);
