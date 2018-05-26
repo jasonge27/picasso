@@ -1,3 +1,4 @@
+[![Build Status](http://circleci-badges-max.herokuapp.com/img/jasonge27/picasso/1?token=)](https://circleci.com/gh/jasonge27/picasso/1)
 <h1 align="center">PICASSO</h1>
 <h4 align="center">High Performance R and Python Library for Sparse Learning</h4>
 
@@ -6,12 +7,17 @@ CalibrAted Sparse Shooting algOrithm) implements a unified framework of pathwise
 
 ## Table of contents
 
+- [Table of contents](#table-of-contents)
 - [Directory structure](#directory-structure)
 - [Introduction](#introduction)
 - [Background](#background)
-- [The Power of Nonconvex Penalties](#power-of-nonconvex-penalties)
+- [Power of Nonconvex Penalties](#power-of-nonconvex-penalties)
 - [Performance](#performance)
+    - [R package](#r-package)
+    - [Python package](#python-package)
 - [Installation](#installation)
+    - [Installing R package](#installing-r-package)
+    - [Installing Python package](#installing-python-package)
 - [Tutorials](#tutorials)
 - [References](#references)
 
