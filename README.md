@@ -1,4 +1,4 @@
-[![Build Status](http://circleci-badges-max.herokuapp.com/img/jasonge27/picasso/1?token=)](https://circleci.com/gh/jasonge27/picasso/1)
+[![Build Status](http://circleci-badges-max.herokuapp.com/img/jasonge27/picasso/1?token=65317b48c13e9567b12e5a8c52661d709d3f605e)](https://circleci.com/gh/jasonge27/picasso/1)
 <h1 align="center">PICASSO</h1>
 <h4 align="center">High Performance R and Python Library for Sparse Learning</h4>
 
