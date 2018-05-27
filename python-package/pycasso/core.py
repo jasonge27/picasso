@@ -41,18 +41,15 @@ class Solver:
     :param y: The *n* dimensional response vector. `y` is numeric vector for `gaussian` and `sqrtlasso`,
             or a two-level factor for `binomial`, or a non-negative integer vector representing counts
             for `gaussian`.
-    :param lambdas: A sequence of decreasing positive values to control the regularization. Typical usage
-            is to leave the input `lambdas = None` and have the program compute its own `lambdas` sequence
-            based on `nlambda` and `lambda_min_ratio`. Users can also specify a sequence to override this.
-            Default value is from `lambda_max` to `lambda_min_ratio*lambda_max`. The default value of
-            `lambda_max` is the minimum regularization parameter which yields an all-zero estimates.
-    :param nlambda: The number of values used in lambdas. Default value is 100. (useless when `lambdas` is specified)
-    :param lambda_min_ratio: The smallest value for lambdas, as a fraction of the upper-bound (`MAX`) of the
-            regularization parameter. The program can automatically generate `lambda` as a sequence of
-            `length = nlambda` starting from `MAX` to `lambda_min_ratio` * `MAX` in log scale. The
-            default value is `0.05`. **Caution**: logistic and poisson regression can be ill-conditioned
+    :param lambdas: The parameters of controling regularization. Can be one of the following two cases:
+            **Case1 (default)**: A tuple of 2 variables (`n`, `lambda_min_ratio`), where the default values are
+            (100,0.05). The program calculates `lambdas` as an array of `n` elements starting from `lambda_max`
+            to `lambda_min_ratio * lambda_max` in log scale. `lambda_max` is the minimum regularization parameter
+            which yields an all-zero estimates.
+            **Caution**: logistic and poisson regression can be ill-conditioned
             if lambda is too small for nonconvex penalty. We suggest the user to avoid using any
             `lambda_min_raito` smaller than 0.05 for logistic/poisson regression under nonconvex penalty.
+            **Case2**: A manually specified sequence (size > 2) of decreasing positive values to control the regularization.
     :param family: Options for model. Sparse linear regression and sparse multivariate regression is applied if
             `family = "gaussian"`, sqrt lasso is applied if `family = "sqrtlasso"`, sparse logistic regression is
             applied if `family = "binomial"` and sparse poisson regression is applied if `family = "poisson"`.
@@ -64,8 +61,6 @@ class Solver:
             default value is `"naive"`.
     :param gamma: The concavity parameter for MCP and SCAD. The default value is `3`.
     :param df: Maximum degree of freedom for the covariance update. The default value is `m`.
-    :param standardize: Design matrix X will be standardized to have mean zero and unit standard deviation if
-            `standardize = True`. The default value is `True`.
     :param useintercept: Whether or not to include intercept term. Default value is False.
     :param prec: Stopping precision. The default value is 1e-7.
     :param max_ite: The iteration limit. The default value is 1000.
@@ -75,15 +70,12 @@ class Solver:
   def __init__(self,
                x,
                y,
-               lambdas=None,
-               nlambda=100,
-               lambda_min_ratio=0.05,
+               lambdas=(100,0.05),
                family="gaussian",
                penalty="l1",
                type_gaussian="naive",
                gamma=3,
                df=None,
-               standardize=True,
                useintercept=False,
                prec=1e-4,
                max_ite=1000,
@@ -109,14 +101,6 @@ class Solver:
     self.num_feature = self.x.shape[1]
     if self.x.size == 0:
       raise RuntimeError("Wrong: no input!")
-    self.standardize = standardize
-    if standardize:
-      self.x_mean = np.mean(self.x, axis=0)
-      self.x_std = np.std(self.x, axis=0, ddof=1)
-      self.x = ss.zscore(self.x, axis=0, ddof=1)
-      if self.family == "gaussian":
-        self.y_mean = np.mean(self.y)
-        self.y -= self.y_mean
     if self.x.shape[0] != self.y.shape[0]:
       raise RuntimeError(r' the size of data "x" and label "y" does not match'+ \
                          "/nx: %i * %i, y: %i"%(self.x.shape[0],self.x.shape[1],self.y.shape[0]))
@@ -148,10 +132,12 @@ class Solver:
     self.prec = prec
     self.verbose = verbose
 
-    if lambdas is not None:
+    if len(lambdas) > 2:
       self.lambdas = np.array(lambdas, dtype='double')
       self.nlambda = lambdas.size
     else:
+      nlambda = int(lambdas[0])
+      lambda_min_ratio = lambdas[1]
       if self.family == 'poisson':
         lambda_max = np.max(
             np.abs(np.matmul(self.x.T,
@@ -381,15 +367,9 @@ class Solver:
 
     _beta = np.copy(self.result['beta'][lambdidx,])
     _intercept = np.copy(self.result['intercept'][lambdidx])
-    if self.standardize:
-      if self.family == 'gaussian':
-        _intercept += self.y_mean
     if newdata is None:
       y_pred = np.matmul(self.x, _beta) + _intercept
     else:
-      if self.standardize:
-        _intercept -= np.matmul(_beta, self.x_mean / self.x_std)
-        _beta /= self.x_std
       y_pred = np.matmul(newdata, _beta) + _intercept
 
     return y_pred
