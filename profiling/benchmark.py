@@ -3,7 +3,7 @@ from sklearn import preprocessing
 import matplotlib
 matplotlib.use('TKAgg')
 import matplotlib.pyplot as plt
-from pycasso import core
+import pycasso
 from sklearn.linear_model import lasso_path
 from sklearn.linear_model import lars_path
 from sklearn import linear_model
@@ -65,14 +65,12 @@ def lognet_obj(X, Y, beta, intcpt, lamb):
 def test_elnet(n, p, c, nlambda=100):
   X, Y, true_beta = generate_sim_elnet(n, p, c)
   time0 = time.time()
-  picasso = core.Solver(
+  picasso = pycasso.Solver(
       X,
       Y,
-      nlambda=nlambda,
-      lambda_min_ratio=0.01,
+      lambdas=(nlambda, 0.01),
       family='gaussian',
-      penalty='l1',
-      standardize=False)
+      penalty='l1')
   picasso.train()
   time1 = time.time()
   picasso_time = time1 - time0
@@ -105,14 +103,12 @@ def test_elnet(n, p, c, nlambda=100):
 def test_lognet(n, p, c, nlambda=100):
   X, Y, true_beta = generate_sim_lognet(n, p, c)
   time0 = time.time()
-  picasso = core.Solver(
+  picasso = pycasso.Solver(
       X,
       Y,
-      nlambda=nlambda,
-      lambda_min_ratio=0.01,
+      lambdas=(nlambda,0.01),
       family='binomial',
-      penalty='l1',
-      standardize=False)
+      penalty='l1')
   picasso.train()
   time1 = time.time()
   picasso_time = time1 - time0
