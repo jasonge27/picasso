@@ -42,7 +42,7 @@ class Solver:
             or a two-level factor for `binomial`, or a non-negative integer vector representing counts
             for `gaussian`.
     :param lambdas: A sequence of decreasing positive values to control the regularization. Typical usage
-            is to leave the input `lambda = None` and have the program compute its own `lambda` sequence
+            is to leave the input `lambdas = None` and have the program compute its own `lambdas` sequence
             based on `nlambda` and `lambda_min_ratio`. Users can also specify a sequence to override this.
             Default value is from `lambda_max` to `lambda_min_ratio*lambda_max`. The default value of
             `lambda_max` is the minimum regularization parameter which yields an all-zero estimates.
@@ -53,9 +53,6 @@ class Solver:
             default value is `0.05`. **Caution**: logistic and poisson regression can be ill-conditioned
             if lambda is too small for nonconvex penalty. We suggest the user to avoid using any
             `lambda_min_raito` smaller than 0.05 for logistic/poisson regression under nonconvex penalty.
-    :param lambda_min: The smallest value for `lambda`. If `lambda_min_ratio` is provided, then it is set to
-            `lambda.min.ratio*MAX`, where `MAX` is the uppperbound of the regularization parameter. The default
-            value is `0.05*MAX`.
     :param family: Options for model. Sparse linear regression and sparse multivariate regression is applied if
             `family = "gaussian"`, sqrt lasso is applied if `family = "sqrtlasso"`, sparse logistic regression is
             applied if `family = "binomial"` and sparse poisson regression is applied if `family = "poisson"`.
@@ -80,8 +77,7 @@ class Solver:
                y,
                lambdas=None,
                nlambda=100,
-               lambda_min_ratio=None,
-               lambda_min=None,
+               lambda_min_ratio=0.05,
                family="gaussian",
                penalty="l1",
                type_gaussian="naive",
@@ -166,13 +162,8 @@ class Solver:
       else:
         lambda_max = np.max(
             np.abs(np.matmul(self.x.T, self.y))) / self.num_sample
-      if lambda_min_ratio is None:
-        if lambda_min is None:
-          lambda_min_ratio = 0.05
-        else:
-          lambda_min_ratio = 1. * lambda_min / lambda_max
       if lambda_min_ratio > 1:
-        raise RuntimeError(r'"lambda_min" is too small.')
+        raise RuntimeError(r'"lambda_min_ratio" is too small.')
       self.nlambda = nlambda
       self.lambdas = np.linspace(
           math.log(1), math.log(lambda_min_ratio), self.nlambda, dtype='double')
