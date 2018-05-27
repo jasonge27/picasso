@@ -57,11 +57,7 @@ class Solver:
             The default value is `"gaussian"`.
     :param penalty: Options for regularization. Lasso is applied if `method = "l1"`, MCP is applied if `
             method = "mcp"` and SCAD Lasso is applied if `method = "scad"`. The default value is `"l1"`.
-    :param type_gaussian: Options for updating residuals in sparse linear regression. The naive update rule is
-            applied if `opt = "naive"`, and the covariance update rule is applied if `opt = "covariance"`. The
-            default value is `"naive"`.
     :param gamma: The concavity parameter for MCP and SCAD. The default value is `3`.
-    :param df: Maximum degree of freedom for the covariance update. The default value is `m`.
     :param useintercept: Whether or not to include intercept term. Default value is False.
     :param prec: Stopping precision. The default value is 1e-7.
     :param max_ite: The iteration limit. The default value is 1000.
@@ -74,9 +70,7 @@ class Solver:
                lambdas=(100,0.05),
                family="gaussian",
                penalty="l1",
-               type_gaussian="naive",
                gamma=3,
-               df=None,
                useintercept=False,
                prec=1e-4,
                max_ite=1000,
@@ -107,11 +101,6 @@ class Solver:
                          "/nx: %i * %i, y: %i"%(self.x.shape[0],self.x.shape[1],self.y.shape[0]))
 
     # Define the parameters
-    if df is None:
-      self.df = min(self.num_feature, self.num_sample)
-    else:
-      self.df = df
-    self.type_gaussian = type_gaussian
     self.gamma = gamma
     if self.penalty == "mcp":
       self.penaltyflag = 2
@@ -236,20 +225,8 @@ class Solver:
       print(self.penalty.upper(
       ) + "regularization via active set identification and coordinate descent. \n"
            )
-    if self.type_gaussian not in ("covariance", "naive"):
-      print(
-          r'Automatically set "type_gaussian", since "type_gaussian" is not one of "covariance", "naive"'
-          + '\n')
-      if self.num_sample < 500:
-        self.type_gaussian = "covariance"
-      else:
-        self.type_gaussian = "naive"
 
-    if self.type_gaussian == "covariance":
-      return self._decor_cinterface(_PICASSO_LIB.SolveLinearRegressionCovUpdate)
-    else:
-      return self._decor_cinterface(
-          _PICASSO_LIB.SolveLinearRegressionNaiveUpdate)
+    return self._decor_cinterface(_PICASSO_LIB.SolveLinearRegressionNaiveUpdate)
 
   def _binomial_wrapper(self):
     """
