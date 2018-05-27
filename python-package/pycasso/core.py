@@ -13,6 +13,7 @@ from numpy.ctypeslib import ndpointer
 from .cutils import CDoubleArray, CIntArray
 from .libpath import find_lib_path
 
+__all__ = ["Solver"]
 
 class PycassoError(Exception):
   """Error thrown by pycasso solver."""
