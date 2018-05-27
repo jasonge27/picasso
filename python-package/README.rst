@@ -31,10 +31,10 @@ Install from source file (Github) with Makefile:
 
 
 Install from source file (Github) with CMAKE:
+
 - Clone ``picasso.git`` via ``git clone https://github.com/jasonge27/picasso.git``
 - Make sure you have `setuptools <https://pypi.python.org/pypi/setuptools>`__
-- Build the source file first via the ``cmake`` with ``CMakeLists.txt`` in the root directory.
-  (You will see a ``.so`` or ``.lib`` file under ``(root)/lib/`` )
+- Build the source file first via the ``cmake`` with ``CMakeLists.txt`` in the root directory. (You will see a ``.so`` or ``.lib`` file under ``(root)/lib/`` )
 - Run ``cd python-package; sudo python setup.py install`` command.
 
 

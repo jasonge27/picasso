@@ -42,14 +42,14 @@ class Solver:
     :param y: The *n* dimensional response vector. `y` is numeric vector for `gaussian` and `sqrtlasso`,
             or a two-level factor for `binomial`, or a non-negative integer vector representing counts
             for `gaussian`.
-    :param lambdas: The parameters of controling regularization. Can be one of the following two cases:
+    :param lambdas: The parameters of controling regularization. Can be one of the following two cases: \n
             **Case1 (default)**: A tuple of 2 variables (`n`, `lambda_min_ratio`), where the default values are
             (100,0.05). The program calculates `lambdas` as an array of `n` elements starting from `lambda_max`
             to `lambda_min_ratio * lambda_max` in log scale. `lambda_max` is the minimum regularization parameter
             which yields an all-zero estimates.
             **Caution**: logistic and poisson regression can be ill-conditioned
             if lambda is too small for nonconvex penalty. We suggest the user to avoid using any
-            `lambda_min_raito` smaller than 0.05 for logistic/poisson regression under nonconvex penalty.
+            `lambda_min_raito` smaller than 0.05 for logistic/poisson regression under nonconvex penalty. \n
             **Case2**: A manually specified sequence (size > 2) of decreasing positive values to control the regularization.
     :param family: Options for model. Sparse linear regression and sparse multivariate regression is applied if
             `family = "gaussian"`, sqrt lasso is applied if `family = "sqrtlasso"`, sparse logistic regression is
