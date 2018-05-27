@@ -18,19 +18,19 @@ Y = np.matmul(X,beta) + noise
 
 
 ## l1 regularization solved with naive update
-solver_l1_naive = pycasso.Solver(X,Y, nlambda=100, family="gaussian", type_gaussian="naive")
+solver_l1_naive = pycasso.Solver(X,Y, lambdas=(100,0.05), family="gaussian", type_gaussian="naive")
 solver_l1_naive.train()
 
 ## l1 regularization solved with covariance update
-solver_l1_cov = pycasso.Solver(X,Y, nlambda=100, family="gaussian", type_gaussian="covariance")
+solver_l1_cov = pycasso.Solver(X,Y, lambdas=(100,0.05), family="gaussian", type_gaussian="covariance")
 solver_l1_cov.train()
 
 ## mcp regularization
-solver_mcp = pycasso.Solver(X,Y, nlambda=100, penalty="mcp")
+solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), penalty="mcp")
 solver_mcp.train()
 
 ## scad regularization
-solver_scad = pycasso.Solver(X,Y, nlambda=100, penalty="scad")
+solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), penalty="scad")
 solver_scad.train()
 
 ## Obtain the result
@@ -75,15 +75,15 @@ p = 1/(1+np.exp(-np.matmul(X,beta) - noise))
 Y = np.random.binomial(np.ones(n,dtype='int64'),p)
 
 ## l1 regularization
-solver_l1 = pycasso.Solver(X,Y, nlambda=100, family="binomial", penalty="l1")
+solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="l1")
 solver_l1.train()
 
 ## mcp regularization
-solver_mcp = pycasso.Solver(X,Y, nlambda=100, family="binomial", penalty="mcp")
+solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="mcp")
 solver_mcp.train()
 
 ## scad regularization
-solver_scad = pycasso.Solver(X,Y, nlambda=100, family="binomial", penalty="scad")
+solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="scad")
 solver_scad.train()
 
 ## Obtain the result
@@ -125,15 +125,15 @@ p = np.exp(-np.matmul(X,beta) - noise)
 Y = np.random.poisson(p, n)
 
 ## l1 regularization
-solver_l1 = pycasso.Solver(X,Y, nlambda=100, family="poisson", penalty="l1")
+solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="l1")
 solver_l1.train()
 
 ## mcp regularization
-solver_mcp = pycasso.Solver(X,Y, nlambda=100, family="poisson", penalty="mcp")
+solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="mcp")
 solver_mcp.train()
 
 ## scad regularization
-solver_scad = pycasso.Solver(X,Y, nlambda=100, family="poisson", penalty="scad")
+solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="scad")
 solver_scad.train()
 
 ## Obtain the result

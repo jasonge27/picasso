@@ -27,7 +27,7 @@ The directory is organized as follows:
    * [__c_api__](c_api): C API as an interface for R and Python package.
    * [__objective__](objective): Objective functions, which includes linear regression, logsitic regression, poisson regression and scaled linear regression.
    * [__solver__](solver): Two types of pathwise active set algorithms. Actgd.cpp implements pathwise active set + gradient descent. Actnewton.cpp implements pathwise active set + newton algorithm.
-* [__include__](include) 
+* [__include__](include)
    * [__picasso__](picasso): declarations of the C++ implementation
    * [__Eigen__](Eigen): Eigen3 header files for high performance linear algebra.
 * [__amalgamation__](amalgamation):flag all the c++ implementation for compiling.
@@ -51,7 +51,7 @@ The pathwise coordinate optimization framework with 3 nested loops : (1) Warm st
 ## Background
 There exists several R pakcages (such as ncvreg and glmnet) which implement state-of-the-art heuristic optimization algorithms for sparse learning. However they either lack support for nonconvex penalties or becomes very unstable when there are multi-colinear features. PICASSO combines pathwise coordinate optimization and multi-stage convex relaxation for nonconvex optimization and finds a 'good' local minimal which has provable statistical property.
 
-## Power of Nonconvex Penalties 
+## Power of Nonconvex Penalties
 
 L1 penalized regression (LASSO) is a useful tool for feature selection but it tends to give very biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **16.41%**.
 
@@ -85,9 +85,9 @@ Let's see PICASSO in action — the estimation error drops to **6.06%** using SC
 
 
 
-## Performance 
+## Performance
 ```bash
-$cd profiling 
+$cd profiling
 $Rscript benchmark.R
 $python benchmark.py
 ```
@@ -114,7 +114,7 @@ There are two ways to install the picasso R package.
 install.packages("picasso")
 ```
 
-- Installing from source code. 
+- Installing from source code.
 ```bash
 $ git clone https://github.com/jasonge27/picasso.git
 $ cd picasso; make Rinstall
@@ -122,19 +122,19 @@ $ cd picasso; make Rinstall
 
 ### Installing Python package
 There are two ways to install the picasso python package.
-- Installing from PyPi (recommended). ``pip install pycasso --user``. 
-- Installing from source code. 
+- Installing from PyPi (recommended). ``pip install pycasso --user``.
+- Installing from source code.
  ```bash
  $git clone https://github.com/jasonge27/picasso.git
  $cd picasso; make Pyinstall
  ```
 
-You can test if the package has been successfully installed by ``python -c "import pycasso; pycasso.test() ``
+You can test if the package has been successfully installed by ``python -c "import pycasso; pycasso.test()" ``
 
 Details for installing python package can also be found in [document](https://hmjianggatech.github.io/picasso/) or [github](https://github.com/jasonge27/picasso/tree/master/python-package)
 
 ## Tutorials
-Check the R tutorial in tutorials/tutorial.R and Python tutorial in tutorials/tutorial.py. Let us know if anything is hard to use or if you want any other features. 
+Check the R tutorial in tutorials/tutorial.R and Python tutorial in tutorials/tutorial.py. Let us know if anything is hard to use or if you want any other features.
 
 ## References
 

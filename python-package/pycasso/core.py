@@ -13,6 +13,7 @@ from numpy.ctypeslib import ndpointer
 from .cutils import CDoubleArray, CIntArray
 from .libpath import find_lib_path
 
+__all__ = ["Solver"]
 
 class PycassoError(Exception):
   """Error thrown by pycasso solver."""
@@ -41,53 +42,35 @@ class Solver:
     :param y: The *n* dimensional response vector. `y` is numeric vector for `gaussian` and `sqrtlasso`,
             or a two-level factor for `binomial`, or a non-negative integer vector representing counts
             for `gaussian`.
-    :param lambdas: A sequence of decreasing positive values to control the regularization. Typical usage
-            is to leave the input `lambda = None` and have the program compute its own `lambda` sequence
-            based on `nlambda` and `lambda_min_ratio`. Users can also specify a sequence to override this.
-            Default value is from `lambda_max` to `lambda_min_ratio*lambda_max`. The default value of
-            `lambda_max` is the minimum regularization parameter which yields an all-zero estimates.
-    :param nlambda: The number of values used in lambdas. Default value is 100. (useless when `lambdas` is specified)
-    :param lambda_min_ratio: The smallest value for lambdas, as a fraction of the upper-bound (`MAX`) of the
-            regularization parameter. The program can automatically generate `lambda` as a sequence of
-            `length = nlambda` starting from `MAX` to `lambda_min_ratio` * `MAX` in log scale. The
-            default value is `0.05`. **Caution**: logistic and poisson regression can be ill-conditioned
+    :param lambdas: The parameters of controling regularization. Can be one of the following two cases: |br|
+            **Case1 (default)**: A tuple of 2 variables (`n`, `lambda_min_ratio`), where the default values are
+            (100,0.05). The program calculates `lambdas` as an array of `n` elements starting from `lambda_max`
+            to `lambda_min_ratio * lambda_max` in log scale. `lambda_max` is the minimum regularization parameter
+            which yields an all-zero estimates.
+            **Caution**: logistic and poisson regression can be ill-conditioned
             if lambda is too small for nonconvex penalty. We suggest the user to avoid using any
-            `lambda_min_raito` smaller than 0.05 for logistic/poisson regression under nonconvex penalty.
-    :param lambda_min: The smallest value for `lambda`. If `lambda_min_ratio` is provided, then it is set to
-            `lambda.min.ratio*MAX`, where `MAX` is the uppperbound of the regularization parameter. The default
-            value is `0.05*MAX`.
+            `lambda_min_raito` smaller than 0.05 for logistic/poisson regression under nonconvex penalty. |br|
+            **Case2**: A manually specified sequence (size > 2) of decreasing positive values to control the regularization.
     :param family: Options for model. Sparse linear regression and sparse multivariate regression is applied if
             `family = "gaussian"`, sqrt lasso is applied if `family = "sqrtlasso"`, sparse logistic regression is
             applied if `family = "binomial"` and sparse poisson regression is applied if `family = "poisson"`.
             The default value is `"gaussian"`.
     :param penalty: Options for regularization. Lasso is applied if `method = "l1"`, MCP is applied if `
             method = "mcp"` and SCAD Lasso is applied if `method = "scad"`. The default value is `"l1"`.
-    :param type_gaussian: Options for updating residuals in sparse linear regression. The naive update rule is
-            applied if `opt = "naive"`, and the covariance update rule is applied if `opt = "covariance"`. The
-            default value is `"naive"`.
     :param gamma: The concavity parameter for MCP and SCAD. The default value is `3`.
-    :param df: Maximum degree of freedom for the covariance update. The default value is `m`.
-    :param standardize: Design matrix X will be standardized to have mean zero and unit standard deviation if
-            `standardize = TRUE`. The default value is `TRUE`.
     :param useintercept: Whether or not to include intercept term. Default value is False.
     :param prec: Stopping precision. The default value is 1e-7.
     :param max_ite: The iteration limit. The default value is 1000.
-    :param verbose: Tracing information is disabled if `verbose = FALSE`. The default value is `FALSE`.
+    :param verbose: Tracing information is disabled if `verbose = False`. The default value is `False`.
     """
 
   def __init__(self,
                x,
                y,
-               lambdas=None,
-               nlambda=100,
-               lambda_min_ratio=None,
-               lambda_min=None,
+               lambdas=(100,0.05),
                family="gaussian",
                penalty="l1",
-               type_gaussian="naive",
                gamma=3,
-               df=None,
-               standardize=True,
                useintercept=False,
                prec=1e-4,
                max_ite=1000,
@@ -113,24 +96,11 @@ class Solver:
     self.num_feature = self.x.shape[1]
     if self.x.size == 0:
       raise RuntimeError("Wrong: no input!")
-    self.standardize = standardize
-    if standardize:
-      self.x_mean = np.mean(self.x, axis=0)
-      self.x_std = np.std(self.x, axis=0, ddof=1)
-      self.x = ss.zscore(self.x, axis=0, ddof=1)
-      if self.family == "gaussian":
-        self.y_mean = np.mean(self.y)
-        self.y -= self.y_mean
     if self.x.shape[0] != self.y.shape[0]:
       raise RuntimeError(r' the size of data "x" and label "y" does not match'+ \
                          "/nx: %i * %i, y: %i"%(self.x.shape[0],self.x.shape[1],self.y.shape[0]))
 
     # Define the parameters
-    if df is None:
-      self.df = min(self.num_feature, self.num_sample)
-    else:
-      self.df = df
-    self.type_gaussian = type_gaussian
     self.gamma = gamma
     if self.penalty == "mcp":
       self.penaltyflag = 2
@@ -152,10 +122,12 @@ class Solver:
     self.prec = prec
     self.verbose = verbose
 
-    if lambdas is not None:
+    if len(lambdas) > 2:
       self.lambdas = np.array(lambdas, dtype='double')
       self.nlambda = lambdas.size
     else:
+      nlambda = int(lambdas[0])
+      lambda_min_ratio = lambdas[1]
       if self.family == 'poisson':
         lambda_max = np.max(
             np.abs(np.matmul(self.x.T,
@@ -166,13 +138,8 @@ class Solver:
       else:
         lambda_max = np.max(
             np.abs(np.matmul(self.x.T, self.y))) / self.num_sample
-      if lambda_min_ratio is None:
-        if lambda_min is None:
-          lambda_min_ratio = 0.05
-        else:
-          lambda_min_ratio = 1. * lambda_min / lambda_max
       if lambda_min_ratio > 1:
-        raise RuntimeError(r'"lambda_min" is too small.')
+        raise RuntimeError(r'"lambda_min_ratio" is too small.')
       self.nlambda = nlambda
       self.lambdas = np.linspace(
           math.log(1), math.log(lambda_min_ratio), self.nlambda, dtype='double')
@@ -258,20 +225,8 @@ class Solver:
       print(self.penalty.upper(
       ) + "regularization via active set identification and coordinate descent. \n"
            )
-    if self.type_gaussian not in ("covariance", "naive"):
-      print(
-          r'Automatically set "type_gaussian", since "type_gaussian" is not one of "covariance", "naive"'
-          + '\n')
-      if self.num_sample < 500:
-        self.type_gaussian = "covariance"
-      else:
-        self.type_gaussian = "naive"
 
-    if self.type_gaussian == "covariance":
-      return self._decor_cinterface(_PICASSO_LIB.SolveLinearRegressionCovUpdate)
-    else:
-      return self._decor_cinterface(
-          _PICASSO_LIB.SolveLinearRegressionNaiveUpdate)
+    return self._decor_cinterface(_PICASSO_LIB.SolveLinearRegressionNaiveUpdate)
 
   def _binomial_wrapper(self):
     """
@@ -390,15 +345,9 @@ class Solver:
 
     _beta = np.copy(self.result['beta'][lambdidx,])
     _intercept = np.copy(self.result['intercept'][lambdidx])
-    if self.standardize:
-      if self.family == 'gaussian':
-        _intercept += self.y_mean
     if newdata is None:
       y_pred = np.matmul(self.x, _beta) + _intercept
     else:
-      if self.standardize:
-        _intercept -= np.matmul(_beta, self.x_mean / self.x_std)
-        _beta /= self.x_std
       y_pred = np.matmul(newdata, _beta) + _intercept
 
     return y_pred

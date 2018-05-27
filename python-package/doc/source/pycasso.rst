@@ -1,3 +1,7 @@
+.. |br| raw:: html
+
+ <br />
+
 pycasso package
 ===============
 
@@ -24,5 +28,3 @@ pycasso\.libpath
     :members:
     :undoc-members:
     :show-inheritance:
-
-
