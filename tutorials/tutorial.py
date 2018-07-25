@@ -18,12 +18,8 @@ Y = np.matmul(X,beta) + noise
 
 
 ## l1 regularization solved with naive update
-solver_l1_naive = pycasso.Solver(X,Y, lambdas=(100,0.05), family="gaussian", type_gaussian="naive")
-solver_l1_naive.train()
-
-## l1 regularization solved with covariance update
-solver_l1_cov = pycasso.Solver(X,Y, lambdas=(100,0.05), family="gaussian", type_gaussian="covariance")
-solver_l1_cov.train()
+solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="gaussian")
+solver_l1.train()
 
 ## mcp regularization
 solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), penalty="mcp")
@@ -34,26 +30,25 @@ solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), penalty="scad")
 solver_scad.train()
 
 ## Obtain the result
-result = solver_l1_naive.coef()
+result = solver_l1.coef()
 
 ## print out training time
 print(result['total_train_time'])
 
 ## lambdas used
-print(solver_l1_naive.lambdas)
+print(solver_l1.lambdas)
 
 ## number of nonzero coefficients for each lambda
 print(result['df'])
 
 ## coefficients and intercept for the i-th lambda
 i = 30
-print(solver_l1_naive.lambdas[i])
+print(solver_l1.lambdas[i])
 print(result['beta'][i])
 print(result['intercept'][i])
 
 ## Visualize the solution path
-solver_l1_naive.plot()
-solver_l1_cov.plot()
+solver_l1.plot()
 solver_mcp.plot()
 solver_scad.plot()
 
@@ -106,10 +101,12 @@ print(result['intercept'][i])
 
 ## Visualize the solution path
 solver_l1.plot()
+solver_mcp.plot()
+solver_scad.plot()
 
 
 ################################################################
-## Sparse logistic regression
+## Sparse poisson regression
 ## Generate the design matrix and regression coefficient vector
 n = 100 # sample number
 d = 80 # sample dimension
@@ -156,3 +153,5 @@ print(result['intercept'][i])
 
 ## Visualize the solution path
 solver_l1.plot()
+solver_mcp.plot()
+solver_scad.plot()

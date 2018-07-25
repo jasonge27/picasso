@@ -96,7 +96,7 @@ test_sqrt_mse <- function(n = 500, p = 800, c = 0.5, nlambda = 20){
 
   cat("flare\n")
   cat(paste("time", mean(time.flare), "std", sd(time.flare), "\n", sep=','))
-  cat(paste("obj", mean(obj.flare), "obj", sd(obj.flare), "\n", sep=','))
+  cat(paste("obj", mean(obj.flare), "std", sd(obj.flare), "\n", sep=','))
 
   cat("scalreg\n")
   cat(paste("time", mean(time.scalreg), "std", sd(time.scalreg), "\n", sep=','))
@@ -153,7 +153,7 @@ test_elnet<- function(n = 10000, p = 5000, c = 0.5, nlambda = 20){
 
   cat("glmnet\n")
   cat(paste("time", mean(time.glmnet), "std", sd(time.glmnet), "\n", sep=','))
-  cat(paste("obj", mean(obj.glmnet), "obj", sd(obj.glmnet), "\n", sep=','))
+  cat(paste("obj", mean(obj.glmnet), "std", sd(obj.glmnet), "\n", sep=','))
 
   cat("ncvreg\n")
   cat(paste("time", mean(time.ncvreg), "std", sd(time.ncvreg), "\n", sep=','))
@@ -275,7 +275,7 @@ test_lognet <- function(n = 10000, p = 5000, c = 1.0, nlambda = 20, ratio=0.1){
 
   cat("glmnet\n")
   cat(paste("time", mean(time.glmnet), "std", sd(time.glmnet), "\n", sep=','))
-  cat(paste("obj", mean(obj.glmnet), "obj", sd(obj.glmnet), "\n", sep=','))
+  cat(paste("obj", mean(obj.glmnet), "std", sd(obj.glmnet), "\n", sep=','))
 
   cat("ncvreg\n")
   cat(paste("time", mean(time.ncvreg), "std", sd(time.ncvreg), "\n", sep=','))
