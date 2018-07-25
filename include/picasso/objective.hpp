@@ -93,12 +93,7 @@ class RegMCP : public RegFunction {
     if (fabs(x) > fabs(m_gamma * m_lambda)) {
       return x;
     } else {
-      if (fabs(x) > fabs(2 * m_lambda)) {
-        return threshold_l1(x, m_gamma * m_lambda / (m_gamma - 1)) /
-               (1 - 1 / (m_gamma - 1));
-      } else {
-        return threshold_l1(x, m_lambda);
-      }
+      return threshold_l1(x, m_lambda)/(1-1/m_gamma);
     }
   }
 };
