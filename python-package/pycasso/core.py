@@ -124,7 +124,7 @@ class Solver:
 
     if len(lambdas) > 2:
       self.lambdas = np.array(lambdas, dtype='double')
-      self.nlambda = lambdas.size
+      self.nlambda = len(lambdas)
     else:
       nlambda = int(lambdas[0])
       lambda_min_ratio = lambdas[1]
