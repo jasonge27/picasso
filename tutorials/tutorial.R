@@ -38,6 +38,7 @@ print(fitted.l1.naive$lambda[i])
 print(fitted.l1.naive$beta[,i])
 print(fitted.l1.naive$intercept[i])
 
+
 ## Visualize the solution path
 plot(fitted.l1.naive)
 plot(fitted.l1.covariance)

@@ -14,8 +14,9 @@ Requirements
 
 - Linux or MacOS
 
-It may take lots of effort to build on Windows. One way to do it is using CMAKE and MSVC.
-Be careful of issues like the system bits.
+**Windows User:** It may take lots of effort to build on Windows. One way to do it is using mingw/mingw64.
+Be careful of issues like the system bits and environment variables.
+Once the correct make tools and g++ are setted up, you can install the package from suorce with the following instruction.
 
 
 Installation
