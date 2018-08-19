@@ -14,8 +14,9 @@ Requirements
 
 - Linux or MacOS
 
-It may take lots of effort to build on Windows. One way to do it is using CMAKE and MSVC.
-Be careful of issues like the system bits.
+**Windows User:** It may take lots of effort to build on Windows. One way to do it is using mingw/mingw64.
+Be careful of issues like the system bits and environment variables.
+Once the correct make tools and g++ are setted up, you can install the package from suorce with the following instruction.
 
 
 Installation
@@ -25,14 +26,14 @@ In the following process, you may need to be root (``sudo``).
 
 Install from source file (Github) with Makefile:
 
-- Clone ``picasso.git`` via ``git clone https://github.com/jasonge27/picasso.git``
+- Clone ``picasso.git`` via ``git clone --recurse-submodules https://github.com/jasonge27/picasso.git``
 - Make sure you have `setuptools <https://pypi.python.org/pypi/setuptools>`__
 - Run ``sudo make Pyinstall`` command.
 
 
 Install from source file (Github) with CMAKE:
 
-- Clone ``picasso.git`` via ``git clone https://github.com/jasonge27/picasso.git``
+- Clone ``picasso.git`` via ``git clone --recurse-submodules https://github.com/jasonge27/picasso.git``
 - Make sure you have `setuptools <https://pypi.python.org/pypi/setuptools>`__
 - Build the source file first via the ``cmake`` with ``CMakeLists.txt`` in the root directory. (You will see a ``.so`` or ``.lib`` file under ``(root)/lib/`` )
 - Run ``cd python-package; sudo python setup.py install`` command.
