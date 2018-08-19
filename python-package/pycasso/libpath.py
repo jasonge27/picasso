@@ -19,7 +19,8 @@ def find_lib_path():
     dll_path = [os.path.join(curr_path, './lib/')]
 
     if sys.platform == 'win32':
-        dll_path = [os.path.join(p, 'picasso.dll') for p in dll_path]
+        dll_path = [os.path.join(p, 'picasso.dll') for p in dll_path] \
+                    +[os.path.join(p, 'libpicasso.so') for p in dll_path]
     elif sys.platform.startswith('linux'):
         dll_path = [os.path.join(p, 'libpicasso.so') for p in dll_path]
     elif sys.platform == 'darwin':
