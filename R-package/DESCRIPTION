@@ -8,7 +8,7 @@ Maintainer: Jason Ge <jiange@princeton.edu>
 Depends: R (>= 2.15.0), MASS, Matrix
 Imports: methods
 Description: Computationally efficient tools for fitting generalized linear model with convex or non-convex penalty. Users can enjoy the superior statistical property of non-convex penalty such as SCAD and MCP which has significantly less estimation error and overfitting compared to convex penalty such as lasso and ridge. Computation is handled by multi-stage convex relaxation and the PathwIse CAlibrated Sparse Shooting algOrithm (PICASSO) which exploits warm start initialization, active set updating, and strong rule for coordinate preselection to boost computation, and attains a linear convergence to a unique sparse local optimum with optimal statistical properties. The computation is memory-optimized using the sparse matrix output.
-License: GPL-2 
+License: GPL-3 
 Repository: CRAN
 Packaged: 2017-09-09 12:00:00 UTC; Jason
 NeedsCompilation: yes

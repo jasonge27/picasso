@@ -22,6 +22,7 @@ libdir_candidate = [os.path.join(CURRENT_DIR, './pycasso/src/lib/')]
 
 if sys.platform == 'win32':
     libcand_path = [os.path.join(p, 'picasso.dll') for p in libdir_candidate]
+    libcand_path = libcand_path + [os.path.join(p, 'libpicasso.so') for p in libdir_candidate]
 elif sys.platform.startswith('linux'):
     libcand_path = [os.path.join(p, 'libpicasso.so') for p in libdir_candidate]
 elif sys.platform == 'darwin':
@@ -62,12 +63,12 @@ setup(name='pycasso',
       # this is the golden line
       include_package_data=True,
       # data_files=[('pycasso',LIB_PATH)],
-      license='MIT',
+      license='GPL-3.0',
       classifiers=['Development Status :: 3 - Alpha',
                    'Intended Audience :: Developers',
                    'Intended Audience :: Science/Research',
                    'Topic :: Scientific/Engineering :: Artificial Intelligence',
                    'Topic :: Scientific/Engineering :: Mathematics',
                    'Programming Language :: Python :: 3 :: Only',
-                   'License :: OSI Approved :: MIT License'],
+                   'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'],
       url='https://hmjianggatech.github.io/picasso/')

@@ -116,7 +116,7 @@ install.packages("picasso")
 
 - Installing from source code.
 ```bash
-$ git clone https://github.com/jasonge27/picasso.git
+$ git clone --recurse-submodules https://github.com/jasonge27/picasso.git
 $ cd picasso; make Rinstall
 ```
 
@@ -125,7 +125,7 @@ There are two ways to install the picasso python package.
 - Installing from PyPi (recommended). ``pip install pycasso --user``.
 - Installing from source code.
  ```bash
- $git clone https://github.com/jasonge27/picasso.git
+ $git clone --recurse-submodules https://github.com/jasonge27/picasso.git
  $cd picasso; make Pyinstall
  ```
 
