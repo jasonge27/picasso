@@ -10,7 +10,6 @@ import scipy.stats as ss
 import ctypes
 from numpy.ctypeslib import ndpointer
 
-from .cutils import CDoubleArray, CIntArray
 from .libpath import find_lib_path
 
 __all__ = ["Solver"]
@@ -90,7 +89,7 @@ class Solver:
     self.use_intercept = useintercept
 
     # Define the data
-    self.x = np.ascontiguousarray(x, dtype='double')
+    self.x = np.asfortranarray(x, dtype='double')
     self.y = np.ascontiguousarray(y, dtype='double')
     self.num_sample = self.x.shape[0]
     self.num_feature = self.x.shape[1]
@@ -190,14 +189,15 @@ class Solver:
             int *ite_lamb,   // output: number of iterations for each lambda
             int *size_act,   // output: an array of solution sparsity (model df)
             double *runt     // output: runtime
-            // default settings
-            bool usePypthon
         """
+    FDoubleArray = ndpointer(ctypes.c_double, flags='F_CONTIGUOUS')
+    CDoubleArray = ndpointer(ctypes.c_double, flags='C_CONTIGUOUS')
+    CIntArray = ndpointer(ctypes.c_int, flags='C_CONTIGUOUS')
     _function.argtypes = [
-        CDoubleArray, CDoubleArray, ctypes.c_int, ctypes.c_int, CDoubleArray,
+        CDoubleArray, FDoubleArray, ctypes.c_int, ctypes.c_int, CDoubleArray,
         ctypes.c_int, ctypes.c_double, ctypes.c_int, ctypes.c_double,
         ctypes.c_int, ctypes.c_bool, CDoubleArray, CDoubleArray, CIntArray,
-        CIntArray, CDoubleArray, ctypes.c_bool
+        CIntArray, CDoubleArray
     ]
 
     def wrapper():
@@ -206,7 +206,7 @@ class Solver:
                 self.nlambda, self.gamma, self.max_ite, self.prec,
                 self.penaltyflag, self.use_intercept, self.result['beta'],
                 self.result['intercept'], self.result['ite_lamb'],
-                self.result['size_act'], self.result['train_time'], True)
+                self.result['size_act'], self.result['train_time'])
       time_end = time.time()
       self.result['total_train_time'] = time_end - time_start
       self.result['df'] = sum(self.result['beta'].T!=0)

@@ -2,8 +2,8 @@
 
 namespace picasso {
 SqrtMSEObjective::SqrtMSEObjective(const double *xmat, const double *y, int n,
-                                   int d, bool include_intercept, bool usePypthon)
-    : ObjFunction(xmat, y, n, d, usePypthon) {
+                                   int d, bool include_intercept)
+    : ObjFunction(xmat, y, n, d) {
   a = 0.0;
   g = 0.0;
   L = 0.0;
