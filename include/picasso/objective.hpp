@@ -103,8 +103,8 @@ class ObjFunction {
   int n;  // sample number
   int d;  // sample dimension
 
-  Eigen::ArrayXXd X;
-  Eigen::ArrayXd Y;
+  Eigen::Map<const Eigen::ArrayXXd> X;
+  Eigen::Map<const Eigen::ArrayXd> Y;
 
   Eigen::ArrayXd gr;
   Eigen::ArrayXd Xb;
@@ -115,21 +115,13 @@ class ObjFunction {
 
  public:
   ObjFunction(const double *xmat, const double *y, int n, int d)
-      : model_param(d) {
+      : X(xmat, n, d), Y(y, n), model_param(d) {
     this->d = d;
     this->n = n;
-    Y.resize(n);
     gr.resize(d);
 
     Xb.resize(n);
     Xb.setZero();
-
-    for (int i = 0; i < n; i++) Y[i] = y[i];
-
-    X.resize(n, d);
-    for (int j = 0; j < d; j++) {
-      for (int i = 0; i < n; i++) X(i, j) = xmat[j * n + i];
-    }
   };
 
   int get_dim() { return d; }
