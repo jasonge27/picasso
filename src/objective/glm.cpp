@@ -3,8 +3,8 @@
 namespace picasso {
 
 GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d,
-                           bool include_intercept, bool usePypthon)
-    : ObjFunction(xmat, y, n, d, usePypthon) {
+                           bool include_intercept)
+    : ObjFunction(xmat, y, n, d) {
   a = 0.0;
   g = 0.0;
 
@@ -70,8 +70,8 @@ double GLMObjective::get_local_change(double old, int idx) {
 }
 
 LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
-                                     int d, bool include_intercept, bool usePypthon)
-    : GLMObjective(xmat, y, n, d, include_intercept, usePypthon) {
+                                     int d, bool include_intercept)
+    : GLMObjective(xmat, y, n, d, include_intercept) {
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 
@@ -102,8 +102,8 @@ double LogisticObjective::eval() {
 }
 
 PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
-                                   int d, bool include_intercept, bool usePypthon)
-    : GLMObjective(xmat, y, n, d, include_intercept, usePypthon) {
+                                   int d, bool include_intercept)
+    : GLMObjective(xmat, y, n, d, include_intercept) {
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 

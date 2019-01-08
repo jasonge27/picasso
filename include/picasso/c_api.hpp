@@ -19,9 +19,7 @@ extern "C" void SolveLogisticRegression(
                      //         saving the model intercept for each lambda
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
-    double *runt,    // output: runtime
-    // default settings
-    bool usePypthon = false
+    double *runt     // output: runtime
     );
 
 extern "C" void SolvePoissonRegression(
@@ -42,9 +40,7 @@ extern "C" void SolvePoissonRegression(
                      //         saving the model intercept for each lambda
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
-    double *runt,    // output: runtime
-    // default settings
-    bool usePypthon = false
+    double *runt     // output: runtime
     );
 
 extern "C" void SolveSqrtLinearRegression(
@@ -65,9 +61,7 @@ extern "C" void SolveSqrtLinearRegression(
                      //         saving the model intercept for each lambda
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
-    double *runt,    // output: runtime
-    // default settings
-    bool usePypthon = false
+    double *runt     // output: runtime
     );
 
 extern "C" void SolveLinearRegressionNaiveUpdate(
@@ -88,9 +82,7 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
                      //         saving the model intercept for each lambda
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
-    double *runt,    // output: runtime
-    // default settings
-    bool usePypthon = false
+    double *runt     // output: runtime
     );
 
 extern "C" void SolveLinearRegressionCovUpdate(
@@ -111,9 +103,7 @@ extern "C" void SolveLinearRegressionCovUpdate(
                      //         saving the model intercept for each lambda
     int *ite_lamb,   // output: number of iterations for each lambda
     int *size_act,   // output: an array of solution sparsity (model df)
-    double *runt,    // output: runtime
-    // default settings
-    bool usePypthon = false
+    double *runt     // output: runtime
     );
 
 #endif  // PICASSO_C_API_H
