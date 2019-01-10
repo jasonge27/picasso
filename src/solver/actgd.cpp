@@ -10,7 +10,7 @@ ActGDSolver::ActGDSolver(ObjFunction *obj, PicassoSolverParams param)
 }
 
 void ActGDSolver::solve() {
-  unsigned int d = m_obj->get_dim();
+  int d = m_obj->get_dim();
 
   const std::vector<double> &lambdas = m_param.get_lambda_path();
   itercnt_path.resize(lambdas.size(), 0);
@@ -38,7 +38,7 @@ void ActGDSolver::solve() {
 
   int flag1 = 0;
   int flag2 = 1;
-  for (int i = 0; i < lambdas.size(); i++) {
+  for (std::vector<double>::size_type i = 0; i < lambdas.size(); i++) {
     // m_obj->update_auxiliary();
     regfunc->set_param(lambdas[i], m_param.gamma);
 
@@ -117,7 +117,7 @@ void ActGDSolver::solve() {
         loopcnt_level_1 += 1;
 
         bool terminate_loop_level_1 = true;
-        for (int j = 0; j < actset_idx.size(); j++) {
+        for (std::vector<int>::size_type j = 0; j < actset_idx.size(); j++) {
           int idx = actset_idx[j];
           double beta_old = m_obj->get_model_coef(idx);
 

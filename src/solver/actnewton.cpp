@@ -44,7 +44,7 @@ void ActNewtonSolver::solve() {
 
   std::vector<double> stage_lambdas(d, 0);
   RegFunction *regfunc = new RegL1();
-  for (int i = 0; i < lambdas.size(); i++) {
+  for (std::vector<double>::size_type i = 0; i < lambdas.size(); i++) {
     // Rprintf("lambda[%d]:%f\n", i, lambdas[i]);
     // start with the previous solution on the master path
     m_obj->set_model_param(model_master);
@@ -70,7 +70,7 @@ void ActNewtonSolver::solve() {
 
     m_obj->update_auxiliary();
     // loop level 0: multistage convex relaxation
-    int loopcnt_level_0 = 0;
+    unsigned int loopcnt_level_0 = 0;
     int idx;
     double old_beta, old_intcpt, updated_coord, beta;
     while (loopcnt_level_0 < m_param.num_relaxation_round) {
@@ -103,7 +103,7 @@ void ActNewtonSolver::solve() {
           loopcnt_level_2++;
           terminate_loop_level_2 = true;
 
-          for (int k = 0; k < actset_idx.size(); k++) {
+          for (std::vector<int>::size_type k = 0; k < actset_idx.size(); k++) {
             idx = actset_idx[k];
 
             old_beta = m_obj->get_model_coef(idx);
@@ -130,7 +130,7 @@ void ActNewtonSolver::solve() {
 
         terminate_loop_level_1 = true;
         // check stopping criterion 1: fvalue change
-        for (int k = 0; k < actset_idx.size(); ++k) {
+        for (std::vector<int>::size_type k = 0; k < actset_idx.size(); ++k) {
           idx = actset_idx[k];
           if (m_obj->get_local_change(old_coef[idx], idx) > dev_thr)
             terminate_loop_level_1 = false;
