@@ -119,7 +119,7 @@ def test_lognet(n, p, c, nlambda=100):
                            picasso.lambdas[idx])
 
   time0 = time.time()
-  clf = linear_model.LogisticRegression(penalty='l1', tol=1e-6, warm_start=True)
+  clf = linear_model.LogisticRegression(penalty='l1', tol=1e-6, solver='liblinear')
   coefs_ = []
   intcpt_ = []
   for lamb in picasso.lambdas:
