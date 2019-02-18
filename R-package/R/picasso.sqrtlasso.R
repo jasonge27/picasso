@@ -178,7 +178,7 @@ predict.sqrtlasso <- function(object, newdata, lambda.idx = c(1:3), Y.pred.idx =
   pred.n = nrow(newdata)
   lambda.n = length(lambda.idx)
   Y.pred.n = length(Y.pred.idx)
-  intcpt = matrix(rep(object$intercept[,lambda.idx],pred.n),nrow=pred.n,
+  intcpt = matrix(rep(object$intercept[lambda.idx],pred.n),nrow=pred.n,
                   ncol=lambda.n,byrow=T)
   Y.pred = newdata%*%object$beta[,lambda.idx] + intcpt
   cat("\n Values of predicted responses: \n")

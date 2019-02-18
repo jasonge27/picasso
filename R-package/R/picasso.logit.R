@@ -187,7 +187,7 @@ predict.logit <- function(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1
   pred.n = nrow(newdata)
   lambda.n = length(lambda.idx)
   p.pred.n = length(p.pred.idx)
-  intcpt = matrix(rep(object$intercept[,lambda.idx],pred.n),nrow=pred.n,
+  intcpt = matrix(rep(object$intercept[lambda.idx],pred.n),nrow=pred.n,
                   ncol=lambda.n,byrow=T)
   res = newdata%*%object$beta[,lambda.idx] + intcpt
   p.pred = exp(res)/(1+exp(res))
