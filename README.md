@@ -29,7 +29,7 @@ The directory is organized as follows:
    * [__solver__](solver): Two types of pathwise active set algorithms. Actgd.cpp implements pathwise active set + gradient descent. Actnewton.cpp implements pathwise active set + newton algorithm.
 * [__include__](include)
    * [__picasso__](picasso): declarations of the C++ implementation
-   * [__Eigen__](Eigen): Eigen3 header files for high performance linear algebra.
+   * [__Eigen__](eigen3): Eigen3 header files for high performance linear algebra.
 * [__amalgamation__](amalgamation):flag all the c++ implementation for compiling.
 * [__cmake__](cmake):Makefile local configurations.
 * [__make__](make):Makefile local configurations.
@@ -107,6 +107,7 @@ We compared with sklearn (version 0.19.1) for L1 regularized linear and logistic
 ![Performance_Python](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/performance_python.jpeg)
 
 ## Installation
+Third-party dependencies. The installation only depends on Eigen3's header files which are included in this github repo as a submodule. We use Eigen3 as an independent fully portable module so any existing Eigen3 installation will not have conflict with picasso installation.
 ### Installing R package
 There are two ways to install the picasso R package.
 - Installing from CRAN (recommended). The R package is hosted on CRAN. The easiest way to install R package is by running the following command in R

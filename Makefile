@@ -61,7 +61,7 @@ ifeq ($(UNAME), Linux)
 endif
 
 # specify tensor path
-.PHONY: clean all lint clean_all doxygen rcpplint Pypack Pyinstall Rpack Rbuild Rcheck pylint
+.PHONY: clean all clean_all doxygen Pypack Pyinstall Rpack Rbuild Rcheck
 
 
 all: lib/libpicasso.a $(PICASSO_DYLIB) picasso
@@ -98,16 +98,6 @@ lib/libpicasso.dll lib/libpicasso.so: $(ALL_DEP)
 
 picasso:  $(CLI_OBJ) $(ALL_DEP)
 	$(CXX) $(CFLAGS) -o $@  $(filter %.o %.a, $^)  $(LDFLAGS)
-
-# TODO: lint check
-# rcpplint:
-# 	python2  picasso ${LINT_LANG} R-package/src
-#
-# lint: rcpplint
-# 	python2 picasso ${LINT_LANG} include src  python-package
-#
-# pylint:
-# 	flake8 --ignore E501 python-package
 
 ifeq ($(TEST_COVER), 1)
 cover: check
