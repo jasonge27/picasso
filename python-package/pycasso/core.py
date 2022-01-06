@@ -290,7 +290,8 @@ class Solver:
         """
     self.result['state'] = 'trained'
     self.trainer()
-    print('Training is over.')
+    if self.verbose:
+      print('Training is over.')
 
   def coef(self):
     """
