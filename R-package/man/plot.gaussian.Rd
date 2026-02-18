@@ -4,7 +4,7 @@
 Plot Function for "gaussian"
 }
 \description{
-Visualize the solution path of regression estimate corresponding to regularization paramters.
+Visualize the solution path of regression estimates across regularization parameters.
 }
 \usage{
 \method{plot}{gaussian}(x, ...)
@@ -20,7 +20,7 @@ Visualize the solution path of regression estimate corresponding to regularizati
 
 \author{
 Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
-Maintainer: Jason Ge <jiange@princeton.edu>
+Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
 
 \seealso{

@@ -1,9 +1,8 @@
 # coding: utf-8
 """
-PICASSO: Penalized Generalized Linear Model Solver - Unleash the Power of Non-convex Penalty
+PICASSO: Penalized generalized linear model solver.
 
-:Author: Jason Ge, Haoming Jiang
-:Maintainer: Haoming Jiang <jianghm@gatech.edu>
+:Authors: Jason Ge, Haoming Jiang, Xingguo Li, Tuo Zhao
 
 """
 
