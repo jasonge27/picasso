@@ -88,19 +88,17 @@ picasso.poisson <- function(X,
     }
     
     out = poisson_solver(yy, xx, lambda, nlambda, gamma, 
-                n, d, max.ite, prec, intercept = FALSE, verbose, 
+                n, d, max.ite, prec, intercept = intercept, verbose, 
                 method.flag)
   }
   
-  df = rep(0,nlambda)
-  for (i in 1:nlambda)
-    df[i] = sum(out$beta[[i]]!=0)
+  df = vapply(out$beta, function(beta.k) sum(beta.k != 0), FUN.VALUE = integer(1))
   
   est = list()
   intcpt = matrix(0, nrow=1, ncol=nlambda)
   beta1 = matrix(0, nrow=d, ncol=nlambda)
   
-  if (standardize==TRUE){
+  if (standardize){
     for (k in 1:nlambda){
       tmp.beta = out$beta[[k]]
       beta1[,k] = xinvc.vec*tmp.beta
@@ -185,7 +183,7 @@ predict.poisson <- function(object, newdata, lambda.idx = c(1:3), p.pred.idx = c
                   ncol=lambda.n, byrow=T)
   res = newdata%*%object$beta[,lambda.idx] + intcpt
 
-  p.pred = res
+  p.pred = exp(res)
   cat("\n Values of predicted Poisson parameter: \n")
   cat("   index   ")
   for (i in 1:lambda.n){

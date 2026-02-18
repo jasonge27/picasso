@@ -1,14 +1,22 @@
 Package: picasso
 Type: Package
 Title: Pathwise Calibrated Sparse Shooting Algorithm
-Version: 1.1.0
-Date: 2017-09-09
-Author: Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao
-Maintainer: Jason Ge <jiange@princeton.edu>
+Version: 1.4.1
+Date: 2026-02-18
+Author: Jason Ge [aut], Xingguo Li [aut], Haoming Jiang [aut], Mengdi Wang [aut], Tong Zhang [aut], Han Liu [aut], Tuo Zhao [aut, cre]
+Maintainer: Tuo Zhao <tourzhao@gatech.edu>
+Authors@R: c(
+ person("Jason", "Ge", role = "aut", email = "jiange@princeton.edu"),
+ person("Xingguo", "Li", role = "aut"),
+ person("Haoming", "Jiang", role = "aut"),
+ person("Mengdi", "Wang", role = "aut"),
+ person("Tong", "Zhang", role = "aut"),
+ person("Han", "Liu", role = "aut"),
+ person("Tuo", "Zhao", role = c("aut", "cre"), email = "tourzhao@gatech.edu")
+ )
 Depends: R (>= 2.15.0), MASS, Matrix
 Imports: methods
 Description: Computationally efficient tools for fitting generalized linear model with convex or non-convex penalty. Users can enjoy the superior statistical property of non-convex penalty such as SCAD and MCP which has significantly less estimation error and overfitting compared to convex penalty such as lasso and ridge. Computation is handled by multi-stage convex relaxation and the PathwIse CAlibrated Sparse Shooting algOrithm (PICASSO) which exploits warm start initialization, active set updating, and strong rule for coordinate preselection to boost computation, and attains a linear convergence to a unique sparse local optimum with optimal statistical properties. The computation is memory-optimized using the sparse matrix output.
-License: GPL-3 
+License: GPL-3
 Repository: CRAN
-Packaged: 2017-09-09 12:00:00 UTC; Jason
 NeedsCompilation: yes

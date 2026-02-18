@@ -1,6 +1,7 @@
 #include <R.h>
 #include <picasso/c_api.hpp>
-
+#include <R_ext/Rdynload.h>
+#include <stdlib.h> // 
 extern "C" void picasso_logit_solver(
     double* Y,       // input: 0/1 model response
     double* X,       // input: model covariates
@@ -157,3 +158,21 @@ extern "C" void standardize_design(double* X, double* xx, double* xm,
     }
   }
 }
+
+
+static const R_CMethodDef CEntries[] = {
+    {"picasso_gaussian_cov",      (DL_FUNC) &picasso_gaussian_cov,      16},
+    {"picasso_gaussian_naive",    (DL_FUNC) &picasso_gaussian_naive,    16},
+    {"picasso_logit_solver",      (DL_FUNC) &picasso_logit_solver,      16},
+    {"picasso_poisson_solver",    (DL_FUNC) &picasso_poisson_solver,    16},
+    {"picasso_sqrt_lasso_solver", (DL_FUNC) &picasso_sqrt_lasso_solver, 16},
+    {"standardize_design",        (DL_FUNC) &standardize_design,         6},
+    {NULL, NULL, 0}
+};
+
+void R_init_picasso(DllInfo *dll)
+{
+    R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
+

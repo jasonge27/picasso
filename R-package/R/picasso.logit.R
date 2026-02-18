@@ -94,9 +94,7 @@ picasso.logit <- function(X,
                 method.flag)
   }
   
-  df = rep(0, nlambda)
-  for (i in 1:nlambda)
-    df[i] = sum(out$beta[[i]]!=0)
+  df = vapply(out$beta, function(beta.k) sum(beta.k != 0), FUN.VALUE = integer(1))
   
   est = list()
   intcpt = matrix(0, nrow=1, ncol=nlambda)
@@ -125,6 +123,7 @@ picasso.logit <- function(X,
   est$nlambda = nlambda
   est$df = df
   est$method = method
+  est$alg = "actgd"
  
   est$ite =out$ite
   est$verbose = verbose

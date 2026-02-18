@@ -10,42 +10,43 @@ The function "picasso" implements the user interface.
 }
 
 \usage{
-picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio = 0.05,
-         family = "gaussian", method="l1",
-        type.gaussian = "naive", gamma = 3, df = NULL, standardize = TRUE,
-        intercept= TRUE,
-        prec = 1e-7, max.ite = 1000,  verbose = FALSE)
+picasso(X, Y, lambda = NULL, nlambda = 100, lambda.min.ratio =
+                 0.05, family = "gaussian", method = "l1",
+                 type.gaussian = "naive", gamma = 3, df = NULL,
+                 standardize = TRUE, intercept = TRUE, prec = 1e-07,
+                 max.ite = 1000, verbose = FALSE)
 }
 
 \arguments{
   \item{X}{ \code{X} is an \eqn{n} by \eqn{d} design matrix where \code{n} is the sample size and \code{d} is the data dimension.}
-
-  \item{Y}{\code{Y} is the \eqn{n} dimensional response vector. Y is numeric vector for \code{family=``gaussian''} and \code{family=``sqrtlasso''}, or a two-level factor for \code{family=``binomial''}, or a non-negative integer vector representing counts for \code{family = ``poisson''}. }
-
+  
+  \item{Y}{\code{Y} is the \eqn{n} dimensional response vector. Y is numeric vector for \code{family=``gaussian''} and \code{family=``sqrtlasso''}, or a two-level factor for \code{family=``binomial''}, or a non-negative integer vector representing counts for \code{family = ``gaussian''}. }
+  
   \item{lambda}{A sequence of decresing positive values to control the regularization. Typical usage is to leave the input \code{lambda = NULL} and have the program compute its own \code{lambda} sequence based on \code{nlambda} and \code{lambda.min.ratio}. Users can also specify a sequence to override this. Default value is from \eqn{lambda.max} to \code{lambda.min.ratio*lambda.max}. The default value of \eqn{lambda.max} is the minimum regularization parameter which yields an all-zero estimates.}
-
+  
   \item{nlambda}{The number of values used in \code{lambda}. Default value is 100.}
 
   \item{lambda.min.ratio}{The smallest value for \code{lambda}, as a fraction of the uppperbound (\code{MAX}) of the regularization parameter. The program can automatically generate \code{lambda} as a sequence of length = \code{nlambda} starting from \code{MAX} to \code{lambda.min.ratio*MAX} in log scale. The default value is \code{0.05}.} Caution: logistic and poisson regression can be ill-conditioned if lambda is too small for nonconvex penalty. We suggest the user to avoid using any lambda.min.raito smaller than 0.05 for logistic/poisson regression under nonconvex penalty.
-
+  
+  
   \item{family}{Options for model. Sparse linear regression and sparse multivariate regression is applied if \code{family = "gaussian"}, sqrt lasso is applied if \code{family = "sqrtlasso"}, sparse logistic regression is applied if \code{family = "binomial"} and sparse poisson regression is applied if \code{family = "poisson"}. The default value is \code{"gaussian"}.}
-
+  
   \item{method}{Options for regularization. Lasso is applied if \code{method = "l1"}, MCP is applied if \code{method = "mcp"} and SCAD Lasso is applied if \code{method = "scad"}. The default value is \code{"l1"}.}
-
+  
   \item{type.gaussian}{Options for updating residuals in sparse linear regression. The naive update rule is applied if \code{opt = "naive"}, and the covariance update rule is applied if \code{opt = "covariance"}. The default value is \code{"naive"}.}
-
+  
   \item{gamma}{The concavity parameter for MCP and SCAD. The default value is \code{3}.}
-
+  
   \item{df}{Maximum degree of freedom for the covariance update. The default value is \code{2*n}.}
-
+  
   \item{standardize}{Design matrix X will be standardized to have mean zero and unit standard deviation if \code{standardize = TRUE}. The default value is \code{TRUE}.}
-
-  \item{intercept}{Whether or not to include intercept term. Default value is True.}
-
-  \item{max.ite}{The iteration limit. The default value is 1000.}
+      
+  
+  \item{intercept}{Does the model has intercept term or not. Default value is \code{TRUE}.}
 
   \item{prec}{Stopping precision. The default value is 1e-7.}
-
+  
+  \item{max.ite}{Max number of iterations for the algorithm. The default value is 1000.}
 
   \item{verbose}{Tracing information is disabled if \code{verbose = FALSE}. The default value is \code{FALSE}.}
   }
@@ -56,14 +57,14 @@ For sparse linear regression,
     \min_{\beta} {\frac{1}{2n}}|| Y - X \beta - \beta_0||_2^2 + \lambda R(\beta),
     }\cr
     where \eqn{R(\beta)} can be \eqn{\ell_1} norm, MCP, SCAD regularizers.
-
+   
 For sparse logistic regression,
 
 \deqn{
     \min_{\beta} {\frac{1}{n}}\sum_{i=1}^n (\log(1+e^{x_i^T \beta+ \beta_0}) - y_i x_i^T \beta) + \lambda R(\beta),
     }\cr
-    where \eqn{R(\beta)} can be \eqn{\ell_1} norm, MCP, and SCAD regularizers.
-
+    where \eqn{R(\beta)} can be \eqn{\ell_1} norm, MCP, and SCAD regularizers. 
+    
 For sparse poisson regression,
 \deqn{
     \min_{\beta} {\frac{1}{n}}\sum_{i=1}^n (e^{x_i^T \beta + \beta_0} - y_i (x_i^T \beta+\beta_0) + \lambda R(\beta),
@@ -73,7 +74,7 @@ For sparse poisson regression,
 }
 
 \value{
-An object with S3 classes \code{"gaussian"}, \code{"binomial"}, and \code{"poisson"} corresponding to  sparse linear regression, sparse logistic regression, and sparse poisson regression respectively is returned:
+An object with S3 classes \code{"gaussian"}, \code{"binomial"}, and \code{"poisson"} corresponding to  sparse linear regression, sparse logistic regression, and sparse poisson regression respectively is returned: 
   \item{beta}{
   A matrix of regression estimates whose columns correspond to regularization parameters for sparse linear regression and sparse logistic regression. A list of matrices of regression estimation corresponding to regularization parameters for sparse column inverse operator.
   }
@@ -87,10 +88,10 @@ An object with S3 classes \code{"gaussian"}, \code{"binomial"}, and \code{"poiss
   The number of values used in \code{lambda}.
   }
   \item{family}{
-  The \code{family} from the input.
+  The \code{family} from the input. 
   }
   \item{method}{
-  The \code{method} from the input.
+  The \code{method} from the input. 
   }
   \item{path}{
   A list of \code{d} by \code{d} adjacency matrices of estimated graphs as a graph path corresponding to \code{lambda}.
@@ -100,7 +101,7 @@ An object with S3 classes \code{"gaussian"}, \code{"binomial"}, and \code{"poiss
   }
   \item{standardize}{The \code{standardize} from the input.}
   \item{df}{
-  The degree of freecom (number of nonzero coefficients) along the solution path for sparse linear regression, nd sparse logistic regression.
+  The degree of freecom (number of nonzero coefficients) along the solution path for sparse linear regression, nd sparse logistic regression. 
   }
   \item{ite}{
   A list of vectors where the i-th entries of ite[[1]] and ite[[2]] correspond to the outer iteration and inner iteration of i-th regularization parameter respectively.
@@ -130,7 +131,7 @@ properties. \emph{Journal of the American Statistical Association}, 2001.\cr
 ################################################################
 ## Sparse linear regression
 ## Generate the design matrix and regression coefficient vector
-n = 100 # sample number
+n = 100 # sample number 
 d = 80 # sample dimension
 c = 0.5 # correlation parameter
 s = 20  # support size of coefficient
@@ -154,7 +155,7 @@ fitted.mcp = picasso(X, Y, nlambda=100, method="mcp")
 ## scad regularization
 fitted.scad = picasso(X, Y, nlambda=100, method="scad")
 
-## lambdas used
+## lambdas used 
 print(fitted.l1.naive$lambda)
 
 ## number of nonzero coefficients for each lambda
@@ -176,7 +177,7 @@ plot(fitted.scad)
 ################################################################
 ## Sparse logistic regression
 ## Generate the design matrix and regression coefficient vector
-n <- 100  # sample number
+n <- 100  # sample number 
 d <- 80   # sample dimension
 c <- 0.5   # parameter controlling the correlation between columns of X
 s <- 20    # support size of coefficient
@@ -197,7 +198,7 @@ fitted.mcp = picasso(X, Y, nlambda=100, family="binomial", method="mcp")
 ## scad regularization
 fitted.scad = picasso(X, Y, nlambda=100, family="binomial", method="scad")
 
-## lambdas used
+## lambdas used 
 print(fitted.l1$lambda)
 
 ## number of nonzero coefficients for each lambda
@@ -219,7 +220,7 @@ param.l1 = fitted.l1$p
 ################################################################
 ## Sparse poisson regression
 ## Generate the design matrix and regression coefficient vector
-n <- 100  # sample number
+n <- 100  # sample number 
 d <- 80   # sample dimension
 c <- 0.5   # parameter controlling the correlation between columns of X
 s <- 20    # support size of coefficient
@@ -240,7 +241,7 @@ fitted.mcp = picasso(X, Y, nlambda=100, family="poisson", method="mcp")
 ## scad regularization
 fitted.scad = picasso(X, Y, nlambda=100, family="poisson", method="scad")
 
-## lambdas used
+## lambdas used 
 print(fitted.l1$lambda)
 
 ## number of nonzero coefficients for each lambda

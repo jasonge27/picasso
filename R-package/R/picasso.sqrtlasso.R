@@ -18,7 +18,7 @@ picasso.sqrtlasso <- function(X,
   begt = Sys.time()
 
   if (verbose)
-    cat("Sparse logistic regression. \n")
+    cat("Sparse sqrt lasso regression. \n")
   if (n == 0 || d == 0) {
     cat("No data input.\n")
     return(NULL)
@@ -87,9 +87,7 @@ picasso.sqrtlasso <- function(X,
                 method.flag)
   }
   
-  df = rep(0, nlambda)
-  for (i in 1:nlambda)
-    df[i] = sum(out$beta[[i]]!=0)
+  df = vapply(out$beta, function(beta.k) sum(beta.k != 0), FUN.VALUE = integer(1))
   
   est = list()
   intcpt = matrix(0, nrow=1, ncol=nlambda)
@@ -111,8 +109,6 @@ picasso.sqrtlasso <- function(X,
   runt = Sys.time()-begt
   est$runt = out$runt
   est$beta = Matrix(beta1)
-  res = X%*%beta1+matrix(rep(intcpt,n),nrow=n,byrow=TRUE)
-  est$p = exp(res)/(1+exp(res))
   est$intercept = intcpt
   est$lambda = lambda
   est$nlambda = nlambda
@@ -122,7 +118,7 @@ picasso.sqrtlasso <- function(X,
   est$ite =out$ite
   est$verbose = verbose
   est$runtime = runt
-  class(est) = ""
+  class(est) = "sqrtlasso"
   return(est)
 }
 

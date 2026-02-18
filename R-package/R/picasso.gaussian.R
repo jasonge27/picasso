@@ -150,9 +150,7 @@ picasso.gaussian <- function(X,
   est$beta = Matrix(beta1)
   est$intercept = intcpt
   
-  est$df = rep(0, nlambda)
-  for (i in 1:nlambda)
-    est$df[i] = sum(out$beta[((i-1)*d+1):(i*d)]!=0)
+  est$df = colSums(matrix(out$beta, nrow=d, ncol=nlambda, byrow=FALSE) != 0)
   
   est$ite = out$ite
   
@@ -161,6 +159,7 @@ picasso.gaussian <- function(X,
   est$nlambda = nlambda
   est$gamma = gamma
   est$method = method
+  est$alg = paste("actnewton", type.gaussian, sep = "-")
   est$verbose = verbose
   est$runtime = runt
   class(est) = "gaussian"
