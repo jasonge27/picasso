@@ -2,7 +2,15 @@
 #define PICASSO_OBJECTIVE_H
 
 #include <cmath>
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"
+#pragma clang diagnostic ignored "-Wdeprecated-enum-enum-conversion"
+#endif
 #include <eigen3/Eigen/Dense>
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 #include <vector>
 
 #include <ctime>

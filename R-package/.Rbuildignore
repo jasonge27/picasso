@@ -1,2 +1,10 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.Rlib($|/)
+^\.Rcheck($|/)
+^\.\.[Rr]check($|/)
+^[^/]+\.Rcheck($|/)
+^[^/]+_[0-9].*\.tar\.gz$
+^[^/]+\.patch$
+^src/.*\.(o|so|dll|dylib|a)$
+^\.DS_Store$
