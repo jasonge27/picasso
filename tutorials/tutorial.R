@@ -1,129 +1,85 @@
 library(picasso)
 
+# Reproducible tutorial examples for Gaussian, binomial, and Poisson models.
+set.seed(2016)
+
+generate_design <- function(n, d, corr = 0.5) {
+  scale(matrix(rnorm(n * d), n, d) + corr * rnorm(n)) / sqrt(n - 1) * sqrt(n)
+}
+
+show_path_summary <- function(fit, label, idx = 30) {
+  i <- min(idx, fit$nlambda)
+  cat("\n====", label, "====\n")
+  cat("First 5 lambdas:\n")
+  print(head(fit$lambda, 5))
+  cat("First 5 df values:\n")
+  print(head(fit$df, 5))
+  cat("Selected lambda index:", i, "\n")
+  print(fit$lambda[i])
+  print(fit$beta[, i])
+  print(fit$intercept[i])
+}
+
+################################################################
 ## Sparse linear regression
-## Generate the design matrix and regression coefficient vector
-n = 100 # sample number
-d = 80 # sample dimension
-c = 0.5 # correlation parameter
-s = 20  # support size of coefficient
-set.seed(1024)
-X = scale(matrix(rnorm(n*d),n,d)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
-beta = c(runif(s), rep(0, d-s))
+n <- 100
+d <- 80
+s <- 20
+X <- generate_design(n, d, corr = 0.5)
+beta <- c(runif(s), rep(0, d - s))
+Y <- X %*% beta + rnorm(n)
 
-## Generate response using Gaussian noise, and fit sparse linear models
-noise = rnorm(n)
-Y = X%*%beta + noise
+fit_g_l1_naive <- picasso(X, Y, family = "gaussian", method = "l1",
+                          type.gaussian = "naive", nlambda = 100)
+fit_g_l1_cov <- picasso(X, Y, family = "gaussian", method = "l1",
+                        type.gaussian = "covariance", nlambda = 100)
+fit_g_mcp <- picasso(X, Y, family = "gaussian", method = "mcp", nlambda = 100)
+fit_g_scad <- picasso(X, Y, family = "gaussian", method = "scad", nlambda = 100)
 
-## l1 regularization solved with naive update
-fitted.l1.naive = picasso(X, Y, nlambda=100, type.gaussian="naive")
+show_path_summary(fit_g_l1_naive, "Gaussian / L1 (naive)")
 
-## l1 regularization solved with covariance update
-fitted.l1.covariance  = picasso(X, Y, nlambda=100, type.gaussian="covariance")
-
-## mcp regularization
-fitted.mcp = picasso(X, Y, nlambda=100, method="mcp")
-
-## scad regularization
-fitted.scad = picasso(X, Y, nlambda=100, method="scad")
-
-## lambdas used
-print(fitted.l1.naive$lambda)
-
-## number of nonzero coefficients for each lambda
-print(fitted.l1.naive$df)
-
-## coefficients and intercept for the i-th lambda
-i = 30
-print(fitted.l1.naive$lambda[i])
-print(fitted.l1.naive$beta[,i])
-print(fitted.l1.naive$intercept[i])
-
-
-## Visualize the solution path
-plot(fitted.l1.naive)
-plot(fitted.l1.covariance)
-plot(fitted.mcp)
-plot(fitted.scad)
-
+## Optional: visualize solution paths
+plot(fit_g_l1_naive)
+plot(fit_g_l1_cov)
+plot(fit_g_mcp)
+plot(fit_g_scad)
 
 ################################################################
 ## Sparse logistic regression
-## Generate the design matrix and regression coefficient vector
-n <- 100  # sample number
-d <- 80   # sample dimension
-c <- 0.5   # parameter controlling the correlation between columns of X
-s <- 20    # support size of coefficient
-set.seed(2016)
-X <- scale(matrix(rnorm(n*d),n,d)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
-beta <- c(runif(s), rep(0, d-s))
+X <- generate_design(n, d, corr = 0.5)
+beta <- c(runif(s), rep(0, d - s))
+p <- 1 / (1 + exp(-X %*% beta))
+Y <- rbinom(n, 1, p)
 
-## Generate response and fit sparse logistic models
-p = 1/(1+exp(-X%*%beta))
-Y = rbinom(n, rep(1,n), p)
+fit_b_l1 <- picasso(X, Y, family = "binomial", method = "l1", nlambda = 100)
+fit_b_mcp <- picasso(X, Y, family = "binomial", method = "mcp", nlambda = 100)
+fit_b_scad <- picasso(X, Y, family = "binomial", method = "scad", nlambda = 100)
 
-## l1 regularization
-fitted.l1 = picasso(X, Y, nlambda=100, family="binomial", method="l1")
+show_path_summary(fit_b_l1, "Binomial / L1")
 
-## mcp regularization
-fitted.mcp = picasso(X, Y, nlambda=100, family="binomial", method="mcp")
+## Fitted Bernoulli probabilities on training data
+prob_train <- fit_b_l1$p
+print(dim(prob_train))
 
-## scad regularization
-fitted.scad = picasso(X, Y, nlambda=100, family="binomial", method="scad")
-
-## lambdas used
-print(fitted.l1$lambda)
-
-## number of nonzero coefficients for each lambda
-print(fitted.l1$df)
-
-## coefficients and intercept for the i-th lambda
-i = 30
-print(fitted.l1$lambda[i])
-print(fitted.l1$beta[,i])
-print(fitted.l1$intercept[i])
-
-## Visualize the solution path
-plot(fitted.l1)
-
-## Estimate of Bernoulli parameters
-param.l1 = fitted.l1$p
-
+## Optional: visualize solution paths
+plot(fit_b_l1)
+plot(fit_b_mcp)
+plot(fit_b_scad)
 
 ################################################################
 ## Sparse poisson regression
-## Generate the design matrix and regression coefficient vector
-n <- 100  # sample number
-d <- 80   # sample dimension
-c <- 0.5   # parameter controlling the correlation between columns of X
-s <- 20    # support size of coefficient
-set.seed(2016)
-X <- scale(matrix(rnorm(n*d),n,d)+c*rnorm(n))/sqrt(n-1)*sqrt(n)
-beta <- c(runif(s), rep(0, d-s))/sqrt(s)
+X <- generate_design(n, d, corr = 0.5)
+beta <- c(runif(s), rep(0, d - s)) / sqrt(s)
+eta <- X %*% beta + rnorm(n)
+Y <- rpois(n, lambda = exp(eta))
 
-## Generate response and fit sparse poisson models
-p = X%*%beta+rnorm(n)
-Y = rpois(n, exp(p))
+fit_p_l1 <- picasso(X, Y, family = "poisson", method = "l1", nlambda = 100)
+fit_p_mcp <- picasso(X, Y, family = "poisson", method = "mcp", nlambda = 100)
+fit_p_scad <- picasso(X, Y, family = "poisson", method = "scad", nlambda = 100)
 
-## l1 regularization
-fitted.l1 = picasso(X, Y, nlambda=100, family="poisson", method="l1")
+show_path_summary(fit_p_l1, "Poisson / L1")
 
-## mcp regularization
-fitted.mcp = picasso(X, Y, nlambda=100, family="poisson", method="mcp")
-
-## scad regularization
-fitted.scad = picasso(X, Y, nlambda=100, family="poisson", method="scad")
-
-## lambdas used
-print(fitted.l1$lambda)
-
-## number of nonzero coefficients for each lambda
-print(fitted.l1$df)
-
-## coefficients and intercept for the i-th lambda
-i = 30
-print(fitted.l1$lambda[i])
-print(fitted.l1$beta[,i])
-print(fitted.l1$intercept[i])
-
-## Visualize the solution path
-plot(fitted.l1)
+## Optional: visualize solution paths
+plot(fit_p_l1)
+plot(fit_p_mcp)
+plot(fit_p_scad)
