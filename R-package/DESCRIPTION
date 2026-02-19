@@ -1,6 +1,6 @@
 Package: picasso
 Type: Package
-Title: Sparse Learning with Convex and Nonconvex Penalties
+Title: Sparse Learning with Convex and Non-Convex Penalties
 Version: 1.4.1
 Date: 2026-02-18
 Author: Jason Ge [aut], Xingguo Li [aut], Haoming Jiang [aut], Mengdi Wang [aut], Tong Zhang [aut], Han Liu [aut], Tuo Zhao [aut, cre]
@@ -17,7 +17,7 @@ Authors@R: c(
 Depends: R (>= 2.15.0), MASS, Matrix
 Imports: methods
 Description: Computationally efficient tools for fitting sparse generalized linear
-    models with convex or nonconvex penalties. Supported penalties include lasso,
+    models with convex or non-convex penalties. Supported penalties include lasso,
     smoothly clipped absolute deviation, and minimax concave penalty. Computation
     is based on multi-stage convex relaxation and a path algorithm with warm
     starts, active-set updates, and screening rules. The implementation uses C++

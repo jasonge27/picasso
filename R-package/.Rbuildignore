@@ -1,6 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.Rlib($|/)
+^\.Rlib($|.*)
 ^\.Rcheck($|/)
 ^\.\.[Rr]check($|/)
 ^[^/]+\.Rcheck($|/)
