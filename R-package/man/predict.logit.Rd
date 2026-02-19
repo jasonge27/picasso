@@ -5,7 +5,7 @@
 Prediction for an object with S3 class \code{"logit"}
 }
 \description{
-Predicting responses of the given design data.
+Predict responses for new design data.
 }
 \usage{
 \method{predict}{logit}(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1:5), \dots)
@@ -16,10 +16,10 @@ Predicting responses of the given design data.
   An object with S3 class \code{"logit"} 
   }
   \item{newdata}{
-  An optional data frame in which to look for variables with which to predict. If omitted, the traning data of the are used.
+  Optional matrix/data frame used for prediction. If omitted, the training design matrix from fitting is used.
   }
   \item{lambda.idx}{
-  The indices of the regularizaiton parameters in the solution path to be displayed. The default values are \code{c(1:3)}.
+  The indices of the regularization parameters in the solution path to be displayed. The default values are \code{c(1:3)}.
   }
   \item{p.pred.idx}{
   The indices of the predicted response vectors in the solution path to be displayed. The default values are \code{c(1:5)}.
@@ -43,7 +43,7 @@ Predicting responses of the given design data.
 }
 \author{
 Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
-Maintainer: Jason Ge <jiange@princeton.edu>
+Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

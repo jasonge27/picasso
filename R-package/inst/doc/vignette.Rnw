@@ -6,5 +6,8 @@
 \usepackage{hyperref}
 \usepackage{pdfpages}
 \begin{document}
+\section*{Reference}
+Updated manuscript link: \url{https://arxiv.org/abs/2006.15261}
+\clearpage
 \includepdf[fitpaper=true,pages=-]{PICASSO.pdf}
 \end{document}

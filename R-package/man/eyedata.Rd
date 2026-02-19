@@ -6,7 +6,7 @@ The Bardet-Biedl syndrome Gene expression data from Scheetz et al. (2006)
 }
 
 \description{
-Gene expression data (20 genes for 120 samples) from the microarray experiments of mammalianeye tissue samples of Scheetz et al. (2006).
+Gene expression data (200 genes for 120 samples) from the microarray experiments of mammalian eye tissue samples of Scheetz et al. (2006).
 }
 
 \usage{data(eyedata)}
@@ -16,9 +16,11 @@ Gene expression data (20 genes for 120 samples) from the microarray experiments 
 }
 
 \format{
-  The format is a list containing conatins a matrix and a vector.
-  1. x - an 120 by 200 matrix, which represents the data of 120 rats with 200 gene probes.
-  2. y - a 120-dimensional vector of, which represents the expression level of TRIM32 gene.
+  A list with components:
+  \describe{
+    \item{x}{A 120 by 200 matrix of gene probes.}
+    \item{y}{A numeric response vector of length 120 representing the expression level of TRIM32 gene.}
+  }
 }
 
 \author{
@@ -36,5 +38,5 @@ Maintainer: Xingguo Li <xingguo.leo@gmail.com>
 
 \examples{
 data(eyedata)
-image(x)
+image(eyedata$x)
 }

@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-Main Interface of the package
+Primary Python interface for PICASSO solvers.
 """
 
 import time
@@ -35,32 +35,32 @@ _PICASSO_LIB = _load_lib()
 
 class Solver:
   """
-    The PICASSO Solver For GLM.
+    PICASSO solver for sparse GLM and square-root lasso.
 
-    :param x: An `n*m` design matrix where n is the sample size and d is the data dimension.
-    :param y: The *n* dimensional response vector. `y` is numeric vector for `gaussian` and `sqrtlasso`,
-            or a two-level factor for `binomial`, or a non-negative integer vector representing counts
-            for `gaussian`.
-    :param lambdas: The parameters of controling regularization. Can be one of the following two cases: |br|
-            **Case1 (default)**: A tuple of 2 variables (`n`, `lambda_min_ratio`), where the default values are
-            (100,0.05). The program calculates `lambdas` as an array of `n` elements starting from `lambda_max`
-            to `lambda_min_ratio * lambda_max` in log scale. `lambda_max` is the minimum regularization parameter
-            which yields an all-zero estimates.
-            **Caution**: logistic and poisson regression can be ill-conditioned
-            if lambda is too small for nonconvex penalty. We suggest the user to avoid using any
-            `lambda_min_raito` smaller than 0.05 for logistic/poisson regression under nonconvex penalty. |br|
-            **Case2**: A manually specified sequence (size > 2) of decreasing positive values to control the regularization.
-    :param family: Options for model. Sparse linear regression and sparse multivariate regression is applied if
-            `family = "gaussian"`, sqrt lasso is applied if `family = "sqrtlasso"`, sparse logistic regression is
-            applied if `family = "binomial"` and sparse poisson regression is applied if `family = "poisson"`.
-            The default value is `"gaussian"`.
-    :param penalty: Options for regularization. Lasso is applied if `method = "l1"`, MCP is applied if `
-            method = "mcp"` and SCAD Lasso is applied if `method = "scad"`. The default value is `"l1"`.
-    :param gamma: The concavity parameter for MCP and SCAD. The default value is `3`.
-    :param useintercept: Whether or not to include intercept term. Default value is False.
-    :param prec: Stopping precision. The default value is 1e-7.
-    :param max_ite: The iteration limit. The default value is 1000.
-    :param verbose: Tracing information is disabled if `verbose = False`. The default value is `False`.
+    :param x: Numeric design matrix with shape ``(n_samples, n_features)``.
+    :param y: Response vector of length ``n_samples``.
+              Use numeric values for ``gaussian``/``sqrtlasso``,
+              binary values in ``{0, 1}`` for ``binomial``,
+              and non-negative integers for ``poisson``.
+    :param lambdas: Regularization path specification. Use one of:
+              (1) tuple ``(nlambda, lambda_min_ratio)`` to auto-generate
+              a logarithmic path from ``lambda_max`` to
+              ``lambda_min_ratio * lambda_max``;
+              (2) explicit decreasing positive sequence.
+    :param family: One of ``"gaussian"``, ``"binomial"``,
+              ``"poisson"``, or ``"sqrtlasso"``.
+    :param penalty: One of ``"l1"``, ``"mcp"``, or ``"scad"``.
+    :param gamma: Concavity parameter for MCP/SCAD penalties.
+    :param useintercept: Whether to include an intercept term.
+    :param prec: Optimization stopping tolerance.
+    :param max_ite: Maximum number of iterations per lambda.
+    :param verbose: Whether to print training diagnostics.
+
+    Notes
+    -----
+    For nonconvex logistic/poisson fits (MCP/SCAD), very small lambda values
+    can make optimization unstable in practice. A common default is
+    ``lambda_min_ratio >= 0.05``.
     """
 
   def __init__(self,
@@ -286,7 +286,7 @@ class Solver:
 
   def train(self):
     """
-        The trigger function for training the model
+        Train the model along the lambda path.
         """
     self.result['state'] = 'trained'
     self.trainer()
@@ -295,24 +295,21 @@ class Solver:
 
   def coef(self):
     """
-        Extract model coefficients.
+        Return fitted coefficients and training diagnostics.
 
-        :return: a dictionary of the model coefficients.
-        :rtype: dict{name : value}
+        :return: dictionary containing model path results.
+        :rtype: dict
 
-        The detail of returned list:
+        Main fields in the returned dictionary:
 
-            - **beta** - A matrix of regression estimates whose columns correspond to regularization parameters for \
-                sparse linear regression and sparse logistic regression. A list of matrices of regression estimation \
-                corresponding to regularization parameters for sparse column inverse operator.
-            - **intercept** - The value of intercepts corresponding to regularization parameters for sparse linear \
-                regression, and sparse logistic regression.
-            - **ite_lamb** - Number of iterations for each lambda.
-            - **size_act** - An array of solution sparsity (model degree of freedom).
-            - **train_time** - The training time on each lambda.
-            - **total_train_time** - The total training time.
-            - **state** - The training state.
-            - **df** - The number of nonzero coefficients
+            - **beta**: coefficient path with shape ``(nlambda, n_features)``
+            - **intercept**: intercept path with shape ``(nlambda,)``
+            - **ite_lamb**: iteration count for each lambda
+            - **size_act**: active-set size over iterations
+            - **df**: number of nonzero coefficients per lambda
+            - **train_time**: runtime per lambda
+            - **total_train_time**: end-to-end runtime
+            - **state**: training state string
 
         """
     if self.result['state'] == 'not trained':
@@ -332,13 +329,15 @@ class Solver:
 
   def predict(self, newdata=None, lambdidx=None):
     """
-        Predicting responses of the new data.
+        Predict responses for new data.
 
-        :param newdata: An optional data frame in which to look for variables with which to predict.
-                        If omitted, the training data of the model are used.
-        :param lambdidx: Use the model coefficient corresponding to the `lambdidx` th lambda.
+        :param newdata: Optional feature matrix with shape
+                        ``(n_new_samples, n_features)``.
+                        If omitted, the training matrix is used.
+        :param lambdidx: Index of the lambda model to use.
+                         Defaults to the last lambda in the path.
 
-        :return: The predicted response vectors based on the estimated models.
+        :return: Predicted response vector.
         :rtype: np.array
         """
     if lambdidx is None:

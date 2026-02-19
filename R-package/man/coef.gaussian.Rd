@@ -1,7 +1,7 @@
 \name{coef.gaussian}
 \alias{coef.gaussian}
 \title{
-Extract Model Coefficients for an object with S3 class \code{"gaussian"}
+Extract model coefficients for an object with S3 class \code{"gaussian"}
 }
 \description{
 Extract estimated regression coefficient vectors from the solution path.
@@ -14,10 +14,10 @@ Extract estimated regression coefficient vectors from the solution path.
   An object with S3 class \code{"gaussian"} 
   }
   \item{lambda.idx}{
-  The indices of the regularizaiton parameters in the solution path to be displayed. The default values are \code{c(1:3)}.
+  The indices of the regularization parameters in the solution path to be displayed. The default values are \code{c(1:3)}.
   }
   \item{beta.idx}{
-  The indices of the estimate regression coefficient vectors in the solution path to be displayed. The default values are \code{c(1:3)}.
+  The indices of the estimated regression coefficient vectors in the solution path to be displayed. The default values are \code{c(1:3)}.
   }
   \item{\dots}{
   Arguments to be passed to methods.
@@ -26,7 +26,7 @@ Extract estimated regression coefficient vectors from the solution path.
 
 \author{
 Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
-Maintainer: Jason Ge <jiange@princeton.edu>
+Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
 
 \seealso{

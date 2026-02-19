@@ -14,26 +14,27 @@ picasso <- function(X,
                     max.ite = 1e3,
                     verbose = FALSE)
 {
-  if (family != "gaussian" && family != "binomial" &&  family != "poisson" && family != "sqrtlasso"){
+  supported.family = c("gaussian", "binomial", "poisson", "sqrtlasso")
+  if (!(family %in% supported.family)) {
     cat(" Wrong \"family\" input. \n \"family\" should be 
-           one of \"gaussian\", \"binomial\" and \"poisson\".\n", 
+           one of \"gaussian\", \"binomial\", \"poisson\" and \"sqrtlasso\".\n", 
         family," is not supported in this version. \n")
     return(NULL)
   }
+
   if (family == "gaussian") {
-    if (!is.matrix(Y)) 
+    if (!is.matrix(Y))
       Y = as.matrix(Y)
-    p = ncol(Y)
-    if (p == 1)
-      out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
-                          lambda.min.ratio = lambda.min.ratio, 
-                          method = method, type.gaussian = type.gaussian, gamma = gamma, df = df, 
-                          standardize = standardize,  intercept= intercept, 
-                           prec = prec, 
-                          max.ite = max.ite, verbose = verbose)
-  }
-  
-  if (family == "binomial") {
+    if (ncol(Y) != 1)
+      stop("Only univariate response is supported for family = \"gaussian\" in this version.")
+
+    out = picasso.gaussian(X = X, Y = Y, lambda = lambda, nlambda = nlambda, 
+                        lambda.min.ratio = lambda.min.ratio, 
+                        method = method, type.gaussian = type.gaussian, gamma = gamma, df = df, 
+                        standardize = standardize,  intercept= intercept, 
+                        prec = prec, 
+                        max.ite = max.ite, verbose = verbose)
+  } else if (family == "binomial") {
     if(!is.matrix(Y))
       Y = as.matrix(Y)
     
@@ -41,9 +42,7 @@ picasso <- function(X,
                         lambda.min.ratio = lambda.min.ratio, 
                         method = method, gamma = gamma, standardize = standardize, intercept=intercept, 
                         prec = prec, max.ite = max.ite, verbose = verbose)
-  }
-
-  if (family == "sqrtlasso"){
+  } else if (family == "sqrtlasso"){
     if(!is.matrix(Y))
       Y = as.matrix(Y)
     
@@ -51,9 +50,7 @@ picasso <- function(X,
                         lambda.min.ratio = lambda.min.ratio,
                         method = method, gamma = gamma, standardize = standardize, intercept=intercept, 
                         prec = prec, max.ite = max.ite, verbose = verbose)
-  }
-
-  if(family=="poisson"){
+  } else if (family=="poisson") {
     out = picasso.poisson(X = X, Y=Y, lambda = lambda, nlambda = nlambda, 
                         lambda.min.ratio = lambda.min.ratio,
                        method = method, gamma = gamma, 

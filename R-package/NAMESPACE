@@ -16,7 +16,7 @@ export("picasso",
        "coef.sqrtlasso",
        "print.sqrtlasso",
        "plot.sqrtlasso",
-       "coef.sqrtlasso"
+       "predict.sqrtlasso"
       )
 importFrom("grDevices", "dev.off", "gray.colors", "postscript")
 importFrom("graphics", "lines", "matplot", "par", "plot")
