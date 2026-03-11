@@ -1,13 +1,81 @@
-version: 2
+version: 2.1
 jobs:
-  build:
+  build-and-test:
     docker:
-      - image: debian:stretch
+      - image: cimg/python:3.11
     steps:
       - checkout
       - run:
-          name: Greeting
-          command: echo Hello, world.
+          name: Install dependencies
+          command: |
+            sudo apt-get update && sudo apt-get install -y g++ cmake
+            pip install numpy scipy
       - run:
-          name: Print the Current Time
-          command: date
+          name: Build libpicasso.so
+          command: |
+            g++ -shared -fPIC -O2 -std=c++11 \
+              -I include -I R-package/src/include/eigen3 \
+              -o lib/libpicasso.so amalgamation/picasso-all0.cpp
+      - run:
+          name: Install pycasso
+          command: |
+            cp lib/libpicasso.so python-package/pycasso/lib/
+            pip install -e python-package/
+      - run:
+          name: Test pycasso
+          command: |
+            python -c "
+            import numpy as np
+            np.random.seed(42)
+            from pycasso import core
+
+            n, p = 200, 50
+            X = np.random.randn(n, p)
+            beta_true = np.zeros(p); beta_true[:5] = [3, 1.5, 0, 0, 2]
+
+            # Test 1: Gaussian with intercept
+            y = X @ beta_true + 5.0 + 0.5 * np.random.randn(n)
+            solver = core.Solver(X, y, family='gaussian', useintercept=True)
+            solver.train()
+            r = solver.result
+            assert int(r['num_fit'][0]) > 0, 'Gaussian: num_fit should be > 0'
+            assert r['size_act'].ndim == 1, 'size_act should be 1D'
+            print('Gaussian OK: num_fit=%d' % int(r['num_fit'][0]))
+
+            # Test 2: Gaussian without intercept
+            solver2 = core.Solver(X, y, family='gaussian', useintercept=False, standardize=False)
+            solver2.train()
+            assert solver2.result['intercept'][-1] == 0.0, 'No-intercept: intercept should be 0'
+            print('Gaussian no-intercept OK')
+
+            # Test 3: Logistic
+            prob = 1 / (1 + np.exp(-X @ beta_true))
+            y_bin = (np.random.rand(n) < prob).astype(float)
+            solver3 = core.Solver(X, y_bin, family='binomial', penalty='l1')
+            solver3.train()
+            assert int(solver3.result['num_fit'][0]) > 0, 'Logistic: num_fit should be > 0'
+            print('Logistic OK: num_fit=%d' % int(solver3.result['num_fit'][0]))
+
+            # Test 4: Poisson
+            X2 = np.random.randn(n, p) * 0.5
+            beta_true2 = np.zeros(p); beta_true2[:3] = [0.5, -0.3, 0.2]
+            y_pois = np.random.poisson(np.exp(X2 @ beta_true2)).astype(float)
+            solver4 = core.Solver(X2, y_pois, family='poisson', penalty='l1')
+            solver4.train()
+            assert int(solver4.result['num_fit'][0]) > 0, 'Poisson: num_fit should be > 0'
+            print('Poisson OK: num_fit=%d' % int(solver4.result['num_fit'][0]))
+
+            # Test 5: SCAD and MCP
+            for pen in ['scad', 'mcp']:
+                s = core.Solver(X, y_bin, family='binomial', penalty=pen)
+                s.train()
+                assert int(s.result['num_fit'][0]) > 0, '%s: num_fit should be > 0' % pen
+                print('%s OK: num_fit=%d' % (pen.upper(), int(s.result['num_fit'][0])))
+
+            print('All tests passed!')
+            "
+
+workflows:
+  build-test:
+    jobs:
+      - build-and-test
