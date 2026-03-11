@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install numpy scipy
+
+      - name: Build libpicasso.so
+        run: |
+          mkdir -p lib
+          g++ -shared -fPIC -O2 -std=c++11 \
+            -I include -I R-package/src/include/eigen3 \
+            -o lib/libpicasso.so amalgamation/picasso-all0.cpp
+
+      - name: Install pycasso
+        run: |
+          mkdir -p python-package/pycasso/lib
+          cp lib/libpicasso.so python-package/pycasso/lib/
+          pip install -e python-package/
+
+      - name: Test pycasso
+        run: |
+          python -c "
+          import numpy as np
+          np.random.seed(42)
+          from pycasso import core
+
+          n, p = 200, 50
+          X = np.random.randn(n, p)
+          beta_true = np.zeros(p); beta_true[:5] = [3, 1.5, 0, 0, 2]
+
+          # Gaussian with intercept
+          y = X @ beta_true + 5.0 + 0.5 * np.random.randn(n)
+          s = core.Solver(X, y, family='gaussian', useintercept=True)
+          s.train()
+          assert int(s.result['num_fit'][0]) > 0
+          assert s.result['size_act'].ndim == 1
+          print('Gaussian OK: num_fit=%d' % int(s.result['num_fit'][0]))
+
+          # Gaussian without intercept
+          s2 = core.Solver(X, y, family='gaussian', useintercept=False, standardize=False)
+          s2.train()
+          assert s2.result['intercept'][-1] == 0.0
+          print('Gaussian no-intercept OK')
+
+          # Logistic
+          prob = 1 / (1 + np.exp(-X @ beta_true))
+          y_bin = (np.random.rand(n) < prob).astype(float)
+          s3 = core.Solver(X, y_bin, family='binomial', penalty='l1')
+          s3.train()
+          assert int(s3.result['num_fit'][0]) > 0
+          print('Logistic OK: num_fit=%d' % int(s3.result['num_fit'][0]))
+
+          # Poisson
+          X2 = np.random.randn(n, p) * 0.5
+          beta2 = np.zeros(p); beta2[:3] = [0.5, -0.3, 0.2]
+          y_pois = np.random.poisson(np.exp(X2 @ beta2)).astype(float)
+          s4 = core.Solver(X2, y_pois, family='poisson', penalty='l1')
+          s4.train()
+          assert int(s4.result['num_fit'][0]) > 0
+          print('Poisson OK: num_fit=%d' % int(s4.result['num_fit'][0]))
+
+          # SCAD and MCP
+          for pen in ['scad', 'mcp']:
+              s5 = core.Solver(X, y_bin, family='binomial', penalty=pen)
+              s5.train()
+              assert int(s5.result['num_fit'][0]) > 0
+              print('%s OK: num_fit=%d' % (pen.upper(), int(s5.result['num_fit'][0])))
+
+          print('All tests passed!')
+          "
