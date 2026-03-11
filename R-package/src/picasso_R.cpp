@@ -1,178 +1,273 @@
 #include <R.h>
-#include <picasso/c_api.hpp>
+#include <Rinternals.h>
 #include <R_ext/Rdynload.h>
-#include <stdlib.h> // 
-extern "C" void picasso_logit_solver(
-    double* Y,       // input: 0/1 model response
-    double* X,       // input: model covariates
-    int* nn,         // input: number of samples
-    int* dd,         // input: dimension
-    double* lambda,  // input: regularization parameter
-    int* nnlambda,   // input: number of lambda on the regularization path
-    double* gamma,   // input: gamma for SCAD or MCP penalty
-    int* mmax_ite,   // input: max number of interations
-    double* pprec,   // input: optimization precision
-    int* reg_type,   // input: type of regularization
-    int* include_intercept,  // input: to have intercept term or not
-    double* beta,            // output: an nlambda * d dim matrix
-                             //         saving the coefficients for each lambda
-    double* intcpt,          // output: an nlambda dim array
-    //         saving the model intercept for each lambda
-    int* ite_lamb,  // output: number of iterations for each lambda
-    int* size_act,  // output: an array of solution sparsity (model df)
-    double* runt    // output: runtime
-) {
-  SolveLogisticRegression(Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite,
-                          *pprec, *reg_type, *include_intercept, beta, intcpt,
-                          ite_lamb, size_act, runt);
+#include <picasso/c_api.hpp>
+#include <cmath>
+
+// Helper: create a named list from components
+static SEXP make_result_list(SEXP beta, SEXP intcpt, SEXP ite_lamb,
+                             SEXP size_act, SEXP runt, SEXP num_fit) {
+  const char *names[] = {"beta", "intcpt", "ite_lamb", "size_act", "runt",
+                         "num_fit", ""};
+  SEXP result = PROTECT(Rf_mkNamed(VECSXP, names));
+  SET_VECTOR_ELT(result, 0, beta);
+  SET_VECTOR_ELT(result, 1, intcpt);
+  SET_VECTOR_ELT(result, 2, ite_lamb);
+  SET_VECTOR_ELT(result, 3, size_act);
+  SET_VECTOR_ELT(result, 4, runt);
+  SET_VECTOR_ELT(result, 5, num_fit);
+  UNPROTECT(1);
+  return result;
 }
 
-extern "C" void picasso_sqrt_lasso_solver(
-    double* Y,       // input: 0/1 model response
-    double* X,       // input: model covariates
-    int* nn,         // input: number of samples
-    int* dd,         // input: dimension
-    double* lambda,  // input: regularization parameter
-    int* nnlambda,   // input: number of lambda on the regularization path
-    double* gamma,   // input: gamma for SCAD or MCP penalty
-    int* mmax_ite,   // input: max number of interations
-    double* pprec,   // input: optimization precision
-    int* reg_type,   // input: type of regularization
-    int* include_intercept,  // input: to have intercept term or not
-    double* beta,            // output: an nlambda * d dim matrix
-                             //         saving the coefficients for each lambda
-    double* intcpt,          // output: an nlambda dim array
-    //         saving the model intercept for each lambda
-    int* ite_lamb,  // output: number of iterations for each lambda
-    int* size_act,  // output: an array of solution sparsity (model df)
-    double* runt    // output: runtime
-) {
-  SolveSqrtLinearRegression(Y, X, *nn, *dd, lambda, *nnlambda, *gamma,
-                            *mmax_ite, *pprec, *reg_type, *include_intercept,
-                            beta, intcpt, ite_lamb, size_act, runt);
-}
+extern "C" SEXP picasso_gaussian_naive_call(
+    SEXP Y_sexp, SEXP X_sexp, SEXP n_sexp, SEXP d_sexp,
+    SEXP lambda_sexp, SEXP nlambda_sexp, SEXP gamma_sexp,
+    SEXP max_ite_sexp, SEXP prec_sexp, SEXP reg_type_sexp,
+    SEXP intercept_sexp, SEXP dfmax_sexp) {
+  int n = Rf_asInteger(n_sexp);
+  int d = Rf_asInteger(d_sexp);
+  int nlambda = Rf_asInteger(nlambda_sexp);
 
-extern "C" void picasso_poisson_solver(
-    double* Y,       // input: 0/1 model response
-    double* X,       // input: model covariates
-    int* nn,         // input: number of samples
-    int* dd,         // input: dimension
-    double* lambda,  // input: regularization parameter
-    int* nnlambda,   // input: number of lambda on the regularization path
-    double* gamma,   // input: gamma for SCAD or MCP penalty
-    int* mmax_ite,   // input: max number of interations
-    double* pprec,   // input: optimization precision
-    int* reg_type,   // input: type of regularization
-    int* include_intercept,  // input: to have intercept term or not
-    double* beta,            // output: an nlambda * d dim matrix
-                             //         saving the coefficients for each lambda
-    double* intcpt,          // output: an nlambda dim array
-    //         saving the model intercept for each lambda
-    int* ite_lamb,  // output: number of iterations for each lambda
-    int* size_act,  // output: an array of solution sparsity (model df)
-    double* runt    // output: runtime
-) {
-  // call picasso c api
-  SolvePoissonRegression(Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite,
-                         *pprec, *reg_type, *include_intercept, beta, intcpt,
-                         ite_lamb, size_act, runt);
-}
+  // Allocate outputs — written into directly by C++, no copy back
+  SEXP beta_sexp = PROTECT(Rf_allocVector(REALSXP, (R_xlen_t)d * nlambda));
+  SEXP intcpt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP ite_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP size_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP runt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP nfit_sexp = PROTECT(Rf_allocVector(INTSXP, 1));
 
-extern "C" void picasso_gaussian_cov(
-    double* Y,       // input: 0/1 model response
-    double* X,       // input: model covariates
-    int* nn,         // input: number of samples
-    int* dd,         // input: dimension
-    double* lambda,  // input: regularization parameter
-    int* nnlambda,   // input: number of lambda on the regularization path
-    double* gamma,   // input: gamma for SCAD or MCP penalty
-    int* mmax_ite,   // input: max number of interations
-    double* pprec,   // input: optimization precision
-    int* reg_type,   // input: type of regularization
-    int* include_intercept,  // input: to have intercept term or not
-    double* beta,            // output: an nlambda * d dim matrix
-                             //         saving the coefficients for each lambda
-    double* intcpt,          // output: an nlambda dim array
-    //         saving the model intercept for each lambda
-    int* ite_lamb,  // output: number of iterations for each lambda
-    int* size_act,  // output: an array of solution sparsity (model df)
-    double* runt    // output: runtime
-) {
-  SolveLinearRegressionCovUpdate(
-      Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite, *pprec, *reg_type,
-      *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
-}
+  // Zero-initialize outputs
+  memset(REAL(beta_sexp), 0, sizeof(double) * (size_t)d * nlambda);
+  memset(REAL(intcpt_sexp), 0, sizeof(double) * nlambda);
+  memset(INTEGER(ite_sexp), 0, sizeof(int) * nlambda);
+  memset(INTEGER(size_sexp), 0, sizeof(int) * nlambda);
+  memset(REAL(runt_sexp), 0, sizeof(double) * nlambda);
+  INTEGER(nfit_sexp)[0] = 0;
 
-extern "C" void picasso_gaussian_naive(
-    double* Y,       // input: 0/1 model response
-    double* X,       // input: model covariates
-    int* nn,         // input: number of samples
-    int* dd,         // input: dimension
-    double* lambda,  // input: regularization parameter
-    int* nnlambda,   // input: number of lambda on the regularization path
-    double* gamma,   // input: gamma for SCAD or MCP penalty
-    int* mmax_ite,   // input: max number of interations
-    double* pprec,   // input: optimization precision
-    int* reg_type,   // input: type of regularization
-    int* include_intercept,  // input: to have intercept term or not
-    double* beta,            // output: an nlambda * d dim matrix
-                             //         saving the coefficients for each lambda
-    double* intcpt,          // output: an nlambda dim array
-    //         saving the model intercept for each lambda
-    int* ite_lamb,  // output: number of iterations for each lambda
-    int* size_act,  // output: an array of solution sparsity (model df)
-    double* runt    // output: runtime
-) {
+  // Call solver — REAL(X_sexp) is a direct pointer, no copy
   SolveLinearRegressionNaiveUpdate(
-      Y, X, *nn, *dd, lambda, *nnlambda, *gamma, *mmax_ite, *pprec, *reg_type,
-      *include_intercept, beta, intcpt, ite_lamb, size_act, runt);
+      REAL(Y_sexp), REAL(X_sexp), n, d,
+      REAL(lambda_sexp), nlambda,
+      Rf_asReal(gamma_sexp), Rf_asInteger(max_ite_sexp),
+      Rf_asReal(prec_sexp), Rf_asInteger(reg_type_sexp),
+      Rf_asInteger(intercept_sexp), Rf_asInteger(dfmax_sexp),
+      REAL(beta_sexp), REAL(intcpt_sexp),
+      INTEGER(ite_sexp), INTEGER(size_sexp),
+      REAL(runt_sexp), INTEGER(nfit_sexp));
+
+  SEXP result = make_result_list(beta_sexp, intcpt_sexp, ite_sexp,
+                                 size_sexp, runt_sexp, nfit_sexp);
+  UNPROTECT(6);
+  return result;
 }
 
-extern "C" void standardize_design(double* X, double* xx, double* xm,
-                                   double* xinvc, int* nn, int* dd) {
-  int i, j, jn, n, d;
+extern "C" SEXP picasso_gaussian_cov_call(
+    SEXP Y_sexp, SEXP X_sexp, SEXP n_sexp, SEXP d_sexp,
+    SEXP lambda_sexp, SEXP nlambda_sexp, SEXP gamma_sexp,
+    SEXP max_ite_sexp, SEXP prec_sexp, SEXP reg_type_sexp,
+    SEXP intercept_sexp, SEXP dfmax_sexp) {
+  int n = Rf_asInteger(n_sexp);
+  int d = Rf_asInteger(d_sexp);
+  int nlambda = Rf_asInteger(nlambda_sexp);
 
-  n = *nn;
-  d = *dd;
+  SEXP beta_sexp = PROTECT(Rf_allocVector(REALSXP, (R_xlen_t)d * nlambda));
+  SEXP intcpt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP ite_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP size_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP runt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP nfit_sexp = PROTECT(Rf_allocVector(INTSXP, 1));
 
-  for (j = 0; j < d; j++) {
-    // Center
+  memset(REAL(beta_sexp), 0, sizeof(double) * (size_t)d * nlambda);
+  memset(REAL(intcpt_sexp), 0, sizeof(double) * nlambda);
+  memset(INTEGER(ite_sexp), 0, sizeof(int) * nlambda);
+  memset(INTEGER(size_sexp), 0, sizeof(int) * nlambda);
+  memset(REAL(runt_sexp), 0, sizeof(double) * nlambda);
+  INTEGER(nfit_sexp)[0] = 0;
+
+  SolveLinearRegressionCovUpdate(
+      REAL(Y_sexp), REAL(X_sexp), n, d,
+      REAL(lambda_sexp), nlambda,
+      Rf_asReal(gamma_sexp), Rf_asInteger(max_ite_sexp),
+      Rf_asReal(prec_sexp), Rf_asInteger(reg_type_sexp),
+      Rf_asInteger(intercept_sexp), Rf_asInteger(dfmax_sexp),
+      REAL(beta_sexp), REAL(intcpt_sexp),
+      INTEGER(ite_sexp), INTEGER(size_sexp),
+      REAL(runt_sexp), INTEGER(nfit_sexp));
+
+  SEXP result = make_result_list(beta_sexp, intcpt_sexp, ite_sexp,
+                                 size_sexp, runt_sexp, nfit_sexp);
+  UNPROTECT(6);
+  return result;
+}
+
+extern "C" SEXP picasso_logit_call(
+    SEXP Y_sexp, SEXP X_sexp, SEXP n_sexp, SEXP d_sexp,
+    SEXP lambda_sexp, SEXP nlambda_sexp, SEXP gamma_sexp,
+    SEXP max_ite_sexp, SEXP prec_sexp, SEXP reg_type_sexp,
+    SEXP intercept_sexp, SEXP dfmax_sexp) {
+  int n = Rf_asInteger(n_sexp);
+  int d = Rf_asInteger(d_sexp);
+  int nlambda = Rf_asInteger(nlambda_sexp);
+
+  SEXP beta_sexp = PROTECT(Rf_allocVector(REALSXP, (R_xlen_t)d * nlambda));
+  SEXP intcpt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP ite_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP size_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP runt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP nfit_sexp = PROTECT(Rf_allocVector(INTSXP, 1));
+
+  memset(REAL(beta_sexp), 0, sizeof(double) * (size_t)d * nlambda);
+  memset(REAL(intcpt_sexp), 0, sizeof(double) * nlambda);
+  memset(INTEGER(ite_sexp), 0, sizeof(int) * nlambda);
+  memset(INTEGER(size_sexp), 0, sizeof(int) * nlambda);
+  memset(REAL(runt_sexp), 0, sizeof(double) * nlambda);
+  INTEGER(nfit_sexp)[0] = 0;
+
+  SolveLogisticRegression(
+      REAL(Y_sexp), REAL(X_sexp), n, d,
+      REAL(lambda_sexp), nlambda,
+      Rf_asReal(gamma_sexp), Rf_asInteger(max_ite_sexp),
+      Rf_asReal(prec_sexp), Rf_asInteger(reg_type_sexp),
+      Rf_asInteger(intercept_sexp), Rf_asInteger(dfmax_sexp),
+      REAL(beta_sexp), REAL(intcpt_sexp),
+      INTEGER(ite_sexp), INTEGER(size_sexp),
+      REAL(runt_sexp), INTEGER(nfit_sexp));
+
+  SEXP result = make_result_list(beta_sexp, intcpt_sexp, ite_sexp,
+                                 size_sexp, runt_sexp, nfit_sexp);
+  UNPROTECT(6);
+  return result;
+}
+
+extern "C" SEXP picasso_poisson_call(
+    SEXP Y_sexp, SEXP X_sexp, SEXP n_sexp, SEXP d_sexp,
+    SEXP lambda_sexp, SEXP nlambda_sexp, SEXP gamma_sexp,
+    SEXP max_ite_sexp, SEXP prec_sexp, SEXP reg_type_sexp,
+    SEXP intercept_sexp, SEXP dfmax_sexp) {
+  int n = Rf_asInteger(n_sexp);
+  int d = Rf_asInteger(d_sexp);
+  int nlambda = Rf_asInteger(nlambda_sexp);
+
+  SEXP beta_sexp = PROTECT(Rf_allocVector(REALSXP, (R_xlen_t)d * nlambda));
+  SEXP intcpt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP ite_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP size_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP runt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP nfit_sexp = PROTECT(Rf_allocVector(INTSXP, 1));
+
+  memset(REAL(beta_sexp), 0, sizeof(double) * (size_t)d * nlambda);
+  memset(REAL(intcpt_sexp), 0, sizeof(double) * nlambda);
+  memset(INTEGER(ite_sexp), 0, sizeof(int) * nlambda);
+  memset(INTEGER(size_sexp), 0, sizeof(int) * nlambda);
+  memset(REAL(runt_sexp), 0, sizeof(double) * nlambda);
+  INTEGER(nfit_sexp)[0] = 0;
+
+  SolvePoissonRegression(
+      REAL(Y_sexp), REAL(X_sexp), n, d,
+      REAL(lambda_sexp), nlambda,
+      Rf_asReal(gamma_sexp), Rf_asInteger(max_ite_sexp),
+      Rf_asReal(prec_sexp), Rf_asInteger(reg_type_sexp),
+      Rf_asInteger(intercept_sexp), Rf_asInteger(dfmax_sexp),
+      REAL(beta_sexp), REAL(intcpt_sexp),
+      INTEGER(ite_sexp), INTEGER(size_sexp),
+      REAL(runt_sexp), INTEGER(nfit_sexp));
+
+  SEXP result = make_result_list(beta_sexp, intcpt_sexp, ite_sexp,
+                                 size_sexp, runt_sexp, nfit_sexp);
+  UNPROTECT(6);
+  return result;
+}
+
+extern "C" SEXP picasso_sqrtlasso_call(
+    SEXP Y_sexp, SEXP X_sexp, SEXP n_sexp, SEXP d_sexp,
+    SEXP lambda_sexp, SEXP nlambda_sexp, SEXP gamma_sexp,
+    SEXP max_ite_sexp, SEXP prec_sexp, SEXP reg_type_sexp,
+    SEXP intercept_sexp, SEXP dfmax_sexp) {
+  int n = Rf_asInteger(n_sexp);
+  int d = Rf_asInteger(d_sexp);
+  int nlambda = Rf_asInteger(nlambda_sexp);
+
+  SEXP beta_sexp = PROTECT(Rf_allocVector(REALSXP, (R_xlen_t)d * nlambda));
+  SEXP intcpt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP ite_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP size_sexp = PROTECT(Rf_allocVector(INTSXP, nlambda));
+  SEXP runt_sexp = PROTECT(Rf_allocVector(REALSXP, nlambda));
+  SEXP nfit_sexp = PROTECT(Rf_allocVector(INTSXP, 1));
+
+  memset(REAL(beta_sexp), 0, sizeof(double) * (size_t)d * nlambda);
+  memset(REAL(intcpt_sexp), 0, sizeof(double) * nlambda);
+  memset(INTEGER(ite_sexp), 0, sizeof(int) * nlambda);
+  memset(INTEGER(size_sexp), 0, sizeof(int) * nlambda);
+  memset(REAL(runt_sexp), 0, sizeof(double) * nlambda);
+  INTEGER(nfit_sexp)[0] = 0;
+
+  SolveSqrtLinearRegression(
+      REAL(Y_sexp), REAL(X_sexp), n, d,
+      REAL(lambda_sexp), nlambda,
+      Rf_asReal(gamma_sexp), Rf_asInteger(max_ite_sexp),
+      Rf_asReal(prec_sexp), Rf_asInteger(reg_type_sexp),
+      Rf_asInteger(intercept_sexp), Rf_asInteger(dfmax_sexp),
+      REAL(beta_sexp), REAL(intcpt_sexp),
+      INTEGER(ite_sexp), INTEGER(size_sexp),
+      REAL(runt_sexp), INTEGER(nfit_sexp));
+
+  SEXP result = make_result_list(beta_sexp, intcpt_sexp, ite_sexp,
+                                 size_sexp, runt_sexp, nfit_sexp);
+  UNPROTECT(6);
+  return result;
+}
+
+extern "C" SEXP picasso_standardize_call(SEXP X_sexp, SEXP n_sexp,
+                                         SEXP d_sexp) {
+  int n = Rf_asInteger(n_sexp);
+  int d = Rf_asInteger(d_sexp);
+
+  SEXP xx_sexp = PROTECT(Rf_allocVector(REALSXP, (R_xlen_t)n * d));
+  SEXP xm_sexp = PROTECT(Rf_allocVector(REALSXP, d));
+  SEXP xinvc_sexp = PROTECT(Rf_allocVector(REALSXP, d));
+
+  double *X = REAL(X_sexp);
+  double *xx = REAL(xx_sexp);
+  double *xm = REAL(xm_sexp);
+  double *xinvc = REAL(xinvc_sexp);
+
+  for (int j = 0; j < d; j++) {
+    int jn = j * n;
     xm[j] = 0;
-    jn = j * n;
-    for (i = 0; i < n; i++) xm[j] += X[jn + i];
-
+    for (int i = 0; i < n; i++) xm[j] += X[jn + i];
     xm[j] = xm[j] / n;
-    for (i = 0; i < n; i++) xx[jn + i] = X[jn + i] - xm[j];
+    for (int i = 0; i < n; i++) xx[jn + i] = X[jn + i] - xm[j];
 
-    // Scale
     xinvc[j] = 0;
-    for (i = 0; i < n; i++) {
-      xinvc[j] += xx[jn + i] * xx[jn + i];
-    }
+    for (int i = 0; i < n; i++) xinvc[j] += xx[jn + i] * xx[jn + i];
 
     if (xinvc[j] > 0) {
-      xinvc[j] = 1 / sqrt(xinvc[j] / (n - 1));
-      for (i = 0; i < n; i++) {
-        xx[jn + i] = xx[jn + i] * xinvc[j];
-      }
+      xinvc[j] = 1.0 / sqrt(xinvc[j] / (n - 1));
+      for (int i = 0; i < n; i++) xx[jn + i] = xx[jn + i] * xinvc[j];
     }
   }
+
+  const char *names[] = {"xx", "xm", "xinvc", ""};
+  SEXP result = PROTECT(Rf_mkNamed(VECSXP, names));
+  SET_VECTOR_ELT(result, 0, xx_sexp);
+  SET_VECTOR_ELT(result, 1, xm_sexp);
+  SET_VECTOR_ELT(result, 2, xinvc_sexp);
+  UNPROTECT(4);
+  return result;
 }
 
+// Registration
+static const R_CallMethodDef CallEntries[] = {
+    {"picasso_gaussian_naive_call", (DL_FUNC)&picasso_gaussian_naive_call, 12},
+    {"picasso_gaussian_cov_call", (DL_FUNC)&picasso_gaussian_cov_call, 12},
+    {"picasso_logit_call", (DL_FUNC)&picasso_logit_call, 12},
+    {"picasso_poisson_call", (DL_FUNC)&picasso_poisson_call, 12},
+    {"picasso_sqrtlasso_call", (DL_FUNC)&picasso_sqrtlasso_call, 12},
+    {"picasso_standardize_call", (DL_FUNC)&picasso_standardize_call, 3},
+    {NULL, NULL, 0}};
 
-static const R_CMethodDef CEntries[] = {
-    {"picasso_gaussian_cov",      (DL_FUNC) &picasso_gaussian_cov,      16},
-    {"picasso_gaussian_naive",    (DL_FUNC) &picasso_gaussian_naive,    16},
-    {"picasso_logit_solver",      (DL_FUNC) &picasso_logit_solver,      16},
-    {"picasso_poisson_solver",    (DL_FUNC) &picasso_poisson_solver,    16},
-    {"picasso_sqrt_lasso_solver", (DL_FUNC) &picasso_sqrt_lasso_solver, 16},
-    {"standardize_design",        (DL_FUNC) &standardize_design,         6},
-    {NULL, NULL, 0}
-};
-
-void R_init_picasso(DllInfo *dll)
-{
-    R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE);
+void R_init_picasso(DllInfo *dll) {
+  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
 }
-

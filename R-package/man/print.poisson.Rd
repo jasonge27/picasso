@@ -1,16 +1,14 @@
 \name{print.poisson}
 \alias{print.poisson}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Print Function for an object with S3 class \code{poisson}
+Print Method for an Object with S3 Class \code{"poisson"}
 }
 \description{
-Print a summary of the information about an object with S3 class \code{"poisson"}.
+Print a concise summary for an object with S3 class \code{"poisson"}.
 }
 \usage{
 \method{print}{poisson}(x, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
   An object with S3 class \code{"poisson"}.
@@ -20,22 +18,15 @@ Print a summary of the information about an object with S3 class \code{"poisson"
   }
 }
 \details{
-This call simply outlines the options used for computing a sparse poisson regression object.
+This method prints tuning parameters and fit statistics for a fitted Poisson model object.
 }
-%\value{
-%}
-%\references{
-%}
-
+\value{
+The input object \code{x}, returned invisibly.
+}
 \author{
-Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Jason Ge, Xingguo Li, Haoming Jiang, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
 Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
-%\note{
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
 \code{\link{picasso}} and \code{\link{picasso-package}}.
 }

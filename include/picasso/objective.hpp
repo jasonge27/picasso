@@ -1,8 +1,9 @@
 #ifndef PICASSO_OBJECTIVE_H
 #define PICASSO_OBJECTIVE_H
 
+#include <algorithm>
 #include <cmath>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <vector>
 
 #include <ctime>
@@ -103,8 +104,8 @@ class ObjFunction {
   int n;  // sample number
   int d;  // sample dimension
 
-  Eigen::Map<const Eigen::ArrayXXd> X;
-  Eigen::Map<const Eigen::ArrayXd> Y;
+  Eigen::ArrayXXd X;
+  Eigen::ArrayXd Y;
 
   Eigen::ArrayXd gr;
   Eigen::ArrayXd Xb;
@@ -114,14 +115,26 @@ class ObjFunction {
   double deviance;
 
  public:
-  ObjFunction(const double *xmat, const double *y, int n, int d)
-      : X(xmat, n, d), Y(y, n), model_param(d) {
+  ObjFunction(const double *xmat, const double *y, int n, int d,
+              bool usePython = false)
+      : model_param(d) {
     this->d = d;
     this->n = n;
+    Y.resize(n);
     gr.resize(d);
 
     Xb.resize(n);
     Xb.setZero();
+
+    std::copy(y, y + n, Y.data());
+
+    X.resize(n, d);
+    if (!usePython) {
+      std::copy(xmat, xmat + static_cast<std::size_t>(n) * d, X.data());
+    } else
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < d; j++) X(i, j) = xmat[i * d + j];
+      }
   };
 
   int get_dim() { return d; }
@@ -149,13 +162,13 @@ class ObjFunction {
   const Eigen::ArrayXd &get_model_Xb_ref() const { return Xb; };
 
   // reset model param and also update related aux vars
-  void set_model_param(ModelParam &other_param) {
+  void set_model_param(const ModelParam &other_param) {
     model_param.d = other_param.d;
     model_param.beta = other_param.beta;
     model_param.intercept = other_param.intercept;
   };
 
-  void set_model_Xb(Eigen::ArrayXd &other_Xb) { Xb = other_Xb; };
+  void set_model_Xb(const Eigen::ArrayXd &other_Xb) { Xb = other_Xb; };
 
   // coordinate descent
   virtual double coordinate_descent(RegFunction *regfun, int idx) = 0;
@@ -191,7 +204,7 @@ class GLMObjective : public ObjFunction {
 
  public:
   GLMObjective(const double *xmat, const double *y, int n, int d,
-               bool include_intercept = false);
+               bool include_intercept = false, bool usePython = false);
 
   double coordinate_descent(RegFunction *regfunc, int idx);
 
@@ -204,7 +217,7 @@ class GLMObjective : public ObjFunction {
 class LogisticObjective : public GLMObjective {
  public:
   LogisticObjective(const double *xmat, const double *y, int n, int d,
-                    bool include_intercept = false);
+                    bool include_intercept = false, bool usePython = false);
 
   void update_auxiliary();
 
@@ -214,7 +227,7 @@ class LogisticObjective : public GLMObjective {
 class PoissonObjective : public GLMObjective {
  public:
   PoissonObjective(const double *xmat, const double *y, int n, int d,
-                   bool include_intercept = false);
+                   bool include_intercept = false, bool usePython = false);
 
   void update_auxiliary();
 
@@ -234,7 +247,7 @@ class SqrtMSEObjective : public ObjFunction {
 
  public:
   SqrtMSEObjective(const double *xmat, const double *y, int n, int d,
-                   bool include_intercept = false);
+                   bool include_intercept = false, bool usePython = false);
 
   double coordinate_descent(RegFunction *regfunc, int idx);
 
@@ -248,13 +261,37 @@ class SqrtMSEObjective : public ObjFunction {
   double eval();
 };
 
-class GaussianNaiveUpdateObjective final : public ObjFunction {
+class GaussianNaiveUpdateObjective: public ObjFunction {
  private:
   Eigen::ArrayXd r, XX;
 
  public:
   GaussianNaiveUpdateObjective(const double *xmat, const double *y, int n,
-                               int d, bool include_intercept = false);
+                               int d, bool include_intercept = false,
+                               bool usePython = false);
+  double coordinate_descent(RegFunction *regfunc, int idx);
+
+  void intercept_update();
+  void update_auxiliary();
+  void update_gradient(int idx);
+
+  double get_local_change(double old, int idx);
+
+  double eval();
+};
+
+class GaussianCovUpdateObjective : public ObjFunction {
+ private:
+  Eigen::ArrayXd XX;      // d: diagonal of X^T X / n
+  Eigen::MatrixXd C;      // d x d: X^T X / n
+  Eigen::ArrayXd Xy;      // d: X^T Y / n
+  Eigen::ArrayXd Xmean;   // d: column means of X
+  double Ymean;
+
+ public:
+  GaussianCovUpdateObjective(const double *xmat, const double *y, int n, int d,
+                             bool include_intercept = false,
+                             bool usePython = false);
   double coordinate_descent(RegFunction *regfunc, int idx);
 
   void intercept_update();

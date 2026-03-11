@@ -2,26 +2,22 @@
 \alias{picasso-package}
 \docType{package}
 \title{
-PICASSO: Pathwise Calibrated Sparse Shooting Algorithm
+picasso: Sparse Learning with Convex and Non-Convex Penalties
 }
 \description{
-Computationally efficient tools for fitting sparse generalized linear models
-with convex and non-convex penalties (L1, MCP, and SCAD). The package uses
-pathwise warm starts, active-set updates, and screening rules for fast model
-training along a regularization path.
+Computationally efficient tools for fitting sparse generalized linear models with
+convex or non-convex penalties. Supported penalties include lasso, smoothly
+clipped absolute deviation (SCAD), and minimax concave penalty (MCP).
+Computation is based on multi-stage convex relaxation and pathwise coordinate
+optimization with warm starts, active-set updates, and screening rules.
 }
 \details{
-\tabular{ll}{
-Package: \tab picasso\cr
-Type: \tab Package\cr
-Version: \tab 1.4.1\cr
-Date: \tab 2026-02-18\cr
-License: \tab GPL-3\cr
-}
+Core optimization routines are implemented in C++ for speed, and coefficient
+paths are stored as sparse matrices for memory efficiency.
 }
 
 \author{
-Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Jason Ge, Xingguo Li, Haoming Jiang, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
 Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
 

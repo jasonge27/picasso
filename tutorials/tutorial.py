@@ -1,101 +1,157 @@
-import numpy as np
 import pycasso
+import numpy as np
+from sklearn.preprocessing import scale
 
-np.random.seed(2016)
-
-
-def standardize_columns(x):
-    """Standardize each feature column to zero mean and unit variance."""
-    x = np.asarray(x, dtype="double")
-    mean = x.mean(axis=0, keepdims=True)
-    std = x.std(axis=0, ddof=1, keepdims=True)
-    std[std == 0.0] = 1.0
-    return (x - mean) / std
-
-
-def generate_design(n, d, corr=0.5):
-    """Generate a correlated design matrix."""
-    return standardize_columns(np.random.randn(n, d) + corr * np.random.randn(n, 1))
-
-
-def summarize_path(solver, label, idx=30):
-    """Print a compact summary for one fitted solver."""
-    result = solver.coef()
-    i = min(idx, solver.nlambda - 1)
-    print("\n==== {} ====".format(label))
-    print("First 5 lambdas:", solver.lambdas[:5])
-    print("First 5 df values:", result["df"][:5])
-    print("lambda[{}]: {}".format(i, solver.lambdas[i]))
-    print("intercept[{}]: {}".format(i, result["intercept"][i]))
-    print("total_train_time:", result["total_train_time"])
-    return result
-
-
-################################################################
 ## Sparse linear regression
-n, d, s = 100, 80, 20
-X = generate_design(n, d, corr=0.5)
-beta = np.r_[np.random.rand(s), np.zeros(d - s)]
-Y = X.dot(beta) + np.random.randn(n)
+## Generate the design matrix and regression coefficient vector
+n = 100 # sample number
+d = 80 # sample dimension
+c = 0.5 # correlation parameter
+s = 20  # support size of coefficient
 
-solver_g_l1 = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="gaussian", penalty="l1")
-solver_g_l1.train()
-solver_g_mcp = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="gaussian", penalty="mcp")
-solver_g_mcp.train()
-solver_g_scad = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="gaussian", penalty="scad")
-solver_g_scad.train()
+X = scale(np.random.randn(n,d)+c* np.tile(np.random.randn(n),[d,1]).T )/ (n*(n-1))**0.5
+beta = np.append(np.random.rand(s), np.zeros(d-s))
 
-summarize_path(solver_g_l1, "Gaussian / L1")
+## Generate response using Gaussian noise, and fit sparse linear models
+noise = np.random.randn(n)
+Y = np.matmul(X,beta) + noise
 
-## Optional: visualize solution paths
-solver_g_l1.plot()
-solver_g_mcp.plot()
-solver_g_scad.plot()
+
+## l1 regularization solved with naive update
+solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="gaussian")
+solver_l1.train()
+
+## mcp regularization
+solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), penalty="mcp")
+solver_mcp.train()
+
+## scad regularization
+solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), penalty="scad")
+solver_scad.train()
+
+## Obtain the result
+result = solver_l1.coef()
+
+## print out training time
+print(result['total_train_time'])
+
+## lambdas used
+print(solver_l1.lambdas)
+
+## number of nonzero coefficients for each lambda
+print(result['df'])
+
+## coefficients and intercept for the i-th lambda
+i = 30
+print(solver_l1.lambdas[i])
+print(result['beta'][i])
+print(result['intercept'][i])
+
+## Visualize the solution path
+solver_l1.plot()
+solver_mcp.plot()
+solver_scad.plot()
 
 
 ################################################################
 ## Sparse logistic regression
-X = generate_design(n, d, corr=0.5)
-beta = np.r_[np.random.rand(s), np.zeros(d - s)]
-p = 1.0 / (1.0 + np.exp(-X.dot(beta)))
-Y = np.random.binomial(1, p).astype("int64")
+## Generate the design matrix and regression coefficient vector
+n = 100 # sample number
+d = 80 # sample dimension
+c = 0.5 # correlation parameter
+s = 20  # support size of coefficient
 
-solver_b_l1 = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="binomial", penalty="l1")
-solver_b_l1.train()
-solver_b_mcp = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="binomial", penalty="mcp")
-solver_b_mcp.train()
-solver_b_scad = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="binomial", penalty="scad")
-solver_b_scad.train()
+X = scale(np.random.randn(n,d)+c* np.tile(np.random.randn(n),[d,1]).T )/ (n*(n-1))**0.5
+beta = np.append(np.random.rand(s), np.zeros(d-s))
 
-result_b = summarize_path(solver_b_l1, "Binomial / L1")
+## Generate response and fit sparse logistic models
+noise = np.random.randn(n)
+p = 1/(1+np.exp(-np.matmul(X,beta) - noise))
+Y = np.random.binomial(np.ones(n,dtype='int64'),p)
 
-## Fitted Bernoulli probabilities on training data at each lambda
-y_prob_train = solver_b_l1.predict()
-print("Prediction shape:", y_prob_train.shape)
+## l1 regularization
+solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="l1")
+solver_l1.train()
 
-## Optional: visualize solution paths
-solver_b_l1.plot()
-solver_b_mcp.plot()
-solver_b_scad.plot()
+## mcp regularization
+solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="mcp")
+solver_mcp.train()
+
+## scad regularization
+solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="scad")
+solver_scad.train()
+
+## Obtain the result
+result = solver_l1.coef()
+
+## print out training time
+print(result['total_train_time'])
+
+## lambdas used
+print(solver_l1.lambdas)
+
+## number of nonzero coefficients for each lambda
+print(result['df'])
+
+## coefficients and intercept for the i-th lambda
+i = 30
+print(solver_l1.lambdas[i])
+print(result['beta'][i])
+print(result['intercept'][i])
+
+## Visualize the solution path
+solver_l1.plot()
+solver_mcp.plot()
+solver_scad.plot()
 
 
 ################################################################
 ## Sparse poisson regression
-X = generate_design(n, d, corr=0.5)
-beta = np.r_[np.random.rand(s), np.zeros(d - s)] / np.sqrt(s)
-rate = np.exp(X.dot(beta) + np.random.randn(n))
-Y = np.random.poisson(rate).astype("int64")
+## Generate the design matrix and regression coefficient vector
+n = 100 # sample number
+d = 80 # sample dimension
+c = 0.5 # correlation parameter
+s = 20  # support size of coefficient
 
-solver_p_l1 = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="poisson", penalty="l1")
-solver_p_l1.train()
-solver_p_mcp = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="poisson", penalty="mcp")
-solver_p_mcp.train()
-solver_p_scad = pycasso.Solver(X, Y, lambdas=(100, 0.05), family="poisson", penalty="scad")
-solver_p_scad.train()
+X = scale(np.random.randn(n,d)+c* np.tile(np.random.randn(n),[d,1]).T )/ (n*(n-1))**0.5
+beta = np.append(np.random.rand(s), np.zeros(d-s))/(s**0.5)
 
-summarize_path(solver_p_l1, "Poisson / L1")
+## Generate response and fit sparse logistic models
+noise = np.random.randn(n)
+p = np.exp(-np.matmul(X,beta) - noise)
+Y = np.random.poisson(p, n)
 
-## Optional: visualize solution paths
-solver_p_l1.plot()
-solver_p_mcp.plot()
-solver_p_scad.plot()
+## l1 regularization
+solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="l1")
+solver_l1.train()
+
+## mcp regularization
+solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="mcp")
+solver_mcp.train()
+
+## scad regularization
+solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="scad")
+solver_scad.train()
+
+## Obtain the result
+result = solver_l1.coef()
+
+## print out training time
+print(result['total_train_time'])
+
+## lambdas used
+print(solver_l1.lambdas)
+
+## number of nonzero coefficients for each lambda
+print(result['df'])
+
+## coefficients and intercept for the i-th lambda
+i = 30
+print(solver_l1.lambdas[i])
+print(result['beta'][i])
+print(result['intercept'][i])
+
+## Visualize the solution path
+solver_l1.plot()
+solver_mcp.plot()
+solver_scad.plot()

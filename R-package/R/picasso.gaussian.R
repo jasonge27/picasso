@@ -1,5 +1,5 @@
-picasso.gaussian <- function(X, 
-                          Y, 
+picasso.gaussian <- function(X,
+                          Y,
                           lambda = NULL,
                           nlambda = NULL,
                           lambda.min.ratio = NULL,
@@ -7,6 +7,7 @@ picasso.gaussian <- function(X,
                           type.gaussian = NULL,
                           gamma = 3,
                           df = NULL,
+                          dfmax = NULL,
                           standardize = TRUE,
                           intercept = TRUE,
                           prec = 1e-4,
@@ -14,52 +15,32 @@ picasso.gaussian <- function(X,
                           verbose = FALSE)
 {
   begt = Sys.time()
-  n = nrow(X)
-  d = ncol(X)
+  dims = .picasso_validate_design(X)
+  n = dims$n
+  d = dims$d
   if (verbose)
     cat("Sparse linear regression. \n")
 
   if (is.null(type.gaussian)) {
-    if (n < 500) {
-      type.gaussian = "covariance"
-    } else {
-      type.gaussian = "naive" 
-    }
+    type.gaussian = "naive"
   }
 
-  if (n == 0 || d == 0) {
-    cat("No data input.\n")
-    return(NULL)
-  }
-
-  if (method != "l1" && method != "mcp" && method != "scad"){
-    cat(" Wrong \"method\" input. \n \"method\" 
-          should be one of \"l1\", \"mcp\", \"scad\".\n", 
-        method," is not supported in this version. \n")
-    return(NULL)
-  }
- 
   if (type.gaussian!="naive" && type.gaussian!="covariance") {
-    cat(" Wrong \"type.gaussian\" input. \n \"type.gaussian\" should 
-          be one of \"naive\" and \"covariance\".\n", 
-        type.gaussian," is not supported in this version. \n")
-    return(NULL)
+    stop(sprintf(
+      "Invalid `type.gaussian`: %s. Must be one of: naive, covariance.",
+      type.gaussian
+    ))
   }
 
   
   res.sd = FALSE 
 
-  if (standardize) {
-    xx = rep(0.0, n*d)
-    xm = rep(0.0, d)
-    xinvc.vec = rep(0.0, d)
+  design = .picasso_prepare_design(X, standardize)
+  xx = design$xx
+  xm = design$xm
+  xinvc.vec = design$xinvc.vec
 
-    str = .C("standardize_design", as.double(X), as.double(xx), as.double(xm), 
-              as.double(xinvc.vec), as.integer(n), as.integer(d), PACKAGE="picasso")
-    xx = matrix(unlist(str[2]), nrow=n, ncol=d, byrow=FALSE)
-    xm = matrix(unlist(str[3]), nrow=1)
-    xinvc.vec = unlist(str[4])
-    
+  if (standardize) {
     ym = mean(Y)
     y1 = Y-ym
     if (res.sd){
@@ -70,96 +51,58 @@ picasso.gaussian <- function(X,
       yy = y1
     }
   } else {
-    xinvc.vec = rep(1,d)
     sdy = 1
-    xx = X
     yy = Y
   }
 
-  if (is.null(df)) {
-    df = d
-  }
+  # `df` is accepted for backward compatibility and is currently unused.
   
   est = list()
-  if (!is.null(lambda)) nlambda = length(lambda)
+  xy = crossprod(xx,yy)
+  lambda.max = max(abs(xy/n))
+  lambda.info = .picasso_lambda_path(lambda, nlambda, lambda.min.ratio, lambda.max)
+  lambda = lambda.info$lambda
+  nlambda = lambda.info$nlambda
 
-  if (is.null(lambda)){
-    if (is.null(nlambda))
-      nlambda = 100
+  method.info = .picasso_method_flag(method, gamma)
+  method.flag = method.info$flag
+  gamma = method.info$gamma
 
-    xy = crossprod(xx,yy)
-    lambda.max = max(abs(xy/n))
+  dfmax.int <- if (is.null(dfmax)) as.integer(-1) else as.integer(dfmax)
 
-    if (is.null(lambda.min.ratio)){
-        lambda.min = 0.05*lambda.max
-    } else {
-        lambda.min = min(lambda.min.ratio*lambda.max, lambda.max)
-    }
+  out = gaussian_solver(yy, xx, lambda, nlambda, gamma, n, d, max.ite, prec, verbose,
+                       intercept, method.flag, type.gaussian, dfmax.int)
 
-    if (lambda.min >= lambda.max) 
-      cat("\"lambda.min\" is too small. \n")
-    lambda = exp(seq(log(lambda.max), log(lambda.min), length = nlambda))
+  if (out$err == 1) {
+    stop("Parameters are too dense. Please choose larger `lambda`.")
+  }
+  if (out$err == 2) {
+    warning("`df` may be too small. You may choose larger `df`.", call. = FALSE)
   }
 
-  if (method == "l1" || method == "mcp" || method == "scad") {
-    if (method == "l1") {
-      method.flag = 1
-    }
-    if (method == "mcp") {
-      method.flag = 2
-      if (gamma <= 1) {
-        cat("gamma > 1 is required for MCP. Set to the default value 3. \n")
-        gamma = 3
-      }
-    }
-    if (method == "scad") {
-      method.flag = 3
-      if (gamma <= 2) {
-        cat("gamma > 2 is required for SCAD. Set to the default value 3. \n")
-        gamma = 3
-      }
-    }
-
-    out = gaussian_solver(yy, xx, lambda, nlambda, gamma, n, d, df, max.ite, prec, verbose, 
-                         standardize, intercept, method.flag, type.gaussian)
-
-    if (out$err == 1)
-      cat("Error! Parameters are too dense. Please choose larger \"lambda\". \n")
-    if (out$err == 2)
-      cat("Warning! \"df\" may be too small. You may choose larger \"df\". \n")
+  # truncate to actual number of lambdas fit (early stopping)
+  num.fit = out$num.fit
+  if (num.fit < nlambda) {
+    lambda = lambda[1:num.fit]
+    nlambda = num.fit
   }
 
-  beta1 = matrix(0, nrow=d, ncol=nlambda)
-  intcpt = rep(0, nlambda)
-  
-  if (standardize){
-    for (k in 1:nlambda){
-      tmp.beta = out$beta[((k-1)*d+1):(k*d)]
-      beta1[,k] = xinvc.vec*tmp.beta
-      intcpt[k] = -as.numeric(xm[1,]%*%beta1[,k])+out$intcpt[k]
-      est$lambda = lambda * sdy
-    }
-  } else {
-    for (k in 1:nlambda){
-      beta1[,k] = out$beta[((k-1)*d+1):(k*d)]
-      intcpt[k] = out$intcpt[k]
-      est$lambda = lambda 
-    }
-  }
+  beta.raw = matrix(out$beta[1:(d * nlambda)], nrow = d, ncol = nlambda, byrow = FALSE)
+  scaled = .picasso_rescale_solution(beta.raw, out$intcpt[1:nlambda], standardize, xinvc.vec, xm)
 
-  est$beta = Matrix(beta1)
-  est$intercept = intcpt
-  
-  est$df = colSums(matrix(out$beta, nrow=d, ncol=nlambda, byrow=FALSE) != 0)
-  
-  est$ite = out$ite
-  
+  est$beta = Matrix(scaled$beta)
+  est$intercept = if (standardize) scaled$intercept + ym else scaled$intercept
+  est$lambda = lambda * sdy
+  est$df = colSums(beta.raw != 0)
+
+  est$ite = out$ite[1:nlambda]
+
   runt = Sys.time()-begt
-  
+
   est$nlambda = nlambda
   est$gamma = gamma
   est$method = method
-  est$alg = paste("actnewton", type.gaussian, sep = "-")
+  est$alg = paste("actgd", type.gaussian, sep = "-")
   est$verbose = verbose
   est$runtime = runt
   class(est) = "gaussian"
@@ -168,78 +111,26 @@ picasso.gaussian <- function(X,
 
 print.gaussian <- function(x, ...)
 {  
-  cat("\n Lasso options summary: \n")
-  cat(x$nlambda, " lambdas used:\n")
-  print(signif(x$lambda,digits=3))
-  cat("Method =", x$method, "\n")
-  cat("Alg =", x$alg, "\n")
-  cat("Degree of freedom:",min(x$df),"----->",max(x$df),"\n")
-  if (units.difftime(x$runtime)=="secs") unit="secs"
-  if (units.difftime(x$runtime)=="mins") unit="mins"
-  if (units.difftime(x$runtime)=="hours") unit="hours"
-  cat("Runtime:",x$runtime," ",unit,"\n")
+  .picasso_print_summary(x, " Lasso options summary: ", method_label = "Method", show_alg = TRUE)
 }
 
 plot.gaussian <- function(x, ...)
 {
-  matplot(x$lambda, t(x$beta), type="l", main="Regularization Path",
-          xlab="Regularization Parameter", ylab="Coefficient")
+  .picasso_plot_path(x)
 }
 
 coef.gaussian <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
 {
-  lambda.n = length(lambda.idx)
-  beta.n = length(beta.idx)
-  cat("\n Values of estimated coefficients: \n")
-  cat(" index     ")
-  for (i in 1:lambda.n){
-    cat("",formatC(lambda.idx[i], digits=5, width=10),"")
-  }
-  cat("\n")
-  cat(" lambda    ")
-  for (i in 1:lambda.n){
-    cat("",formatC(object$lambda[lambda.idx[i]], digits=4, width=10),"")
-  }
-  cat("\n")
-  cat(" intercept ")
-  for (i in 1:lambda.n){
-    cat("",formatC(object$intercept[i], digits=4, width=10),"")
-  }
-  cat("\n")
-  for (i in 1:beta.n){
-    cat(" beta",formatC(beta.idx[i], digits=5, width=-5))
-    for (j in 1:lambda.n){
-      cat("",formatC(object$beta[beta.idx[i],lambda.idx[j]], digits=4, width=10),"")
-    }
-    cat("\n")
-  }
+  .picasso_extract_coef(object, lambda.idx, beta.idx)
 }
 
 predict.gaussian <- function(object, newdata, lambda.idx = c(1:3), Y.pred.idx = c(1:5), ...)
 {
-  pred.n = nrow(newdata)
-  lambda.n = length(lambda.idx)
-  Y.pred.n = length(Y.pred.idx)
-  intcpt = matrix(rep(object$intercept[lambda.idx],pred.n),nrow=pred.n,
-                  ncol=lambda.n,byrow=T)
-  Y.pred = newdata%*%object$beta[,lambda.idx] + intcpt
-  cat("\n Values of predicted responses: \n")
-  cat("   index   ")
-  for (i in 1:lambda.n){
-    cat("",formatC(lambda.idx[i], digits=5, width=10),"")
-  }
-  cat("\n")
-  cat("   lambda  ")
-  for (i in 1:lambda.n){
-    cat("",formatC(object$lambda[lambda.idx[i]], digits=4, width=10),"")
-  }
-  cat("\n")
-  for (i in 1:Y.pred.n){
-    cat("    Y",formatC(Y.pred.idx[i], digits=5, width=-5))
-    for (j in 1:lambda.n){
-      cat("",formatC(Y.pred[Y.pred.idx[i],j], digits=4, width=10),"")
-    }
-    cat("\n")
-  }
-  return(Y.pred)
+  .picasso_predict(
+    object,
+    newdata,
+    lambda.idx,
+    Y.pred.idx,
+    default_response_idx = c(1:5)
+  )
 }

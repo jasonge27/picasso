@@ -1,24 +1,28 @@
-pycasso API Reference
-=====================
+.. |br| raw:: html
 
-Package Module
---------------
+ <br />
+
+pycasso package
+===============
+
+pycasso
+---------------
 
 .. automodule:: pycasso
     :members: test
     :undoc-members:
     :show-inheritance:
 
-Core Solver
------------
+pycasso\.core
+-------------
 
 .. automodule:: pycasso.core
     :members:
     :undoc-members:
     :show-inheritance:
 
-Library Path Utilities
-----------------------
+pycasso\.libpath
+----------------
 
 .. automodule:: pycasso.libpath
     :members:

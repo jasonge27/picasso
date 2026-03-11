@@ -1,115 +1,88 @@
-Pycasso Python Package
-======================
+Pycasso - Python Interface for PICASSO
+=======================================
 
-``pycasso`` is the Python wrapper of PICASSO for sparse learning with
-L1/MCP/SCAD penalties. It supports four model families:
+**PICASSO**: Penalized Generalized Linear Model Solver - Unleash the Power of Non-convex Penalty
 
-- ``gaussian`` (linear regression)
-- ``binomial`` (logistic regression)
-- ``poisson`` (count regression)
-- ``sqrtlasso`` (square-root lasso)
+Pycasso provides a Python interface to the PICASSO C++ solver for fitting sparse
+generalized linear models with L1 (Lasso), MCP, and SCAD penalties via pathwise
+coordinate optimization.
+
+Features
+--------
+
+- **Families**: Gaussian (linear), Binomial (logistic), Poisson, Sqrt-Lasso
+- **Penalties**: L1 (Lasso), MCP, SCAD
+- **Standardization**: Automatic design matrix standardization with proper coefficient rescaling
+- **Gaussian solvers**: Naive update and covariance update
+- **Early stopping**: ``dfmax`` parameter to stop when too many coefficients become nonzero
+- **Intercept**: Optional intercept term with correct initialization for all families
 
 Requirements
 ------------
 
-- Linux or macOS is recommended.
-- Python with ``numpy`` and ``scipy``.
-
-Windows users can still build from source, but toolchain setup may require
-extra work (for example, MinGW/MinGW-w64).
+- Linux or macOS
+- Python 3
+- NumPy, SciPy
 
 Installation
 ------------
 
-Install from PyPI (recommended):
+Install from PyPI::
 
-.. code-block:: bash
+    pip install pycasso
 
-   pip install pycasso
+Install from source::
 
-Install from source (repository root):
+    git clone https://github.com/jasonge27/picasso.git
+    cd picasso
+    mkdir build && cd build && cmake .. && make
+    cd ../python-package
+    pip install .
 
-.. code-block:: bash
-
-   git clone --recurse-submodules https://github.com/jasonge27/picasso.git
-   cd picasso
-   make Pyinstall
-
-Alternative source install via ``setup.py``:
-
-.. code-block:: bash
-
-   cd python-package
-   python setup.py install --user
-
-Verify installation:
+Usage
+-----
 
 .. code-block:: python
 
-   import pycasso
-   pycasso.test()
+    import numpy as np
+    import pycasso
 
-Quick Start
------------
+    # Generate example data
+    n, d = 200, 50
+    X = np.random.randn(n, d)
+    beta_true = np.zeros(d)
+    beta_true[:3] = [1, -0.5, 0.3]
+    y = X @ beta_true + np.random.randn(n) * 0.5
 
-.. code-block:: python
+    # Fit sparse linear regression with Lasso
+    s = pycasso.Solver(X, y, family="gaussian", penalty="l1")
+    s.train()
+    result = s.coef()
+    print(result['beta'])     # coefficient matrix (nlambda x d)
+    print(result['intercept'])  # intercept for each lambda
 
-   import numpy as np
-   import pycasso
+    # Predict
+    y_pred = s.predict(X[:5, :])
 
-   n, d, s = 200, 100, 10
-   X = np.random.randn(n, d)
-   beta_true = np.r_[np.random.randn(s), np.zeros(d - s)]
-   y = X @ beta_true + np.random.randn(n)
+    # Logistic regression with MCP penalty
+    y_bin = (np.random.rand(n) < 0.5).astype(float)
+    s2 = pycasso.Solver(X, y_bin, family="binomial", penalty="mcp")
+    s2.train()
 
-   solver = pycasso.Solver(
-       X,
-       y,
-       family="gaussian",
-       penalty="l1",
-       lambdas=(100, 0.05),  # (nlambda, lambda_min_ratio)
-       useintercept=True
-   )
-   solver.train()
+    # Early stopping with dfmax
+    s3 = pycasso.Solver(X, y, family="gaussian", dfmax=10)
+    s3.train()
 
-   result = solver.coef()
-   beta_path = result["beta"]      # shape: (nlambda, d)
-   intercept_path = result["intercept"]
-   y_pred = solver.predict(X[:5], lambdidx=20)
+..
 
-API Notes
+Reference
 ---------
 
-``Solver`` inputs:
+Jason Ge, Xingguo Li, Haoming Jiang, Han Liu, Tong Zhang, Mengdi Wang, and Tuo Zhao.
+"Picasso: A Sparse Learning Library for High Dimensional Data Analysis in R and Python."
+*Journal of Machine Learning Research*, 20(44):1-5, 2019.
 
-- ``x``: numeric array of shape ``(n_samples, n_features)``
-- ``y``:
-  - ``gaussian``/``sqrtlasso``: numeric values
-  - ``binomial``: binary labels in ``{0, 1}``
-  - ``poisson``: non-negative integers
-- ``lambdas``:
-  - tuple ``(nlambda, lambda_min_ratio)`` to auto-generate the path, or
-  - explicit decreasing sequence of positive values
-- ``family``: one of ``"gaussian"``, ``"binomial"``, ``"poisson"``,
-  ``"sqrtlasso"``
-- ``penalty``: one of ``"l1"``, ``"mcp"``, ``"scad"``
+License
+-------
 
-For nonconvex logistic/poisson fits (``penalty="mcp"`` or ``"scad"``),
-keep ``lambda_min_ratio >= 0.05`` to avoid unstable optimization.
-
-Typical workflow:
-
-1. Build a ``Solver``.
-2. Call ``train()``.
-3. Inspect coefficients from ``coef()``.
-4. Use ``predict(newdata, lambdidx=...)`` for prediction.
-
-For developers
---------------
-
-Build Sphinx docs locally:
-
-.. code-block:: bash
-
-   cd doc
-   make html
+GPL-3.0

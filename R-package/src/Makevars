@@ -1,0 +1,6 @@
+# package root
+PKGROOT=.
+ENABLE_STD_THREAD=0
+
+PKG_CPPFLAGS= -I$(PKGROOT)/include -I$(PKGROOT)/include/eigen3 -I$(PKGROOT) -DEIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS
+OBJECTS= ./picasso_R.o ./picasso-all0.o 
