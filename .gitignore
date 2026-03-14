@@ -1,0 +1,48 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.page
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.page
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*~
+*.Rcheck
+*.rds
+*pyc
+.Rhistory
+*.dll
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+R-package/*.Rproj
+
+#CLion
+.idea
+
+#cmake
+cmake-build-debug
+/build/
+
+# Local R library
+.Rlib/
+
+#python build
+/picasso-python/
+python-package/build
+python-package/doc/build
+python-package/dist
+python-package/pycasso.tar
+python-package/*.egg-info/
+picasso_*.tar.gz
+
+#MacOS
+.DS_Store
+*/.DS_Store

@@ -1,0 +1,34 @@
+Package: picasso
+Type: Package
+Title: Sparse Learning with Convex and Concave Penalties
+Version: 1.6
+Date: 2026-02-18
+Maintainer: Tuo Zhao <tourzhao@gatech.edu>
+Authors@R: c(
+ person("Jason", "Ge", role = "aut", email = "jiange@princeton.edu"),
+ person("Xingguo", "Li", role = "aut"),
+ person("Haoming", "Jiang", role = "aut"),
+ person("Mengdi", "Wang", role = "aut"),
+ person("Tong", "Zhang", role = "aut"),
+ person("Han", "Liu", role = "aut"),
+ person("Tuo", "Zhao", role = c("aut", "cre"), email = "tourzhao@gatech.edu"),
+ person("Gael", "Guennebaud", role = "ctb",
+        comment = "Contributor to bundled Eigen headers"),
+ person("Benoit", "Jacob", role = "ctb",
+        comment = "Contributor to bundled Eigen headers"),
+ person("Eigen", "Library Authors", role = "cph",
+        comment = "Copyright holders of bundled Eigen headers in src/include/eigen3")
+ )
+Depends: R (>= 2.15.0), MASS, Matrix
+Imports: methods
+Description: Fast tools for fitting sparse generalized linear models with convex
+    penalties (lasso) and concave penalties (smoothly clipped absolute
+    deviation and minimax concave penalty). Computation uses multi-stage convex
+    relaxation and pathwise coordinate optimization with warm starts,
+    active-set updates, and screening rules. Core solvers are implemented in
+    C++, and coefficient paths are stored as sparse matrices for memory
+    efficiency.
+License: GPL-3
+Copyright: See inst/COPYRIGHTS for bundled third-party copyright and license notices.
+Repository: CRAN
+NeedsCompilation: yes
