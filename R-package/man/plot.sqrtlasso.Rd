@@ -1,10 +1,10 @@
 \name{plot.sqrtlasso}
 \alias{plot.sqrtlasso}
 \title{
-Plot Function for "sqrtlasso"
+Plot Method for an Object with S3 Class \code{"sqrtlasso"}
 }
 \description{
-Visualize the solution path of regression estimates across regularization parameters.
+Plot coefficient paths across regularization parameters.
 }
 \usage{
 \method{plot}{sqrtlasso}(x, ...)
@@ -17,9 +17,12 @@ Visualize the solution path of regression estimates across regularization parame
   Arguments to be passed to methods.
   }
 }
+\value{
+No return value, called for side effects (drawing the coefficient-path plot).
+}
 
 \author{
-Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Jason Ge, Xingguo Li, Haoming Jiang, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
 Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
 

@@ -16,11 +16,23 @@ export("picasso",
        "coef.sqrtlasso",
        "print.sqrtlasso",
        "plot.sqrtlasso",
-       "predict.sqrtlasso"
+       "predict.sqrtlasso",
+       "print.multinomial",
+       "plot.multinomial",
+       "coef.multinomial",
+       "predict.multinomial",
+       "cv.picasso",
+       "print.cv.picasso",
+       "plot.cv.picasso",
+       "coef.cv.picasso",
+       "predict.cv.picasso",
+       "assess.picasso",
+       "print.assess.picasso",
+       "confusion.picasso"
       )
-importFrom("grDevices", "dev.off", "gray.colors", "postscript")
-importFrom("graphics", "lines", "matplot", "par", "plot")
-importFrom("stats", "cor", "cov", "runif")
+importFrom("grDevices", "dev.off")
+importFrom("graphics", "abline", "lines", "matplot", "par", "plot")
+importFrom("stats", "coef", "cor", "cov", "predict", "runif", "sd")
 importFrom("methods", "new")
 S3method("print", "gaussian")
 S3method("plot", "gaussian")
@@ -38,3 +50,12 @@ S3method("print", "sqrtlasso")
 S3method("plot", "sqrtlasso")
 S3method("coef", "sqrtlasso")
 S3method("predict", "sqrtlasso")
+S3method("print", "multinomial")
+S3method("plot", "multinomial")
+S3method("coef", "multinomial")
+S3method("predict", "multinomial")
+S3method("print", "cv.picasso")
+S3method("plot", "cv.picasso")
+S3method("coef", "cv.picasso")
+S3method("predict", "cv.picasso")
+S3method("print", "assess.picasso")

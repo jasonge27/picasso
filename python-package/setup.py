@@ -5,7 +5,6 @@ import sys
 import os
 import shutil
 from setuptools import setup, find_packages
-# import subprocess
 sys.path.insert(0, '.')
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -48,20 +47,17 @@ setup(name='pycasso',
           'numpy',
           'scipy',
       ],
-      maintainer='Haoming Jiang',
-      maintainer_email='jianghm.ustc@gmail.com',
+      maintainer='Tuo Zhao',
+      maintainer_email='tourzhao@gatech.edu',
       zip_safe=False,
       packages=find_packages(),
-      # this will use MANIFEST.in during install where we specify additional files,
-      # this is the golden line
       include_package_data=True,
-      # data_files=[('pycasso',LIB_PATH)],
       license='GPL-3.0',
-      classifiers=['Development Status :: 3 - Alpha',
+      classifiers=['Development Status :: 5 - Production/Stable',
                    'Intended Audience :: Developers',
                    'Intended Audience :: Science/Research',
                    'Topic :: Scientific/Engineering :: Artificial Intelligence',
                    'Topic :: Scientific/Engineering :: Mathematics',
                    'Programming Language :: Python :: 3 :: Only',
                    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'],
-      url='https://hmjianggatech.github.io/picasso/')
+      url='https://github.com/jasonge27/picasso')

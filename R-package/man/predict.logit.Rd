@@ -1,52 +1,66 @@
 \name{predict.logit}
 \alias{predict.logit}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Prediction for an object with S3 class \code{"logit"}
+Prediction Method for an Object with S3 Class \code{"logit"}
 }
 \description{
-Predict responses for new design data.
+Predict responses for new data using fitted models.
 }
 \usage{
-\method{predict}{logit}(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1:5), \dots)
+\method{predict}{logit}(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1:5),
+  type = "response", s = NULL, \dots)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{
-  An object with S3 class \code{"logit"} 
+  An object with S3 class \code{"logit"}. 
   }
   \item{newdata}{
-  Optional matrix/data frame used for prediction. If omitted, the training design matrix from fitting is used.
+  Numeric matrix of new observations for prediction (\eqn{n_{new} \times d}).
   }
   \item{lambda.idx}{
-  The indices of the regularization parameters in the solution path to be displayed. The default values are \code{c(1:3)}.
+  Indices of regularization parameters along the solution path used for prediction.
+  The default is \code{c(1:3)}.
   }
   \item{p.pred.idx}{
-  The indices of the predicted response vectors in the solution path to be displayed. The default values are \code{c(1:5)}.
+  Optional row indices to subset returned predictions when explicitly set to a
+  value different from the default \code{c(1:5)}.
+  }
+  \item{type}{
+  Type of prediction. \code{"response"} (default) returns probabilities;
+  \code{"link"} returns the log-odds; \code{"class"} returns 0/1 predicted
+  class labels; \code{"nonzero"} returns nonzero variable indices.
+  }
+  \item{s}{
+  Optional numeric vector of lambda \emph{values}; see \code{\link{predict.gaussian}}.
   }
   \item{\dots}{
   Arguments to be passed to methods.
   }
 }
 \details{
-\code{predict.logit} produces predicted values of the responses of the \code{newdata} from the estimated \code{beta} values in the \code{object}, i.e.
+\code{predict.logit} returns predicted Bernoulli probabilities for \code{newdata} using fitted coefficients from \code{object}:
 \deqn{
     \hat{p} = \frac{e^{\hat{\beta}_0 + X_{new} \hat{\beta}}}{1+e^{\hat{\beta}_0 + X_{new} \hat{\beta}}}.
     }\cr
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-  \item{p.pred}{
-  The predicted response vectors based on the estimated models.
-  }
+Return type depends on \code{type}:
+\itemize{
+  \item \code{"response"} (default): numeric matrix of predicted probabilities
+    \eqn{\hat{p} = \sigma(\hat{\beta}_0 + X \hat{\beta})}.
+  \item \code{"link"}: numeric matrix of log-odds
+    \eqn{\hat{\beta}_0 + X \hat{\beta}}.
+  \item \code{"class"}: integer matrix of predicted class labels (0 or 1).
+  \item \code{"nonzero"}: list of integer vectors of nonzero coefficient indices,
+    one element per selected lambda.
+}
+Rows correspond to observations; columns correspond to \code{lambda.idx} (or
+\code{s} values when \code{s} is specified).
 }
 \author{
-Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Jason Ge, Xingguo Li, Haoming Jiang, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
 Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{picasso}} and \code{\link{picasso-package}}.

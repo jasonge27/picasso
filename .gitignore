@@ -31,6 +31,9 @@ R-package/*.Rproj
 cmake-build-debug
 /build/
 
+# Local R library
+.Rlib/
+
 #python build
 /picasso-python/
 python-package/build

@@ -1,52 +1,63 @@
 \name{predict.sqrtlasso}
 \alias{predict.sqrtlasso}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Prediction for an object with S3 class \code{"sqrtlasso"}
+Prediction Method for an Object with S3 Class \code{"sqrtlasso"}
 }
 \description{
-Predict responses for new design data.
+Predict responses for new data using fitted models.
 }
 \usage{
-\method{predict}{sqrtlasso}(object, newdata, lambda.idx = c(1:3), Y.pred.idx = c(1:5), \dots)
+\method{predict}{sqrtlasso}(object, newdata, lambda.idx = c(1:3), Y.pred.idx = c(1:5),
+  type = "response", s = NULL, \dots)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{
-  An object with S3 class \code{"sqrtlasso"} 
+  An object with S3 class \code{"sqrtlasso"}. 
   }
   \item{newdata}{
-  Optional matrix/data frame used for prediction. If omitted, the training design matrix from fitting is used.
+  Numeric matrix of new observations for prediction (\eqn{n_{new} \times d}).
   }
   \item{lambda.idx}{
-  The indices of the regularization parameters in the solution path to be displayed. The default values are \code{c(1:3)}.
+  Indices of regularization parameters along the solution path used for prediction.
+  The default is \code{c(1:3)}.
   }
   \item{Y.pred.idx}{
-  The indices of the predicted response vectors in the solution path to be displayed. The default values are \code{c(1:5)}.
+  Optional row indices to subset returned predictions when explicitly set to a
+  value different from the default \code{c(1:5)}.
+  }
+  \item{type}{
+  Type of prediction. \code{"response"} (default) returns predicted values;
+  \code{"link"} returns the linear predictor; \code{"nonzero"} returns
+  nonzero variable indices.
+  }
+  \item{s}{
+  Optional numeric vector of lambda \emph{values}; see \code{\link{predict.gaussian}}.
   }
   \item{\dots}{
   Arguments to be passed to methods.
   }
 }
 \details{
-\code{predict.sqrtlasso} produces predicted values of the responses of the \code{newdata} from the estimated \code{beta} values in the \code{object}, i.e.
+\code{predict.sqrtlasso} returns predicted responses for \code{newdata} using fitted coefficients from \code{object}:
 \deqn{
     \hat{Y} = \hat{\beta}_0 + X_{new} \hat{\beta}.
     }\cr
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-  \item{Y.pred}{
-  The predicted response vectors based on the estimated models.
-  }
+Return type depends on \code{type}:
+\itemize{
+  \item \code{"response"} or \code{"link"} (default): numeric matrix of
+    predicted values \eqn{\hat{\beta}_0 + X \hat{\beta}}.
+  \item \code{"nonzero"}: list of integer vectors of nonzero coefficient indices,
+    one element per selected lambda.
+}
+Rows correspond to observations; columns correspond to \code{lambda.idx} (or
+\code{s} values when \code{s} is specified).
 }
 \author{
-Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Jason Ge, Xingguo Li, Haoming Jiang, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
 Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{picasso}} and \code{\link{picasso-package}}.

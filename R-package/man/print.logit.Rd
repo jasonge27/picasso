@@ -1,16 +1,14 @@
 \name{print.logit}
 \alias{print.logit}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Print Function for an object with S3 class \code{"logit"}
+Print Method for an Object with S3 Class \code{"logit"}
 }
 \description{
-Print a summary of the information about an object with S3 class \code{"logit"}.
+Print a concise summary for an object with S3 class \code{"logit"}.
 }
 \usage{
 \method{print}{logit}(x, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
   An object with S3 class \code{"logit"}.
@@ -20,22 +18,15 @@ Print a summary of the information about an object with S3 class \code{"logit"}.
   }
 }
 \details{
-This call simply outlines the options used for computing a logit object.
+This method prints tuning parameters and fit statistics for a fitted logistic model object.
 }
-%\value{
-%}
-%\references{
-%}
-
+\value{
+The input object \code{x}, returned invisibly.
+}
 \author{
-Jason Ge, Xingguo Li, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
+Jason Ge, Xingguo Li, Haoming Jiang, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao\cr
 Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 }
-%\note{
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
 \code{\link{picasso}} and \code{\link{picasso-package}}.
 }
