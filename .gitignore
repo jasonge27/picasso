@@ -46,3 +46,10 @@ picasso_*.tar.gz
 #MacOS
 .DS_Store
 */.DS_Store
+
+# One-off local artifacts (kept out of version control)
+*.zip
+Rplots.pdf
+/benchmark_results*.csv
+/benchmark_picasso_vs_glmnet.csv
+/lib/
