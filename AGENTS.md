@@ -24,7 +24,7 @@ No coverage threshold is declared. Add deterministic Python-facing assertions to
 
 ## Cross-Language Changes
 
-When changing shared C++, update the corresponding copies under `R-package/src/`. Merge changes into `R-package/src/include/picasso/objective.hpp` carefully because it carries R-specific diagnostics. Keep C API declarations, implementations, the R bridge, and Python `ctypes` signatures synchronized. Register new `.cpp` files in `cmake/PicassoSources.cmake` and both unity builds, then run `check_mirrors`. Treat both bundled Eigen trees as vendored code.
+When changing shared C++, update the corresponding copies under `R-package/src/`; the mirror check requires every shared source and header — `objective.hpp` included — to be byte-identical to its R-package copy (the Eigen diagnostic pragmas live in both). Keep C API declarations, implementations, the R bridge, Python `ctypes` signatures, and the `EXPECTED_SYMBOLS` list in `tests/verify_c_api_exports.py` synchronized. Register new `.cpp` files in `cmake/PicassoSources.cmake` and both unity builds, then run `check_mirrors`. Treat the bundled Eigen tree under `R-package/src/include/eigen3/` as vendored code.
 
 ## Commit & Pull Request Guidelines
 

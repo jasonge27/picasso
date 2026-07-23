@@ -40,6 +40,38 @@ jobs:
       - name: Verify the complete C ABI
         run: python3 tests/verify_c_api_exports.py build-ci/libpicasso.so
 
+  macos:
+    name: macOS Apple Clang build, tests, and Python wrapper
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python test dependencies
+        run: python -m pip install numpy scipy
+      - name: Configure
+        run: >-
+          cmake -S . -B build-macos
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_TESTING=ON
+      - name: Build
+        run: cmake --build build-macos --parallel 3
+      - name: Check source mirrors
+        run: cmake --build build-macos --target check_mirrors
+      - name: Test
+        run: ctest --test-dir build-macos --output-on-failure
+      - name: Stage the dylib
+        run: cmake --build build-macos --target stage_picasso
+      - name: Verify the complete C ABI
+        run: python tests/verify_c_api_exports.py build-macos/stage/libpicasso.dylib
+      - name: Test Python wrapper against the staged dylib
+        env:
+          PICASSO_NATIVE_LIBRARY: ${{ github.workspace }}/build-macos/stage/libpicasso.dylib
+        run: |
+          python python-package/test_pycasso.py
+          python python-package/test_reproducibility.py
+
   sanitizers:
     name: Linux Clang ASan and UBSan
     runs-on: ubuntu-latest
@@ -62,7 +94,7 @@ jobs:
         run: ctest --test-dir build-sanitize --output-on-failure
 
   windows-c-api:
-    name: Windows x64 C ABI exports
+    name: Windows x64 build, tests, and C ABI exports
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -72,9 +104,15 @@ jobs:
       - name: Configure shared library
         run: >-
           cmake -S . -B build-windows -A x64
-          -DBUILD_TESTING=OFF
+          -DBUILD_TESTING=ON
           -DPICASSO_STAGE_DIRECTORY=${{ github.workspace }}/build-windows/stage
-      - name: Build and stage DLL
+      - name: Build
+        run: cmake --build build-windows --config Release --parallel 2
+      - name: Test
+        run: >-
+          ctest --test-dir build-windows --build-config Release
+          --output-on-failure
+      - name: Stage DLL
         run: >-
           cmake --build build-windows --config Release
           --target stage_picasso --parallel 2
@@ -84,13 +122,17 @@ jobs:
           build-windows/stage/picasso.dll
 
   python-wrapper:
-    name: Python wrapper and source bundle
+    name: Python ${{ matrix.python-version }} wrapper and source bundle
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
       - name: Install Python test dependencies
         run: python -m pip install numpy scipy wheel
       - name: Build native library
@@ -207,11 +249,16 @@ jobs:
   r-wrapper:
     name: R wrapper and registered native API
     runs-on: ubuntu-latest
+    env:
+      _R_CHECK_CRAN_INCOMING_: false
     steps:
       - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+      - uses: r-lib/actions/setup-tinytex@v2
+      - name: Install LaTeX packages for the manual and vignette
+        run: tlmgr install collection-fontsrecommended inconsolata
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: R-package
@@ -223,7 +270,7 @@ jobs:
           Rscript -e
           'library(picasso); testthat::test_dir("R-package/tests/testthat",
           reporter="summary", stop_on_failure=TRUE)'
-      - name: Build R source package
-        run: R CMD build R-package --no-build-vignettes
-      - name: Check R source package
-        run: R CMD check --no-manual --no-build-vignettes picasso_*.tar.gz
+      - name: Build R source package with vignettes
+        run: R CMD build R-package
+      - name: Check R source package as CRAN
+        run: R CMD check --as-cran picasso_*.tar.gz

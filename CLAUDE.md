@@ -36,8 +36,9 @@ amalgamation/          standalone unity-build translation unit
 cmake/                 source inventory, mirror checks, Eigen warning-pair check
 ```
 
-Treat both `include/eigen3/` and `R-package/src/include/eigen3/` as vendored
-code.
+Treat `R-package/src/include/eigen3/` as vendored code; it is the only
+bundled Eigen tree, and both the CMake and Makefile builds resolve it when no
+system Eigen is configured.
 
 ## Build and test
 
@@ -77,8 +78,10 @@ Add `-DPICASSO_ENABLE_SANITIZERS=ON` for an ASan/UBSan CMake build. The root
 Makefile is retained for compatibility and packaging (`make dylib`,
 `make pippack`, `make Rpack`); use CMake for native development.
 CI (`.github/workflows/cpp-tests.yml`) runs GCC and Clang Linux builds with
-the mirror, ctest, and ABI gates, a Clang sanitizer build, a Windows DLL ABI
-job, and full Python-packaging and R-wrapper jobs.
+the mirror, ctest, and ABI gates, a macOS build with ctest and both Python
+suites, a Clang sanitizer build, a Windows build with ctest and the DLL ABI
+gate, Python-packaging jobs on 3.9 and 3.12, and an R job that runs testthat
+plus `R CMD check --as-cran` with vignettes.
 
 ## Solver architecture
 
