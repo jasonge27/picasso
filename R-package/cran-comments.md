@@ -33,8 +33,8 @@ of source-level warning-suppression macros.
 ## Validation
 
 The final isolated source tarball was installed and tested before this
-submission. The complete `testthat` suite contains 68 `test_that()` cases and
-1,070 expectations covering all families, interfaces, solver statuses,
+submission. The complete `testthat` suite contains 97 `test_that()` cases and
+1,481 expectations covering all families, interfaces, solver statuses,
 offsets, adaptive LLA, Gaussian backend selection, path loss reuse, and
 numerical stability.
 
