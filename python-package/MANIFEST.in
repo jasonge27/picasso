@@ -1,16 +1,18 @@
 include *.md *.rst
-recursive-include lib *
-recursive-include data *
-recursive-include pycasso *
-recursive-include pycasso/include *
+include LICENSE
+recursive-include pycasso *.py VERSION
 recursive-include pycasso/src *
-recursive-include pycasso/lib *
-recursive-include pycasso/dmlc-core *
-#exclude pre-compiled .o and .a file for less confusions
-#make sure .a files are all removed for forcing compiling
-#include the pre-compiled .so is needed as a placeholder
-#since it will be copy after compiling on the fly
+prune pycasso/lib
+prune pycasso/src/build
+prune pycasso/src/lib
+# Source distributions must compile for the target host. Never retain a
+# binary from the machine that assembled the sdist.
+global-exclude *.so
+global-exclude *.dylib
+global-exclude *.dll
 global-exclude *.o
+global-exclude *.d
 global-exclude *.a
 global-exclude *.pyo
 global-exclude *.pyc
+global-exclude .DS_Store

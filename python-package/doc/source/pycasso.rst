@@ -1,30 +1,17 @@
-.. |br| raw:: html
+Python API
+==========
 
- <br />
-
-pycasso package
-===============
-
-pycasso
----------------
+The public interface consists of :class:`pycasso.Solver`,
+:class:`pycasso.PycassoError`, and :func:`pycasso.test`.
 
 .. automodule:: pycasso
-    :members: test
-    :undoc-members:
-    :show-inheritance:
+   :members: test, PycassoError
+   :show-inheritance:
 
-pycasso\.core
--------------
+Solver
+------
 
-.. automodule:: pycasso.core
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-pycasso\.libpath
-----------------
-
-.. automodule:: pycasso.libpath
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autoclass:: pycasso.Solver
+   :members:
+   :special-members: __str__
+   :show-inheritance:

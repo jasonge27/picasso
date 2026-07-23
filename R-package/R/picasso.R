@@ -5,7 +5,7 @@ picasso <- function(X,
                     lambda.min.ratio = 0.05,
                     family = "gaussian",
                     method = "l1",
-                    type.gaussian = "naive",
+                    type.gaussian = "auto",
                     gamma = 3,
                     df = NULL,
                     dfmax = NULL,
@@ -14,15 +14,22 @@ picasso <- function(X,
                     prec = 1e-7,
                     max.ite = 1e3,
                     verbose = FALSE,
-                    offset = NULL)
+                    offset = NULL,
+                    lla.max.stages = 3L,
+                    fast.mode = FALSE)
 {
-  supported.family = c("gaussian", "binomial", "poisson", "sqrtlasso", "multinomial")
-  if (!(family %in% supported.family)) {
-    stop(sprintf(
-      "Invalid `family`: %s. Must be one of: %s.",
-      family,
-      paste(supported.family, collapse = ", ")
-    ))
+  supported.family <- c(
+    "gaussian", "binomial", "poisson", "sqrtlasso", "multinomial"
+  )
+  family <- .picasso_validate_choice(family, supported.family, "family")
+  method <- .picasso_validate_choice(
+    method, c("l1", "mcp", "scad"), "method"
+  )
+  prec <- .picasso_resolve_precision(prec, fast.mode, family)
+  lla.max.stages <- .picasso_validate_lla_max_stages(lla.max.stages)
+
+  if (!is.null(offset) && !(family %in% c("binomial", "poisson"))) {
+    stop(sprintf("offset is not supported for family = \"%s\".", family))
   }
 
   if (family == "gaussian") {
@@ -37,17 +44,17 @@ picasso <- function(X,
                         dfmax = dfmax,
                         standardize = standardize,  intercept= intercept,
                         prec = prec,
-                        max.ite = max.ite, verbose = verbose)
+                        max.ite = max.ite, verbose = verbose,
+                        fast.mode = fast.mode)
   } else if (family == "binomial") {
-    if(!is.matrix(Y))
-      Y = as.matrix(Y)
-
     out = picasso.logit(X = X, Y = Y, lambda = lambda, nlambda = nlambda,
                         lambda.min.ratio = lambda.min.ratio,
                         method = method, gamma = gamma, dfmax = dfmax,
                         standardize = standardize, intercept=intercept,
                         prec = prec, max.ite = max.ite, verbose = verbose,
-                        offset = offset)
+                        offset = offset,
+                        lla.max.stages = lla.max.stages,
+                        fast.mode = fast.mode)
   } else if (family == "sqrtlasso"){
     if(!is.matrix(Y))
       Y = as.matrix(Y)
@@ -56,7 +63,9 @@ picasso <- function(X,
                         lambda.min.ratio = lambda.min.ratio,
                         method = method, gamma = gamma, dfmax = dfmax,
                         standardize = standardize, intercept=intercept,
-                        prec = prec, max.ite = max.ite, verbose = verbose)
+                        prec = prec, max.ite = max.ite, verbose = verbose,
+                        lla.max.stages = lla.max.stages,
+                        fast.mode = fast.mode)
   } else if (family=="poisson") {
     out = picasso.poisson(X = X, Y=Y, lambda = lambda, nlambda = nlambda,
                         lambda.min.ratio = lambda.min.ratio,
@@ -65,13 +74,18 @@ picasso <- function(X,
                        intercept = intercept,
                        prec = prec, max.ite = max.ite,
                        verbose = verbose,
-                       offset = offset)
+                       offset = offset,
+                       lla.max.stages = lla.max.stages,
+                       fast.mode = fast.mode)
   } else if (family == "multinomial") {
     out = picasso.multinomial(X = X, Y = Y, lambda = lambda, nlambda = nlambda,
                               lambda.min.ratio = lambda.min.ratio,
                               method = method, gamma = gamma, dfmax = dfmax,
                               standardize = standardize, intercept = intercept,
-                              prec = prec, max.ite = max.ite, verbose = verbose)
+                              prec = prec, max.ite = max.ite,
+                              lla.max.stages = lla.max.stages,
+                              verbose = verbose,
+                              fast.mode = fast.mode)
   }
   out$family = family
   return(out)

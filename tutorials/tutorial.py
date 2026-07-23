@@ -1,157 +1,98 @@
-import pycasso
+"""Current pycasso interface examples for every supported family.
+
+Run after installing the development checkout described in
+``python-package/README.rst``.
+"""
+
 import numpy as np
-from sklearn.preprocessing import scale
 
-## Sparse linear regression
-## Generate the design matrix and regression coefficient vector
-n = 100 # sample number
-d = 80 # sample dimension
-c = 0.5 # correlation parameter
-s = 20  # support size of coefficient
-
-X = scale(np.random.randn(n,d)+c* np.tile(np.random.randn(n),[d,1]).T )/ (n*(n-1))**0.5
-beta = np.append(np.random.rand(s), np.zeros(d-s))
-
-## Generate response using Gaussian noise, and fit sparse linear models
-noise = np.random.randn(n)
-Y = np.matmul(X,beta) + noise
+import pycasso
 
 
-## l1 regularization solved with naive update
-solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="gaussian")
-solver_l1.train()
-
-## mcp regularization
-solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), penalty="mcp")
-solver_mcp.train()
-
-## scad regularization
-solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), penalty="scad")
-solver_scad.train()
-
-## Obtain the result
-result = solver_l1.coef()
-
-## print out training time
-print(result['total_train_time'])
-
-## lambdas used
-print(solver_l1.lambdas)
-
-## number of nonzero coefficients for each lambda
-print(result['df'])
-
-## coefficients and intercept for the i-th lambda
-i = 30
-print(solver_l1.lambdas[i])
-print(result['beta'][i])
-print(result['intercept'][i])
-
-## Visualize the solution path
-solver_l1.plot()
-solver_mcp.plot()
-solver_scad.plot()
+rng = np.random.default_rng(7)
+n, d = 180, 30
+X = rng.normal(size=(n, d))
 
 
-################################################################
-## Sparse logistic regression
-## Generate the design matrix and regression coefficient vector
-n = 100 # sample number
-d = 80 # sample dimension
-c = 0.5 # correlation parameter
-s = 20  # support size of coefficient
-
-X = scale(np.random.randn(n,d)+c* np.tile(np.random.randn(n),[d,1]).T )/ (n*(n-1))**0.5
-beta = np.append(np.random.rand(s), np.zeros(d-s))
-
-## Generate response and fit sparse logistic models
-noise = np.random.randn(n)
-p = 1/(1+np.exp(-np.matmul(X,beta) - noise))
-Y = np.random.binomial(np.ones(n,dtype='int64'),p)
-
-## l1 regularization
-solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="l1")
-solver_l1.train()
-
-## mcp regularization
-solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="mcp")
-solver_mcp.train()
-
-## scad regularization
-solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), family="binomial", penalty="scad")
-solver_scad.train()
-
-## Obtain the result
-result = solver_l1.coef()
-
-## print out training time
-print(result['total_train_time'])
-
-## lambdas used
-print(solver_l1.lambdas)
-
-## number of nonzero coefficients for each lambda
-print(result['df'])
-
-## coefficients and intercept for the i-th lambda
-i = 30
-print(solver_l1.lambdas[i])
-print(result['beta'][i])
-print(result['intercept'][i])
-
-## Visualize the solution path
-solver_l1.plot()
-solver_mcp.plot()
-solver_scad.plot()
+# Gaussian: the public default resolves the residual/covariance backend.
+y_gaussian = 0.4 + X[:, 0] - 0.6 * X[:, 1] + rng.normal(scale=0.7, size=n)
+gaussian = pycasso.Solver(
+    X, y_gaussian, family="gaussian", penalty="l1",
+    lambdas=(20, 0.05), type_gaussian="auto")
+gaussian.train()
+print("Gaussian backend:", gaussian.type_gaussian)
+print("Gaussian beta shape:", gaussian.coef()["beta"].shape)
+print("Gaussian prediction:",
+      gaussian.predict(X[:3], lambdidx=gaussian.nlambda - 1))
 
 
-################################################################
-## Sparse poisson regression
-## Generate the design matrix and regression coefficient vector
-n = 100 # sample number
-d = 80 # sample dimension
-c = 0.5 # correlation parameter
-s = 20  # support size of coefficient
+# Binomial MCP: adaptive LLA may continue beyond its default three stages.
+logit = -0.2 + 0.8 * X[:, 0] - 0.5 * X[:, 1]
+y_binomial = rng.binomial(1, 1.0 / (1.0 + np.exp(-logit)))
+binomial = pycasso.Solver(
+    X, y_binomial, family="binomial", penalty="mcp",
+    lambdas=(16, 0.1), lla_max_stages=5, fast_mode=True)
+binomial.train()
+print("Binomial status:", binomial.coef()["status"])
+print("Binomial probabilities:",
+      binomial.predict(X[:3], lambdidx=binomial.nlambda - 1))
+print("Binomial confusion:",
+      binomial.confusion(
+          X, y_binomial, lambdidx=binomial.nlambda - 1)[0])
 
-X = scale(np.random.randn(n,d)+c* np.tile(np.random.randn(n),[d,1]).T )/ (n*(n-1))**0.5
-beta = np.append(np.random.rand(s), np.zeros(d-s))/(s**0.5)
 
-## Generate response and fit sparse logistic models
-noise = np.random.randn(n)
-p = np.exp(-np.matmul(X,beta) - noise)
-Y = np.random.poisson(p, n)
+# Poisson: offsets are added on the link scale and required for new rows.
+exposure = rng.uniform(0.5, 2.0, size=n)
+offset = np.log(exposure)
+poisson_mean = np.exp(offset + 0.1 + 0.25 * X[:, 0])
+y_poisson = rng.poisson(poisson_mean)
+poisson = pycasso.Solver(
+    X, y_poisson, family="poisson", offset=offset,
+    lambdas=(16, 0.1), fast_mode=True)
+poisson.train()
+print("Poisson means:",
+      poisson.predict(
+          X[:3], lambdidx=poisson.nlambda - 1,
+          newoffset=offset[:3]))
 
-## l1 regularization
-solver_l1 = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="l1")
-solver_l1.train()
 
-## mcp regularization
-solver_mcp = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="mcp")
-solver_mcp.train()
+# Square-root-lasso.
+y_sqrt = X[:, 0] - X[:, 2] + rng.normal(size=n)
+sqrt_model = pycasso.Solver(
+    X, y_sqrt, family="sqrtlasso", lambdas=(16, 0.1))
+sqrt_model.train()
+sqrt_metrics = sqrt_model.assess()
+print("Square-root-lasso final MSE:", sqrt_metrics["mse"][-1])
 
-## scad regularization
-solver_scad = pycasso.Solver(X,Y, lambdas=(100,0.05), family="poisson", penalty="scad")
-solver_scad.train()
 
-## Obtain the result
-result = solver_l1.coef()
+# Multinomial: original string labels are retained in class prediction.
+scores = np.column_stack((
+    0.8 * X[:, 0],
+    -0.5 * X[:, 0] + 0.7 * X[:, 1],
+    -0.6 * X[:, 1],
+))
+labels = np.array(["red", "green", "blue"])
+y_multinomial = labels[np.argmax(
+    scores + rng.normal(scale=0.5, size=scores.shape), axis=1)]
+if np.unique(y_multinomial).size != 3:
+    y_multinomial[:3] = labels
 
-## print out training time
-print(result['total_train_time'])
+multinomial = pycasso.Solver(
+    X, y_multinomial, family="multinomial", penalty="l1",
+    lambdas=(16, 0.1), fast_mode=True)
+multinomial.train()
+print("Multinomial beta shape:", multinomial.coef()["beta"].shape)
+print("Multinomial classes:",
+      multinomial.predict(
+          X[:5], lambdidx=multinomial.nlambda - 1, type="class"))
 
-## lambdas used
-print(solver_l1.lambdas)
 
-## number of nonzero coefficients for each lambda
-print(result['df'])
+# Assessment and CV evaluate the retained path. Python indices are zero-based.
+print("Multinomial class error:",
+      multinomial.assess()["class_error"][-1])
+cv = gaussian.cross_validate(nfolds=3, type_measure="deviance")
+print("CV lambda.min:", cv["lambda_min"])
+print("CV lambda.1se:", cv["lambda_1se"])
 
-## coefficients and intercept for the i-th lambda
-i = 30
-print(solver_l1.lambdas[i])
-print(result['beta'][i])
-print(result['intercept'][i])
-
-## Visualize the solution path
-solver_l1.plot()
-solver_mcp.plot()
-solver_scad.plot()
+# Plotting is optional and requires Matplotlib:
+# gaussian.plot(max_features=8)

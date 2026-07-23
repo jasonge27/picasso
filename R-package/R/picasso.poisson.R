@@ -8,14 +8,30 @@ picasso.poisson <- function(X,
                           dfmax = NULL,
                           standardize = TRUE,
                           intercept = TRUE,
-                          prec = 1e-4,
+                          prec = 1e-7,
                           max.ite = 1e4,
                           verbose = FALSE,
-                          offset = NULL)
+                          offset = NULL,
+                          lla.max.stages = 3L,
+                          fast.mode = FALSE)
 {
+  prec <- .picasso_resolve_precision(prec, fast.mode, "poisson")
+  lla.max.stages <- .picasso_validate_lla_max_stages(lla.max.stages)
+  standardize <- .picasso_validate_flag(standardize, "standardize")
+  intercept <- .picasso_validate_flag(intercept, "intercept")
+  verbose <- .picasso_validate_flag(verbose, "verbose")
+  max.ite <- .picasso_validate_positive_integer(max.ite, "max.ite")
+  dfmax <- .picasso_validate_nonnegative_integer(
+    dfmax, "dfmax", allow.null = TRUE
+  )
   dims = .picasso_validate_design(X)
   n = dims$n
   d = dims$d
+  if (!is.numeric(Y) || length(Y) != n || anyNA(Y) ||
+      any(!is.finite(Y))) {
+    stop(sprintf("Y must be a finite numeric vector of length %d.", n))
+  }
+  Y <- as.double(Y)
   if (!isTRUE(all(Y == floor(Y))) || !isTRUE(all(Y >= 0))) 
     stop("The response must only contain non-negative integer values for poisson regression")
 
@@ -26,15 +42,20 @@ picasso.poisson <- function(X,
   if (verbose)
     cat("Sparse poisson regression. \n")
 
-  design = .picasso_prepare_design(X, standardize)
+  offset.vec <- .picasso_validate_offset(offset, n, "poisson")
+  design = .picasso_prepare_design(X, standardize, center = intercept)
   xx = design$xx
   xm = design$xm
   xinvc.vec = design$xinvc.vec
 
   yy = Y
-  avr_y = mean(yy)
-  
-  lambda.max = max(abs(crossprod(xx,(yy-avr_y)/n)))
+  lambda.max = if (is.null(lambda)) {
+    eta0 <- .picasso_null_eta(yy, "poisson", offset.vec, intercept)
+    mu0 <- .picasso_poisson_mean(eta0)
+    max(abs(crossprod(xx, (yy - mu0) / n)))
+  } else {
+    0.0
+  }
   lambda.info = .picasso_lambda_path(lambda, nlambda, lambda.min.ratio, lambda.max)
   lambda = lambda.info$lambda
   nlambda = lambda.info$nlambda
@@ -43,12 +64,10 @@ picasso.poisson <- function(X,
   method.flag = method.info$flag
   gamma = method.info$gamma
   
-  dfmax.int <- if (is.null(dfmax)) as.integer(-1) else as.integer(dfmax)
-  offset.vec <- if (is.null(offset)) rep(0.0, n) else as.double(offset)
-
+  dfmax.int <- if (is.null(dfmax)) -1L else dfmax
   out = poisson_solver(yy, xx, lambda, nlambda, gamma,
               n, d, max.ite, prec, intercept = intercept, verbose,
-              method.flag, dfmax.int, offset.vec)
+              method.flag, dfmax.int, offset.vec, lla.max.stages)
   
   # truncate to actual number of lambdas fit (early stopping)
   num.fit = out$num.fit
@@ -63,22 +82,39 @@ picasso.poisson <- function(X,
   scaled = .picasso_rescale_solution(beta.raw, out$intcpt, standardize, xinvc.vec, xm)
   runt = Sys.time()-begt
   est$beta = Matrix(scaled$beta)
-  est$intercept = scaled$intercept
+  est$intercept = if (intercept) scaled$intercept else
+    rep(0.0, length(scaled$intercept))
   est$lambda = lambda
   est$nlambda = nlambda
   est$df = df
   est$method = method
   est$alg = "actnewton"
 
+  est$runt = out$runt
   est$ite =out$ite
+  est$lla.max.stages = out$lla.max.stages
+  est$status = out$status
+  est$status.code = out$status.code
+  est$failure = out$failure
+  est$diagnostics = out$diagnostics
   est$verbose = verbose
   est$runtime = runt
+  est$fast.mode = fast.mode
+  est$prec = prec
+  est$offset.used = !is.null(offset)
 
-  off_arg <- if (is.null(offset)) NULL else offset.vec
-  est$nulldev <- .picasso_null_deviance(as.numeric(Y), "poisson", offset = off_arg)
-  fit_dev <- .picasso_fit_deviance(as.numeric(Y), X, as.matrix(est$beta),
-                                   est$intercept, "poisson", offset = off_arg)
-  est$dev.ratio <- pmax(0, pmin(1, 1 - fit_dev / est$nulldev))
+  est$nulldev <- .picasso_null_deviance(
+    Y, "poisson", offset = offset.vec, intercept = intercept
+  )
+  fit_dev <- pmax(
+    0.0,
+    2 * (out$smooth.objective + .picasso_poisson_saturated_constant(Y))
+  )
+  est$dev.ratio <- if (est$nulldev > 0) {
+    pmax(0, pmin(1, 1 - fit_dev / est$nulldev))
+  } else {
+    rep(0.0, nlambda)
+  }
 
   class(est) = "poisson"
   return(est)
@@ -94,22 +130,22 @@ plot.poisson <- function(x, ...)
   .picasso_plot_path(x)
 }
 
-coef.poisson <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
+coef.poisson <- function(object, lambda.idx = NULL, beta.idx = NULL, ...)
 {
   .picasso_extract_coef(object, lambda.idx, beta.idx)
 }
 
-predict.poisson <- function(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1:5),
-                            type = "response", s = NULL, ...)
+predict.poisson <- function(object, newdata, lambda.idx = NULL, p.pred.idx = NULL,
+                            type = "response", s = NULL, newoffset = NULL, ...)
 {
   .picasso_predict(
     object,
     newdata,
     lambda.idx,
     p.pred.idx,
-    default_response_idx = c(1:5),
-    transform = exp,
+    transform = .picasso_poisson_mean,
     type = type,
-    s = s
+    s = s,
+    newoffset = newoffset
   )
 }

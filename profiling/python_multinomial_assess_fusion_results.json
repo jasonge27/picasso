@@ -1,0 +1,532 @@
+{
+  "comparison": {
+    "metric_checksum_equal": true,
+    "peak_rss_delta_reduction_bytes": 25067520,
+    "runtime_speedup_baseline_over_candidate": 1.181377063612206,
+    "tracemalloc_reduction_bytes": 22664578
+  },
+  "config": {
+    "classes": 4,
+    "d": 50,
+    "inner_repeats": 3,
+    "n": 20000,
+    "nlambda": 80,
+    "repeats": 7,
+    "seed": 20260719
+  },
+  "environment": {
+    "machine": "arm64",
+    "numpy": "2.4.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3 (main, Feb  3 2026, 15:32:20) [Clang 17.0.0 (clang-1700.6.3.2)]",
+    "thread_controls": {
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "native_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+  "native_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+  "source_files": {
+    "baseline": {
+      "python-package/pycasso/VERSION": {
+        "path": "/private/tmp/picasso-python-mn-assess-fusion-before-20260719/python-package/pycasso/VERSION",
+        "sha256": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8"
+      },
+      "python-package/pycasso/__init__.py": {
+        "path": "/private/tmp/picasso-python-mn-assess-fusion-before-20260719/python-package/pycasso/__init__.py",
+        "sha256": "71028f8ca5b614d3eec5fc60b978ad92bd103b6bed4fd65424b70af7241fab0f"
+      },
+      "python-package/pycasso/core.py": {
+        "path": "/private/tmp/picasso-python-mn-assess-fusion-before-20260719/python-package/pycasso/core.py",
+        "sha256": "8c777a3b84dff3003e26879f575ae09f72593d8c595b913834518a344a27ea11"
+      },
+      "python-package/pycasso/libpath.py": {
+        "path": "/private/tmp/picasso-python-mn-assess-fusion-before-20260719/python-package/pycasso/libpath.py",
+        "sha256": "76a0785cc3c96cd436a89aa4dd5564d655f290790e5b164680ee92eff71b7599"
+      }
+    },
+    "candidate": {
+      "python-package/pycasso/VERSION": {
+        "path": "/Users/tourzhao/Desktop/picasso-master/python-package/pycasso/VERSION",
+        "sha256": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8"
+      },
+      "python-package/pycasso/__init__.py": {
+        "path": "/Users/tourzhao/Desktop/picasso-master/python-package/pycasso/__init__.py",
+        "sha256": "71028f8ca5b614d3eec5fc60b978ad92bd103b6bed4fd65424b70af7241fab0f"
+      },
+      "python-package/pycasso/core.py": {
+        "path": "/Users/tourzhao/Desktop/picasso-master/python-package/pycasso/core.py",
+        "sha256": "8bca15c666e082e1488fdcbc6032fdd56805910ec76d21fa4b78a898a561757c"
+      },
+      "python-package/pycasso/libpath.py": {
+        "path": "/Users/tourzhao/Desktop/picasso-master/python-package/pycasso/libpath.py",
+        "sha256": "76a0785cc3c96cd436a89aa4dd5564d655f290790e5b164680ee92eff71b7599"
+      }
+    }
+  },
+  "sources": {
+    "baseline": "/private/tmp/picasso-python-mn-assess-fusion-before-20260719",
+    "candidate": "/Users/tourzhao/Desktop/picasso-master"
+  },
+  "summaries": {
+    "baseline": {
+      "memory": {
+        "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+        "median_elapsed_seconds": null,
+        "median_peak_rss_delta_bytes": 37552128,
+        "median_tracemalloc_peak_bytes": 26850152,
+        "runs": [
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 94388224,
+            "peak_rss_before_bytes": 57098240,
+            "peak_rss_delta_bytes": 37289984,
+            "tracemalloc_peak_bytes": 26848885
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 94994432,
+            "peak_rss_before_bytes": 57638912,
+            "peak_rss_delta_bytes": 37355520,
+            "tracemalloc_peak_bytes": 26849992
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 97107968,
+            "peak_rss_before_bytes": 57278464,
+            "peak_rss_delta_bytes": 39829504,
+            "tracemalloc_peak_bytes": 26850496
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 95846400,
+            "peak_rss_before_bytes": 57425920,
+            "peak_rss_delta_bytes": 38420480,
+            "tracemalloc_peak_bytes": 26850688
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 96124928,
+            "peak_rss_before_bytes": 57016320,
+            "peak_rss_delta_bytes": 39108608,
+            "tracemalloc_peak_bytes": 26849833
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 94355456,
+            "peak_rss_before_bytes": 57376768,
+            "peak_rss_delta_bytes": 36978688,
+            "tracemalloc_peak_bytes": 26850277
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 94437376,
+            "peak_rss_before_bytes": 56885248,
+            "peak_rss_delta_bytes": 37552128,
+            "tracemalloc_peak_bytes": 26850152
+          }
+        ]
+      },
+      "runtime": {
+        "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+        "median_elapsed_seconds": 0.2790949170012027,
+        "median_peak_rss_delta_bytes": null,
+        "median_tracemalloc_peak_bytes": null,
+        "runs": [
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.26484345900826156,
+            "inner_timings_seconds": [
+              0.264438042009715,
+              0.26484345900826156,
+              0.2648465000092983
+            ],
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 94339072,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.2790949170012027,
+            "inner_timings_seconds": [
+              0.28081537497928366,
+              0.27845279104076326,
+              0.2790949170012027
+            ],
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 96141312,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.2788312920019962,
+            "inner_timings_seconds": [
+              0.2976433750009164,
+              0.2788312920019962,
+              0.27332287502940744
+            ],
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 97976320,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.3296901249559596,
+            "inner_timings_seconds": [
+              0.3296901249559596,
+              0.31126237503485754,
+              0.3463879590271972
+            ],
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 95256576,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.28618212504079565,
+            "inner_timings_seconds": [
+              0.28618212504079565,
+              0.27987783297430724,
+              0.3119380830321461
+            ],
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 96387072,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.28734533401438966,
+            "inner_timings_seconds": [
+              0.28734533401438966,
+              0.2776414170511998,
+              0.29862899996805936
+            ],
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 96681984,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.26521145802689716,
+            "inner_timings_seconds": [
+              0.2854886669665575,
+              0.26521145802689716,
+              0.25442574999760836
+            ],
+            "label": "baseline",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 94781440,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "memory": {
+        "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+        "median_elapsed_seconds": null,
+        "median_peak_rss_delta_bytes": 12484608,
+        "median_tracemalloc_peak_bytes": 4185574,
+        "runs": [
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 69632000,
+            "peak_rss_before_bytes": 56918016,
+            "peak_rss_delta_bytes": 12713984,
+            "tracemalloc_peak_bytes": 4185640
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 70451200,
+            "peak_rss_before_bytes": 56885248,
+            "peak_rss_delta_bytes": 13565952,
+            "tracemalloc_peak_bytes": 4185495
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 70909952,
+            "peak_rss_before_bytes": 57524224,
+            "peak_rss_delta_bytes": 13385728,
+            "tracemalloc_peak_bytes": 4185501
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 69894144,
+            "peak_rss_before_bytes": 57409536,
+            "peak_rss_delta_bytes": 12484608,
+            "tracemalloc_peak_bytes": 4185690
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 69468160,
+            "peak_rss_before_bytes": 57163776,
+            "peak_rss_delta_bytes": 12304384,
+            "tracemalloc_peak_bytes": 4184776
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 68763648,
+            "peak_rss_before_bytes": 57180160,
+            "peak_rss_delta_bytes": 11583488,
+            "tracemalloc_peak_bytes": 4185882
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": null,
+            "inner_timings_seconds": null,
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "memory",
+            "peak_rss_after_bytes": 69189632,
+            "peak_rss_before_bytes": 57327616,
+            "peak_rss_delta_bytes": 11862016,
+            "tracemalloc_peak_bytes": 4185574
+          }
+        ]
+      },
+      "runtime": {
+        "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+        "median_elapsed_seconds": 0.23624541697790846,
+        "median_peak_rss_delta_bytes": null,
+        "median_tracemalloc_peak_bytes": null,
+        "runs": [
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.22311920899664983,
+            "inner_timings_seconds": [
+              0.23347237496636808,
+              0.21783541602781042,
+              0.22311920899664983
+            ],
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 70270976,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.23624541697790846,
+            "inner_timings_seconds": [
+              0.22993408399634063,
+              0.24206274998141453,
+              0.23624541697790846
+            ],
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 69599232,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.2394785420037806,
+            "inner_timings_seconds": [
+              0.2394785420037806,
+              0.23142879200167954,
+              0.24372620898066089
+            ],
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 70647808,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.2414598329924047,
+            "inner_timings_seconds": [
+              0.23502699995879084,
+              0.2414598329924047,
+              0.2459257089649327
+            ],
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 69320704,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.23355841700686142,
+            "inner_timings_seconds": [
+              0.23355841700686142,
+              0.22583641699748114,
+              0.23926412500441074
+            ],
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 70320128,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.2398580419830978,
+            "inner_timings_seconds": [
+              0.23089300002902746,
+              0.2398580419830978,
+              0.27160599996568635
+            ],
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 70156288,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          },
+          {
+            "checksum": "62597a4abd85480d9074b40dfd80465d0d75907bba1473420abc2398539afe72",
+            "elapsed_seconds": 0.21957362501416355,
+            "inner_timings_seconds": [
+              0.23094812501221895,
+              0.21957362501416355,
+              0.2165745830279775
+            ],
+            "label": "candidate",
+            "loaded_library": "/private/tmp/picasso-actnewton-sink-final-validated-20260719/libpicasso.dylib",
+            "loaded_library_sha256": "52a2ce02ba53d51b3eb8ee8a879ed021b99040dff9dd95eb91262813eb6e7014",
+            "mode": "runtime",
+            "peak_rss_after_bytes": 69124096,
+            "peak_rss_before_bytes": null,
+            "peak_rss_delta_bytes": null,
+            "tracemalloc_peak_bytes": null
+          }
+        ]
+      }
+    }
+  }
+}

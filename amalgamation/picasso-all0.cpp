@@ -2,12 +2,16 @@
 #include "../src/objective/gaussian_naive_update.cpp"
 #include "../src/objective/gaussian_cov_update.cpp"
 #include "../src/objective/glm.cpp"
+#include "../src/objective/multinomial_objective.cpp"
 #include "../src/objective/sqrtmse.cpp"
 
 // solver
 #include "../src/solver/actgd.cpp"
 #include "../src/solver/actnewton.cpp"
+#include "../src/solver/multinomial_actnewton.cpp"
+#include "../src/solver/multinomial_lla.cpp"
 #include "../src/solver/solver_params.cpp"
 
 // c api
 #include "../src/c_api/c_api.cpp"
+#include "../src/c_api/multinomial.cpp"

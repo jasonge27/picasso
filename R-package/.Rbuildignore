@@ -27,3 +27,5 @@
 ^MD5$
 ^cran-comments\.md$
 ^CLAUDE\.md$
+^vignettes/PICASSO\.pdf$
+^inst/doc/PICASSO\.pdf$

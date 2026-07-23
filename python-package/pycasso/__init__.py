@@ -1,10 +1,8 @@
 # coding: utf-8
-"""
-PICASSO: Penalized Generalized Linear Model Solver - Unleash the Power of Non-convex Penalty
+"""Python interface for PICASSO sparse regularization-path solvers.
 
 :Author: Jason Ge, Xingguo Li, Haoming Jiang, Tuo Zhao
 :Maintainer: Tuo Zhao <tourzhao@gatech.edu>
-
 """
 
 from __future__ import absolute_import
@@ -17,6 +15,6 @@ def test():
     print(r"Picasso has been successfully imported!")
     print(r"Version: "+open(os.path.join(current_file, r'./VERSION')).read().strip())
 
-__all__ = ["core"]
+from .core import PycassoError, Solver
 
-from .core import Solver
+__all__ = ["Solver", "PycassoError", "test"]

@@ -1,159 +1,187 @@
-<h1 align="center">PICASSO</h1>
-<h4 align="center">High Performance R and Python Library for Sparse Learning</h4>
+# PICASSO
 
-___PICASSO___ (PathwIse
-CalibrAted Sparse Shooting algOrithm) implements a unified framework of pathwise coordinate optimization for a variety of sparse learning problems (e.g., sparse linear regression, sparse logistic regression, sparse Poisson regression and scaled sparse linear regression) combined with efficient active set selection strategies. The core algorithm is implemented in C++ with Eigen3 support for portable high performance linear algebra. Runtime profiling is documented in the [__Performance__](#performance) section.
+PICASSO is a C++ sparse-learning library with R and Python interfaces. It fits
+regularization paths for Gaussian, binomial, Poisson, square-root-lasso, and
+multinomial models using lasso, MCP, or SCAD penalties. The implementation
+combines warm starts, screening, active sets, and family-specific coordinate,
+majorization, or Newton updates.
 
-You can cite this work by 
+## Supported solvers
+
+| Family | Native optimization | MCP/SCAD strategy |
+|---|---|---|
+| Gaussian | Active-set coordinate descent with residual or lazy-covariance updates | Direct nonconvex coordinate updates |
+| Binomial | Active-set Proximal Newton/IRLS | Adaptive LLA |
+| Poisson | Active-set Proximal Newton/IRLS | Adaptive LLA |
+| Square-root-lasso | Active-set quadratic-MM coordinate updates | Adaptive LLA |
+| Multinomial | Class-coupled active-set Proximal Newton/IRLS | Adaptive LLA |
+
+The multinomial solver first screens a strong working set, solves the
+restricted IRLS quadratic to convergence on its active coordinates, performs a
+full KKT scan, expands the set when necessary, and repeats. Lambda-path warm
+starts carry the master solution forward.
+
+## Current defaults
+
+- High precision is the default: `fast.mode = FALSE` in R and
+  `fast_mode=False` default to `prec=1e-7` and accept a custom
+  positive tolerance. Fast mode uses
+  calibrated stopping/KKT tolerances of `4e-4` for Poisson and `1e-4`
+  for binomial, square-root-lasso, and multinomial; Gaussian remains at
+  `1e-7`. These are achieved-accuracy presets, not glmnet's literal
+  `thresh` value.
+- Gaussian fits default to `auto`. It chooses lazy covariance updates only
+  when path reuse and the design shape can amortize a bounded cache; wide,
+  short-path, or more-than-1024-feature problems use residual updates.
+- Non-Gaussian MCP/SCAD fits use a minimum and default maximum of three LLA
+  stages: one lasso master and two weighted-lasso updates. A larger stage
+  budget permits adaptive continuation to the requested stationarity.
+- Generated paths request 100 lambdas down to a nominal
+  `0.05 * lambda_max` by default. Normal saturation stopping, `dfmax`,
+  or a solver failure can return a shorter committed prefix.
+
+## R interface
+
+The checkout contains R package version 1.6. A CRAN installation may be an
+earlier published release; build this checkout to use the interfaces described
+here:
+
+```bash
+R CMD build R-package
+R CMD INSTALL picasso_1.6.tar.gz
 ```
+
+```r
+library(picasso)
+set.seed(1)
+X <- matrix(rnorm(200 * 40), 200, 40)
+y <- 0.5 + X[, 1] - 0.7 * X[, 2] + rnorm(200)
+
+fit <- picasso(X, y, family = "gaussian", nlambda = 30)
+fit$type.gaussian                 # resolved "naive" or "covariance"
+predict(fit, X[1:5, ], lambda.idx = fit$nlambda)
+cv <- cv.picasso(X, y, family = "gaussian", nfolds = 5, nlambda = 30)
+```
+
+Use `family = "multinomial"` for three or more numeric, character, or
+factor classes. Binomial and Poisson models accept link-scale `offset`
+vectors. See `?picasso` and the installed *PICASSO 1.6 User Guide* for
+complete return values, diagnostics, prediction, assessment, and CV behavior.
+
+## Python interface
+
+The checkout contains `pycasso` 1.1.0. The latest PyPI release can lag the
+development source, so use a staged native build for the exact API documented
+in this repository:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target stage_picasso
+PICASSO_NATIVE_LIBRARY="$PWD/build/stage/libpicasso.dylib" \
+  python -m pip install ./python-package
+```
+
+Use `libpicasso.so` on Linux or `picasso.dll` on Windows.
+
+```python
+import numpy as np
+import pycasso
+
+rng = np.random.default_rng(1)
+X = rng.normal(size=(200, 40))
+y = 0.5 + X[:, 0] - 0.7 * X[:, 1] + rng.normal(size=200)
+
+model = pycasso.Solver(
+    X, y, family="gaussian", lambdas=(30, 0.05),
+    type_gaussian="auto")
+model.train()
+prediction = model.predict(X[:5], lambdidx=model.nlambda - 1)
+cv = model.cross_validate(nfolds=5)
+# Opt in only when folds are expensive; cap BLAS threads separately.
+cv_parallel = model.cross_validate(nfolds=5, n_jobs=4)
+```
+
+Python cross-validation is serial by default (`n_jobs=1`). Larger values use
+at most one thread per fold and preserve fold-order aggregation. Concurrent
+fold solvers consume additional memory, and BLAS should be limited to one
+thread to avoid oversubscription.
+
+Python lambda indices are zero-based. A two-element non-NumPy sequence means
+`(count, ratio)`; NumPy arrays always represent explicit paths, including
+arrays of length one or two. See
+[the Python guide](python-package/README.rst) and
+[current tutorial](tutorials/tutorial.py).
+
+## R/Python option mapping
+
+| Purpose | R | Python |
+|---|---|---|
+| Penalty | `method` | `penalty` |
+| Gaussian backend | `type.gaussian` | `type_gaussian` |
+| Fast precision preset | `fast.mode` | `fast_mode` |
+| LLA stage budget | `lla.max.stages` | `lla_max_stages` |
+| Iteration budget | `max.ite` | `max_ite` |
+| Lambda-value prediction | `s` | `lam` |
+| New-data offset | `newoffset` | `newoffset` |
+
+## Build and validation
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure
+cmake --build build --target check_mirrors
+
+python python-package/test_pycasso.py
+R CMD check --as-cran picasso_1.6.tar.gz
+```
+
+The native and R-package C++ trees are intentionally mirrored; the CMake
+mirror check prevents them from drifting. Contributor workflow and conventions
+are in [AGENTS.md](AGENTS.md).
+
+## Performance evidence
+
+Benchmarks and raw aggregates live in [`profiling/`](profiling/). The
+[fast-mode comparison](profiling/fast_mode_glmnet_comparison_report.md) is a
+single-threaded dense L1 snapshot on arm64 macOS and should not be generalized
+to other hardware, penalties, sparse inputs, or shapes. Its Gaussian
+`public_default` rows predate the current automatic backend; the matched
+naive/covariance rows remain historical reference points. PICASSO does not
+claim to beat glmnet for every family and matrix shape.
+
+## Repository layout
+
+- [`src/objective/`](src/objective/) contains Gaussian, GLM,
+  square-root, and multinomial objectives.
+- [`src/solver/`](src/solver/) contains scalar and multinomial
+  active-set solvers; [`src/c_api/`](src/c_api/) exposes the native ABI.
+- [`include/picasso/`](include/picasso/) contains public C++ headers.
+- [`tests/`](tests/) contains native objective, solver, C API, and
+  stability tests.
+- [`R-package/`](R-package/) contains the R interface, Rd help,
+  vignette, testthat suite, and native-source mirrors.
+- [`python-package/`](python-package/) contains the Python
+  `ctypes` wrapper and Sphinx documentation.
+- [`tutorials/PICASSO.pdf`](tutorials/PICASSO.pdf) is the historical
+  paper-era document, not the current API guide.
+
+## Citation
+
+```bibtex
 @article{ge2019picasso,
-  title={Picasso: A Sparse Learning Library for High Dimensional Data Analysis in R and Python.},
-  author={Ge, Jason and Li, Xingguo and Jiang, Haoming and Liu, Han and Zhang, Tong and Wang, Mengdi and Zhao, Tuo},
-  journal={J. Mach. Learn. Res.},
-  volume={20},
-  pages={44--1},
-  year={2019}
+  title   = {Picasso: A Sparse Learning Library for High Dimensional Data Analysis in R and Python},
+  author  = {Ge, Jason and Li, Xingguo and Jiang, Haoming and Liu, Han and Zhang, Tong and Wang, Mengdi and Zhao, Tuo},
+  journal = {Journal of Machine Learning Research},
+  volume  = {20},
+  number  = {44},
+  pages   = {1--5},
+  year    = {2019}
 }
 ```
 
-## Table of contents
+The [original JMLR paper](https://www.jmlr.org/papers/v20/17-722.html)
+describes the initial pathwise framework. Newer interfaces and algorithms are
+documented in this repository.
 
-- [Table of contents](#table-of-contents)
-- [Directory structure](#directory-structure)
-- [Introduction](#introduction)
-- [Background](#background)
-- [Power of Nonconvex Penalties](#power-of-nonconvex-penalties)
-- [Performance](#performance)
-    - [R package](#r-package)
-    - [Python package](#python-package)
-- [Installation](#installation)
-    - [Installing R package](#installing-r-package)
-    - [Installing Python package](#installing-python-package)
-- [Tutorials](#tutorials)
-- [References](#references)
-
-## Directory structure
-The directory is organized as follows:
-* [__src__](src): C++ implementation of the PICASSO algorithm.
-   * [__c_api__](c_api): C API as an interface for R and Python package.
-   * [__objective__](objective): Objective functions, which includes linear regression, logsitic regression, poisson regression and scaled linear regression.
-   * [__solver__](solver): Two types of pathwise active set algorithms. Actgd.cpp implements pathwise active set + gradient descent. Actnewton.cpp implements pathwise active set + newton algorithm.
-* [__include__](include)
-   * [__picasso__](picasso): declarations of the C++ implementation
-   * [__Eigen__](eigen3): Eigen3 header files for high performance linear algebra.
-* [__amalgamation__](amalgamation):flag all the c++ implementation for compiling.
-* [__cmake__](cmake):Makefile local configurations.
-* [__make__](make):Makefile local configurations.
-* [__R-package__](R-package): R wrapper for the source code.
-* [__python-package__](python-package): Python wrapper for the source code.
-* [__tutorials__](tutorials): tutorials for using the code in R and Python.
-
-## Introduction
-The pathwise coordinate optimization is undoubtedly one the of the most popular solvers for a large variety of sparse learning problems. By leveraging the solution sparsity through a simple but elegant algorithmic structure, it significantly boosts the computational performance in practice (Friedman et al., 2007). Some recent progresses in (Zhao et al., 2017; Li et al., 2017) establish theoretical guarantees to further justify its computational and statistical superiority for both convex and nonconvex sparse learning, which makes it even more attractive to practitioners.
-
-We recently developed a new library named PICASSO, which implements a unified toolkit of pathwise coordinate optimization for solving a large class of convex and nonconvex regularized sparse learning problems. Efficient active set selection strategies are provided to guarantee superior statistical and computational preference.
-
-
-The pathwise coordinate optimization framework with 3 nested loops : (1) Warm start initialization; (2) Active set selection, and strong rule for coordinate preselection; (3) Active coordinate minimization. Please refer to [tutorials/PICASSO.pdf](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/PICASSO.pdf) for details of the algorithm design.
-
-![The pathwise coordinate optimization framework](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/picasso_flow.png)
-
-## Background
-There exists several R packages (such as ncvreg and glmnet) which implement state-of-the-art heuristic optimization algorithms for sparse learning. However they either lack support for nonconvex penalties or becomes very unstable when there are multi-colinear features. PICASSO combines pathwise coordinate optimization and multi-stage convex relaxation for nonconvex optimization and finds a 'good' local minimal which has provable statistical property.
-
-## Power of Nonconvex Penalties
-
-L1 penalized regression (LASSO) is a useful tool for feature selection but it tends to give very biased estimator due to the penalty term. As demonstrated in the example below, the lowest estimation error among all the lambdas computed is as high as **16.41%**.
-
-```R
-> set.seed(2016)
-> library(glmnet)
-> n <- 1000; p <- 1000; c <- 0.1
-> # n sample number, p dimension, c correlation parameter
-> X <- scale(matrix(rnorm(n*p),n,p)+c*rnorm(n))/sqrt(n-1)*sqrt(n) # n is sample number,
-> s <- 20  # sparsity level
-> true_beta <- c(runif(s), rep(0, p-s))
-> Y <- X%*%true_beta + rnorm(n)
-> fitg<-glmnet(X,Y,family="gaussian")
-> # the minimal estimation error |\hat{beta}-beta| / |beta|
-> min(apply(abs(fitg$beta - true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
-[1] 0.1641195
-```
-
-Nonconvex penalties such as SCAD [1] and MCP [2] are statistically better but computationally harder. The solution for SCAD/MCP penalized linear model has much less estimation error than lasso but calculating the estimator involves non-convex optimization. With limited computation resource, we can only get a local optimum which probably lacks the good property of the global optimum.
-
-The PICASSO package [3, 4] solves non-convex optimization through multi-stage convex relaxation. Although we only find a local minimum, it can be proved that this local minimum does not lose the superior statistical property of the global minimum. Multi-stage convex relaxation is also much more stable than other packages (see benchmark below).
-
-Let's see PICASSO in action — the estimation error drops to **6.06%** using SCAD penalty from **16.41%** error produced by LASSO.
-
-```R
-> library(picasso)
-> fitp <- picasso(X, Y, family="gaussian", method="scad")
-> min(apply(abs(fitp$beta-true_beta), MARGIN=2, FUN=sum))/sum(abs(true_beta))
-[1] 0.06064173
-```
-
-
-
-## Performance
-
-### R package
- - Sparse linear regression. picasso achieves similar timing and optimization performance to glmnet and ncvreg.
- - Sparse logistic regression. When using the l1 regularizer, picasso, glmnet and ncvreg achieves similar optimization performance. When using the nonconvex regularizers, picasso achieves significantly better optimization performance than ncvreg, especially in ill-conditioned cases.
- - Scaled sparse linear regression. Picasso significantly outperforms scalreg and flare in timing performance. In Table 5.3 in [tutorials/PICASSO.pdf](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/PICASSO.pdf), picasso is 20 − 100 times faster and achieves smaller objective function values.
-
-Details of our benchmarking process are documented in [tutorials/PICASSO.pdf](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/PICASSO.pdf).
-
-![Performance_R](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/performance_R.jpeg)
-
-### Python package
-We compared with sklearn (version 0.19.1) for L1 regularized linear and logistic regression. For linear regression, we compare against  ``sklearn.linear_model.lasso_path`` and for logistic regression, we compare against ``sklearn.linear_model.LogisticRegression`` (with liblinear backend). Details of the experiments can be found in the script [profiling/benchmark.py](https://raw.githubusercontent.com/jasonge27/picasso/master/profiling/benchmark.py). Fixing sample number as 500 and we change sample dimension, PICASSO's run time also most does not depend on dimension thanks to the active set strategy. Precision parameters of the optimization are adjusted so that equal objective function values are achieved.
-
-![Performance_Python](https://raw.githubusercontent.com/jasonge27/picasso/master/tutorials/images/performance_python.jpeg)
-
-## Installation
-Third-party dependencies. The installation only depends on Eigen3's header files which are included in this github repo as a submodule. We use Eigen3 as an independent fully portable module so any existing Eigen3 installation will not have conflict with picasso installation.
-### Installing R package
-There are two ways to install the picasso R package.
-- Installing from CRAN (recommended). The R package is hosted on CRAN. The easiest way to install R package is by running the following command in R
-```R
-install.packages("picasso")
-```
-
-- Installing from source code.
-```bash
-$ git clone https://github.com/jasonge27/picasso.git
-$ cd picasso
-$ R CMD build R-package
-$ R CMD INSTALL picasso_1.5.tar.gz
-```
-
-### Installing Python package
-There are two ways to install the picasso python package.
-- Installing from PyPi (recommended). ``pip install pycasso --user``.
-- Installing from source code.
- ```bash
- $ git clone https://github.com/jasonge27/picasso.git
- $ cd picasso
- $ mkdir -p build && cd build && cmake .. && make && cd ..
- $ cd python-package && pip install .
- ```
-
-You can test if the package has been successfully installed by ``python -c "import pycasso; pycasso.test()" ``
-
-Details for installing python package can also be found in [document](https://hmjianggatech.github.io/picasso/) or [github](https://github.com/jasonge27/picasso/tree/master/python-package)
-
-## Tutorials
-Check the R tutorial in tutorials/tutorial.R and Python tutorial in tutorials/tutorial.py. Let us know if anything is hard to use or if you want any other features.
-
-## References
-
-[1] Jianqing Fan and Runze Li, Variable Selection via Nonconcave Penalized Likelihood and its Oracle Properties, 2001
-
-[2] Cun-Hui Zhang, Nearly Unbiased Variable Selection Under Minimax Concave Penalty, 2010
-
-[3] Xingguo Li, Jason Ge, Haoming Jiang, Mingyi Hong, Mengdi Wang, and Tuo Zhao, Boosting Pathwise Coordinate Optimization in High Dimensions: Sequential Screening and Proximal Sub-sampled Newton Algorithm, 2016
-
-[4] Tuo Zhao, Han Liu, and Tong Zhang, Pathwise Coordinate Optimization for Nonconvex Sparse Learning: Algorithm and Theory, 2014
-
-[5] Xingguo Li,Lin F. Yang, Jason Ge, Jarvis Haupt, Tong Zhang and Tuo Zhao, On Quadratic Convergence of DC Proximal Newton Algorithm in Nonconvex Sparse Learning, 2017
+PICASSO is distributed under GPL-3.0; see [LICENSE](LICENSE).

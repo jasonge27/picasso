@@ -7,7 +7,7 @@ Prediction Method for an Object with S3 Class \code{"gaussian"}
 Predict responses for new data using fitted models.
 }
 \usage{
-\method{predict}{gaussian}(object, newdata, lambda.idx = c(1:3), Y.pred.idx = c(1:5),
+\method{predict}{gaussian}(object, newdata, lambda.idx = NULL, Y.pred.idx = NULL,
   type = "response", s = NULL, \dots)
 }
 \arguments{
@@ -15,15 +15,17 @@ Predict responses for new data using fitted models.
   An object with S3 class \code{"gaussian"}. 
   }
   \item{newdata}{
-  Numeric matrix of new observations for prediction (\eqn{n_{new} \times d}).
+  Nonempty finite numeric matrix of new observations for prediction
+  (\eqn{n_{new} \times d}) with the same number of columns as the fitted design.
   }
   \item{lambda.idx}{
-  Indices of regularization parameters along the solution path used for prediction.
-  The default is \code{c(1:3)}.
+  Positive integer indices of regularization parameters along the solution
+  path used for prediction.
+  By default, at most the first three fitted path points are used.
   }
   \item{Y.pred.idx}{
-  Optional row indices to subset returned predictions when explicitly set to a
-  value different from the default \code{c(1:5)}.
+  Optional row indices to subset returned predictions. \code{NULL} returns
+  every prediction row.
   }
   \item{type}{
   Type of prediction. \code{"response"} (default) returns predicted values;
@@ -31,10 +33,13 @@ Predict responses for new data using fitted models.
   of nonzero variable indices per selected lambda.
   }
   \item{s}{
-  Optional numeric vector of lambda \emph{values} (not indices).  When
+  Optional nonempty vector of finite non-negative lambda \emph{values} (not
+  indices). When
   supplied, \code{lambda.idx} is ignored.  If a requested value falls between
   two path lambdas the coefficients are linearly interpolated and a message is
   issued.  Values outside the path range are clamped to the nearest endpoint.
+  For \code{type = "nonzero"}, the nearest fitted lambda is used instead
+  because support sets cannot be interpolated.
   }
   \item{\dots}{
   Arguments to be passed to methods.

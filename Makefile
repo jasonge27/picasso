@@ -36,13 +36,29 @@ export CXX = g++
 endif
 endif
 
+ifneq ("$(wildcard ./include/eigen3/Eigen/Dense)","")
+EIGEN_INCLUDE_DIR ?= ./include/eigen3
+else ifneq ("$(wildcard ./R-package/src/include/eigen3/Eigen/Dense)","")
+EIGEN_INCLUDE_DIR ?= ./R-package/src/include/eigen3
+else ifneq ("$(wildcard /usr/include/eigen3/Eigen/Dense)","")
+EIGEN_INCLUDE_DIR ?= /usr/include/eigen3
+else ifneq ("$(wildcard /usr/local/include/eigen3/Eigen/Dense)","")
+EIGEN_INCLUDE_DIR ?= /usr/local/include/eigen3
+else ifneq ("$(wildcard /opt/homebrew/include/eigen3/Eigen/Dense)","")
+EIGEN_INCLUDE_DIR ?= /opt/homebrew/include/eigen3
+endif
+
+ifeq ("$(strip $(EIGEN_INCLUDE_DIR))","")
+$(error Eigen/Dense was not found; set EIGEN_INCLUDE_DIR to Eigen's parent directory)
+endif
+
 export LDFLAGS= -pthread -lm $(ADD_LDFLAGS)$(PLUGIN_LDFLAGS)
-export CFLAGS=  -std=c++11 -Wall -Wno-unknown-pragmas -I ./include $(ADD_CFLAGS) $(PLUGIN_CFLAGS)
+export CFLAGS=  -std=c++11 -Wall -Wno-unknown-pragmas -I ./include -I $(EIGEN_INCLUDE_DIR) $(ADD_CFLAGS) $(PLUGIN_CFLAGS)
 
 ifeq ($(TEST_COVER), 1)
 	CFLAGS += -g -O0 -fprofile-arcs -ftest-coverage
 else
-	CFLAGS += -O3 -funroll-loops -msse2
+	CFLAGS += -O3 -funroll-loops
 endif
 
 ifndef LINT_LANG
@@ -64,7 +80,11 @@ endif
 .PHONY: clean all clean_all doxygen Pypack Pyinstall Rpack Rbuild Rcheck
 
 
-all: lib/libpicasso.a $(PICASSO_DYLIB) picasso
+ifneq ("$(wildcard src/cli_main.cpp)","")
+PICASSO_CLI_TARGET = picasso
+endif
+
+all: lib/libpicasso.a $(PICASSO_DYLIB) $(PICASSO_CLI_TARGET)
 
 dylib: $(PICASSO_DYLIB)
 
@@ -138,6 +158,7 @@ pippack:
 	cp -rf make picasso-python/pycasso/src/
 	cp -rf src picasso-python/pycasso/src/
 	cp -rf include picasso-python/pycasso/src/
+	cp -rf R-package/src/include/eigen3 picasso-python/pycasso/src/include/
 	cp picasso-python/setup-pip.py picasso-python/setup.py
 	rm picasso-python/setup-pip.py
 	rm -rf picasso-python/pycasso/lib/
@@ -157,12 +178,7 @@ Rpack:
 	rm -rf picasso/src/*/*.o
 	rm -rf picasso/demo/*.model picasso/demo/*.buffer picasso/demo/*.txt
 	rm -rf picasso/demo/runall.R
-	cp -r src picasso/src/src
-	cp -r include picasso/src/include
-	cp -r amalgamation picasso/src/amalgamation
-	cat R-package/src/Makevars.in|sed '2s/.*/PKGROOT=./' | sed '3s/.*/ENABLE_STD_THREAD=0/' > picasso/src/Makevars.in
-	cp picasso/src/Makevars.in picasso/src/Makevars.win
-	cp picasso/src/Makevars.in picasso/src/Makevars
+	cp picasso/src/Makevars picasso/src/Makevars.win
 
 Rbuild:
 	$(MAKE) Rpack
