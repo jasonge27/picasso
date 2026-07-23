@@ -1,12 +1,3 @@
-ifndef config
-ifneq ("$(wildcard ./config.mk)","")
-	config = config.mk
-else
-	config = make/config.mk
-endif
-endif
-
-
 ROOTDIR = $(CURDIR)
 
 ifeq ($(OS), Windows_NT)
@@ -77,7 +68,7 @@ ifeq ($(UNAME), Linux)
 endif
 
 # specify tensor path
-.PHONY: clean all clean_all doxygen Pypack Pyinstall Rpack Rbuild Rcheck
+.PHONY: clean all clean_all Pyinstall Rpack Rbuild Rcheck Rinstall dylib pippack
 
 
 ifneq ("$(wildcard src/cli_main.cpp)","")
@@ -131,14 +122,6 @@ clean:
 
 clean_all: clean
 
-doxygen:
-	doxygen doc/Doxyfile
-
-# create standalone python tar file.
-pypack: ${PICASSO_DYLIB}
-	cp ${PICASSO_DYLIB} python-package/pycasso
-	cd python-package; tar cf pycasso.tar pycasso; tar rf pycasso.tar data; cd ..
-
 # install python-package
 Pyinstall: ${PICASSO_DYLIB}
 	rm -rf python-package/pycasso/lib/
@@ -155,7 +138,6 @@ pippack:
 	mkdir picasso-python/pycasso/src/
 	cp -rf amalgamation picasso-python/pycasso/src/
 	cp -rf Makefile picasso-python/pycasso/src/
-	cp -rf make picasso-python/pycasso/src/
 	cp -rf src picasso-python/pycasso/src/
 	cp -rf include picasso-python/pycasso/src/
 	cp -rf R-package/src/include/eigen3 picasso-python/pycasso/src/include/
@@ -163,11 +145,6 @@ pippack:
 	rm picasso-python/setup-pip.py
 	rm -rf picasso-python/pycasso/lib/
 	mkdir picasso-python/pycasso/lib/
-
-# run pippack first!
-pipupload:
-	cd picasso-python; python setup.py register sdist upload; cd ..
-
 
 # Script to make a clean installable R package.
 Rpack:
