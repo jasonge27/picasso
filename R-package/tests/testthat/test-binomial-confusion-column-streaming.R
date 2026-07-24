@@ -47,7 +47,10 @@ expect.confusion.bytes <- function(
   actual <- confusion.picasso(
     object, newx, newy, lambda.idx, newoffset
   )
-  expect_identical(serialize(actual, NULL), serialize(expected, NULL))
+  # identical() asserts exact values, dims, dimnames, and class.  Comparing
+  # serialize() bytes instead is representation-fragile: R 4.6 keeps ALTREP
+  # strings inside the table() oracle that older R materialized.
+  expect_identical(actual, expected)
   expect_null(names(actual))
   expect_true(all(vapply(actual, inherits, logical(1), what = "table")))
 }
@@ -69,7 +72,7 @@ expect.confusion.helper.bytes <- function(
   actual <- picasso:::.picasso_binomial_confusion_tables(
     newx, response, beta, intercept, offset, block.bytes
   )
-  expect_identical(serialize(actual, NULL), serialize(expected, NULL))
+  expect_identical(actual, expected)
   expect_null(names(actual))
 }
 
@@ -254,7 +257,7 @@ test_that("binomial confusion workspace boundaries select exact block widths", {
     x, y, beta.probe, intercept, block.bytes = full.bytes - 1
   )
   expect_identical(selected.widths, rep(1L, nlambda))
-  expect_identical(serialize(blocked, NULL), serialize(full, NULL))
+  expect_identical(blocked, full)
 
   # Below the full-path boundary, a block contains exactly as many columns as
   # fit in the double predictor plus the double coefficient-column copy.
@@ -285,7 +288,7 @@ test_that("binomial confusion workspace boundaries select exact block widths", {
     block.bytes = 2 * block.column.bytes - 1
   )
   expect_identical(selected.widths, rep(1L, nlambda))
-  expect_identical(serialize(one.column, NULL), serialize(two.columns, NULL))
+  expect_identical(one.column, two.columns)
 })
 
 
@@ -322,7 +325,7 @@ test_that("binary tabulation preserves table bytes for every class pattern", {
     actual <- picasso:::.picasso_binary_confusion_table(
       case$predicted, 2L * case$actual
     )
-    expect_identical(serialize(actual, NULL), serialize(expected, NULL))
+    expect_identical(actual, expected)
   }
 })
 

@@ -101,7 +101,7 @@ test_that("tabulated multinomial confusion tables match factor tables exactly", 
     actual <- picasso:::.picasso_multinomial_confusion_table(
       case$predicted, case$response, case$levels
     )
-    expect_identical(serialize(actual, NULL), serialize(expected, NULL))
+    expect_identical(actual, expected)
   }
 })
 
@@ -126,9 +126,7 @@ test_that("tabulated confusion preserves path order, repeats, labels, and ties",
     actual <- confusion.picasso(
       object, data$x, newy, lambda.idx = lambda.idx
     )
-    expect_identical(
-      serialize(actual, NULL), serialize(expected, NULL), info = mode
-    )
+    expect_identical(actual, expected, info = mode)
   }
 })
 
@@ -175,8 +173,7 @@ test_that("streamed scoring is serialization-equivalent on edge cases", {
       class = "assess.picasso"
     )
     expect_identical(
-      serialize(assess.picasso(object, data$x, data$y), NULL),
-      serialize(expected.assessment, NULL),
+      assess.picasso(object, data$x, data$y), expected.assessment,
       info = mode
     )
 
@@ -187,11 +184,8 @@ test_that("streamed scoring is serialization-equivalent on edge cases", {
       )
     })
     expect_identical(
-      serialize(
-        predict(object, data$x, lambda.idx = c(4L, 2L), type = "class"),
-        NULL
-      ),
-      serialize(expected.class, NULL),
+      predict(object, data$x, lambda.idx = c(4L, 2L), type = "class"),
+      expected.class,
       info = mode
     )
 
@@ -207,13 +201,10 @@ test_that("streamed scoring is serialization-equivalent on edge cases", {
     })
     names(expected.confusion) <- c("lambda[4]", "lambda[1]")
     expect_identical(
-      serialize(
-        confusion.picasso(
-          object, data$x, data$y, lambda.idx = c(4L, 1L)
-        ),
-        NULL
+      confusion.picasso(
+        object, data$x, data$y, lambda.idx = c(4L, 1L)
       ),
-      serialize(expected.confusion, NULL),
+      expected.confusion,
       info = mode
     )
   }
