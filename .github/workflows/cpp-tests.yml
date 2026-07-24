@@ -134,7 +134,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Python test dependencies
-        run: python -m pip install numpy scipy wheel
+        # setuptools is no longer bundled with Python >= 3.12 environments
+        # and the source-bundle steps invoke setup.py directly.
+        run: python -m pip install numpy scipy wheel setuptools
       - name: Build native library
         run: make dylib
       - name: Install library into source package

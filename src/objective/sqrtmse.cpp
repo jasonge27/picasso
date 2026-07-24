@@ -6,7 +6,10 @@ namespace picasso {
 namespace {
 
 bool is_exact_null_fit(double loss, const ModelParam &model) {
-  return loss == 0.0 && (model.beta == 0.0).all();
+  // isZero(0) is an exact all-zero test. The array==scalar spelling is not
+  // C++20-clean with the bundled Eigen (non-bool rewritten operator==), and
+  // R 4.6 compiles packages as C++20 by default.
+  return loss == 0.0 && model.beta.isZero(0.0);
 }
 
 }  // namespace

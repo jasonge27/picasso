@@ -123,11 +123,25 @@ add_custom_target(check_eigen_warning_pairs
     VERBATIM)
 
 if(BUILD_TESTING)
+  # The native tests exercise internal C++ classes that the shared library
+  # deliberately does not export (on Windows only PICASSO_C_API symbols leave
+  # the DLL), so link them against a static build of the same sources.
+  add_library(picasso_testing STATIC ${PICASSO_SOURCES})
+  target_compile_features(picasso_testing PUBLIC cxx_std_11)
+  set_target_properties(picasso_testing PROPERTIES CXX_EXTENSIONS OFF)
+  target_include_directories(picasso_testing PUBLIC
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+  target_link_libraries(picasso_testing PUBLIC ${PICASSO_EIGEN_TARGET})
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(picasso_testing PRIVATE OpenMP::OpenMP_CXX)
+  endif()
+  picasso_enable_sanitizers(picasso_testing)
+
   function(picasso_add_cpp_test target source)
     add_executable(${target} ${source})
     target_compile_features(${target} PRIVATE cxx_std_11)
     set_target_properties(${target} PROPERTIES CXX_EXTENSIONS OFF)
-    target_link_libraries(${target} PRIVATE picasso)
+    target_link_libraries(${target} PRIVATE picasso_testing)
     picasso_enable_sanitizers(${target})
     add_test(NAME ${target} COMMAND ${target})
   endfunction()
