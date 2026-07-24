@@ -32,7 +32,9 @@ cv.picasso(X, Y, \dots, nfolds = 10, foldid = NULL,
   \item{foldid}{Optional integer vector of fold assignments (length \eqn{n}).
     Labels must be consecutive positive integers starting at one. If
     \code{NULL}, assignments are generated randomly; binomial and multinomial
-    assignments are stratified by class.}
+    assignments are stratified by class. (The Python
+    \code{cross_validate} counterpart instead expects zero-based labels,
+    matching its zero-based lambda indices.)}
   \item{type.measure}{Loss measure for cross-validation. \code{"default"}
     uses \code{"class"} for binomial and multinomial models and
     \code{"deviance"} otherwise. Multinomial models support only

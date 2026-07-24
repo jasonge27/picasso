@@ -118,7 +118,7 @@ setup(name='pycasso',
       extras_require={
           'plot': ['matplotlib'],
       },
-      python_requires='>=3.6',
+      python_requires='>=3.9',
       maintainer='Tuo Zhao',
       maintainer_email='tourzhao@gatech.edu',
       zip_safe=False,
