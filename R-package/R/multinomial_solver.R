@@ -10,7 +10,8 @@
     "numerical_failure",
     "lla_majorization_failed",
     "exception",
-    "lla_stationarity_limit"
+    "lla_stationarity_limit",
+    "interrupted"
   )
   if (length(code) != 1L || is.na(code) || code < 0L || code >= length(labels))
     stop(sprintf("Multinomial solver returned unknown status code %s.", code))
@@ -83,6 +84,7 @@ multinomial_solver <- function(Y_int, X, lambda, nlambda, gamma,
   num.fit <- as.integer(out$num_fit[1L])
   status.code <- as.integer(out$status[1L])
   status <- .picasso_multinomial_status_label(status.code)
+  if (identical(status.code, 11L)) .picasso_signal_interrupt()
   if (is.na(num.fit) || num.fit < 0L || num.fit > nlambda)
     stop(sprintf("Multinomial solver returned invalid num_fit=%s.", num.fit))
 

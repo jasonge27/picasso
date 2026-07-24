@@ -22,6 +22,9 @@
 
 // Common termination status for versioned adaptive-LLA entry points.  The
 // numeric values intentionally match the established multinomial ABI.
+// PICASSO_LLA_INTERRUPTED reports a cooperative host-interrupt stop at a
+// lambda boundary; every already-committed lambda remains usable and num_fit
+// is the committed prefix, exactly as for dfmax stopping.
 enum PicassoLlaPathStatus {
   PICASSO_LLA_COMPLETED = 0,
   PICASSO_LLA_DFMAX_REACHED = 1,
@@ -33,10 +36,23 @@ enum PicassoLlaPathStatus {
   PICASSO_LLA_NUMERICAL_FAILURE = 7,
   PICASSO_LLA_MAJORIZATION_FAILED = 8,
   PICASSO_LLA_EXCEPTION = 9,
-  PICASSO_LLA_STATIONARITY_LIMIT = 10
+  PICASSO_LLA_STATIONARITY_LIMIT = 10,
+  PICASSO_LLA_INTERRUPTED = 11
 };
 
 extern "C" PICASSO_C_API const char *PicassoLlaPathStatusString(int status);
+
+// Cooperative interrupt hook shared by every solver entry point.  The host
+// registers a cheap polling callback that returns nonzero to request a stop;
+// solvers poll it at lambda boundaries only, so a single very expensive
+// lambda still runs to completion.  An interrupted path keeps its committed
+// num_fit prefix and reports PICASSO_LLA_INTERRUPTED /
+// PICASSO_MULTINOMIAL_INTERRUPTED.  The callback must not throw or longjmp,
+// and it stays registered until replaced; pass nullptr to disable.  Hosts
+// with one solver thread (R) may keep a process-wide callback registered
+// around each call.
+extern "C" PICASSO_C_API void PicassoSetInterruptCallback(
+    int (*callback)(void));
 
 // Scalar X layout and lifetime contract: usePython=false means an nn-by-dd
 // column-major buffer; usePython=true means a row-major buffer. Calls are
@@ -310,7 +326,10 @@ enum PicassoMultinomialPathStatus {
   PICASSO_MULTINOMIAL_NUMERICAL_FAILURE = 7,
   PICASSO_MULTINOMIAL_LLA_MAJORIZATION_FAILED = 8,
   PICASSO_MULTINOMIAL_EXCEPTION = 9,
-  PICASSO_MULTINOMIAL_LLA_STATIONARITY_LIMIT = 10
+  PICASSO_MULTINOMIAL_LLA_STATIONARITY_LIMIT = 10,
+  // Cooperative host-interrupt stop at a lambda boundary; the committed
+  // prefix in num_fit remains usable exactly as for dfmax stopping.
+  PICASSO_MULTINOMIAL_INTERRUPTED = 11
 };
 
 extern "C" PICASSO_C_API const char *PicassoMultinomialPathStatusString(

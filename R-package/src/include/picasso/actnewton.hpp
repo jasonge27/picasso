@@ -12,14 +12,17 @@ namespace solver {
 
 // Per-lambda and aggregate termination state for scalar ActNewton paths.
 // kStationarityLimit retains a fully solved/majorization-checked model; the
-// three failure states do not commit the failing lambda.
+// three failure states do not commit the failing lambda.  kInterrupted is an
+// aggregate-only cooperative host stop at a lambda boundary; the committed
+// prefix remains usable.
 enum class ActNewtonLlaStatus {
   kNotRun,
   kCompleted,
   kStationarityLimit,
   kSubproblemFailed,
   kMajorizationFailed,
-  kNumericalFailure
+  kNumericalFailure,
+  kInterrupted
 };
 
 class ActNewtonSolver {

@@ -2,6 +2,7 @@
 #include <picasso/multinomial_actnewton.hpp>
 #include <picasso/multinomial_lla.hpp>
 #include <picasso/multinomial_objective.hpp>
+#include <picasso/solver_params.hpp>
 
 #include "../internal/multinomial_solver_view.hpp"
 
@@ -489,6 +490,8 @@ int solve_multinomial_regression_impl(
     if (reg_type == 1) {
       picasso::solver::internal::MultinomialPathViewState path_state;
       for (int lambda_index = 0; lambda_index < nlambda; ++lambda_index) {
+        if (picasso::solver::interrupt_requested())
+          return PICASSO_MULTINOMIAL_INTERRUPTED;
         current_lambda = lambda_index;
         const std::chrono::steady_clock::time_point start =
             std::chrono::steady_clock::now();
@@ -550,6 +553,8 @@ int solve_multinomial_regression_impl(
     lla_options.maximum_stages = lla_max_stages;
     int path_status = PICASSO_MULTINOMIAL_COMPLETED;
     for (int lambda_index = 0; lambda_index < nlambda; ++lambda_index) {
+      if (picasso::solver::interrupt_requested())
+        return PICASSO_MULTINOMIAL_INTERRUPTED;
       current_lambda = lambda_index;
       const std::chrono::steady_clock::time_point start =
           std::chrono::steady_clock::now();
@@ -647,6 +652,8 @@ extern "C" const char *PicassoMultinomialPathStatusString(int status) {
       return "exception";
     case PICASSO_MULTINOMIAL_LLA_STATIONARITY_LIMIT:
       return "lla_stationarity_limit";
+    case PICASSO_MULTINOMIAL_INTERRUPTED:
+      return "interrupted";
   }
   return "unknown";
 }

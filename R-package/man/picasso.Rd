@@ -261,6 +261,12 @@ For non-Gaussian MCP/SCAD fits, status \code{lla_stationarity_limit} means
 that every returned model is usable, but at least one point reached its
 LLA-stage budget before meeting \code{prec}.
 
+Native path fitting polls for a pending user interrupt (\kbd{Ctrl-C}) at
+every lambda boundary, so a long path can be stopped without waiting for
+completion; the interrupt is then raised as a standard R \code{interrupt}
+condition. A single very expensive lambda still runs to completion before
+the poll.
+
 Multinomial fits also include \code{path.early.stopped} and
 \code{requested.nlambda}. A successful automatically generated path may
 contain fewer lambdas than requested after its deviance has saturated.

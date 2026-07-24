@@ -7,6 +7,13 @@ namespace picasso {
 namespace solver {
 enum RegType { L1, SCAD, MCP };
 
+// Optional cooperative-interrupt hook shared by every native path loop.
+// The callback must be cheap, must not throw or longjmp, and returns nonzero
+// when the caller wants the current path to stop after the committed prefix.
+// A null callback (the default) disables polling entirely.
+void set_interrupt_callback(int (*callback)(void));
+bool interrupt_requested();
+
 // training parameters
 class PicassoSolverParams {
  public:

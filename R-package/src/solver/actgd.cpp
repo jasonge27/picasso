@@ -104,6 +104,10 @@ int ActGDSolver::solve_impl(CommitSink *sink) {
     regfunc.reset(new RegL1());
 
   for (std::size_t i = 0; i < lambdas.size(); i++) {
+    if (interrupt_requested()) {
+      m_status = ActGDPathStatus::kInterrupted;
+      return committed_count;
+    }
     regfunc->set_param(lambdas[i], m_param.gamma);
 
     // Step 1: Strong rule screening

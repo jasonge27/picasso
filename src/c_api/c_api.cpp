@@ -157,6 +157,8 @@ int actgd_status_to_c(picasso::solver::ActGDPathStatus status) {
       return PICASSO_LLA_DFMAX_REACHED;
     case ActGDPathStatus::kIterationLimit:
       return PICASSO_LLA_INNER_ITERATION_LIMIT;
+    case ActGDPathStatus::kInterrupted:
+      return PICASSO_LLA_INTERRUPTED;
   }
   return PICASSO_LLA_NUMERICAL_FAILURE;
 }
@@ -216,6 +218,8 @@ int actnewton_status_to_c(picasso::solver::ActNewtonLlaStatus status) {
       return PICASSO_LLA_MAJORIZATION_FAILED;
     case ActNewtonLlaStatus::kNumericalFailure:
       return PICASSO_LLA_NUMERICAL_FAILURE;
+    case ActNewtonLlaStatus::kInterrupted:
+      return PICASSO_LLA_INTERRUPTED;
     case ActNewtonLlaStatus::kNotRun:
       return PICASSO_LLA_NUMERICAL_FAILURE;
   }
@@ -296,6 +300,10 @@ int run_actnewton_v2(
 }
 }  // namespace
 
+extern "C" void PicassoSetInterruptCallback(int (*callback)(void)) {
+  picasso::solver::set_interrupt_callback(callback);
+}
+
 extern "C" const char *PicassoLlaPathStatusString(int status) {
   switch (status) {
     case PICASSO_LLA_COMPLETED:
@@ -320,6 +328,8 @@ extern "C" const char *PicassoLlaPathStatusString(int status) {
       return "exception";
     case PICASSO_LLA_STATIONARITY_LIMIT:
       return "lla_stationarity_limit";
+    case PICASSO_LLA_INTERRUPTED:
+      return "interrupted";
     default:
       return "unknown";
   }

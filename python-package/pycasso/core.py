@@ -86,6 +86,7 @@ _MULTINOMIAL_STATUS_NAMES = {
     8: 'lla_majorization_failed',
     9: 'exception',
     10: 'lla_stationarity_limit',
+    11: 'interrupted',
 }
 
 
@@ -101,6 +102,7 @@ _SCALAR_LLA_STATUS_NAMES = {
     8: 'lla_majorization_failed',
     9: 'exception',
     10: 'lla_stationarity_limit',
+    11: 'interrupted',
 }
 
 
@@ -2715,7 +2717,9 @@ class Solver:
 
         :param nfolds: Number of folds. Default ``10``.
         :param foldid: Optional length-``n`` vector of zero-based,
-            contiguous fold IDs starting at zero.
+            contiguous fold IDs starting at zero. (The R
+            ``cv.picasso`` counterpart instead expects one-based labels,
+            matching its one-based lambda indices.)
         :param type_measure: One of ``"default"``, ``"deviance"``, ``"mse"``,
             ``"mae"``, or ``"class"``. The default is class error for
             binomial/multinomial and deviance otherwise. Multinomial supports

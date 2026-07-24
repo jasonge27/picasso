@@ -9,6 +9,20 @@
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
 
+// Cooperative interrupt bridge.  R_CheckUserInterrupt longjmps over C++
+// destructors, so the pending-interrupt probe runs inside R_ToplevelExec,
+// which catches that jump and reports it as an ordinary return value.  The
+// native solvers then unwind normally at the next lambda boundary and the R
+// wrappers raise the condition from R code.
+static void picasso_r_check_interrupt(void *unused) {
+  (void)unused;
+  R_CheckUserInterrupt();
+}
+
+static int picasso_r_interrupt_pending(void) {
+  return R_ToplevelExec(picasso_r_check_interrupt, NULL) == TRUE ? 0 : 1;
+}
+
 // Helper: create a named list from components
 static SEXP make_result_list(SEXP beta, SEXP intcpt, SEXP ite_lamb,
                              SEXP size_act, SEXP runt, SEXP num_fit) {
@@ -761,4 +775,7 @@ static const R_CallMethodDef CallEntries[] = {
 extern "C" void attribute_visible R_init_picasso(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
+  // R runs one solver at a time, so a process-wide registration is safe and
+  // makes every native path loop poll for Ctrl-C at lambda boundaries.
+  PicassoSetInterruptCallback(picasso_r_interrupt_pending);
 }

@@ -13,6 +13,7 @@ from pathlib import Path
 EXPECTED_SYMBOLS = (
     "PicassoLlaPathStatusString",
     "PicassoMultinomialPathStatusString",
+    "PicassoSetInterruptCallback",
     "SolveLinearRegressionCovUpdate",
     "SolveLinearRegressionCovUpdateV2",
     "SolveLinearRegressionCovUpdateV3",

@@ -22,6 +22,10 @@
 
 ## Interfaces and diagnostics
 
+- Native path fitting is now interruptible: every family polls for a pending
+  user interrupt (Ctrl-C) at each lambda boundary and re-raises it as a
+  standard R `interrupt` condition instead of running the full path to
+  completion.
 - Added binomial and Poisson offsets throughout fitting, prediction,
   assessment, and cross-validation. New-data offsets are applied on the link
   scale and are required whenever prediction or assessment evaluates the

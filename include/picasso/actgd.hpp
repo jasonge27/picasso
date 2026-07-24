@@ -12,7 +12,10 @@ namespace solver {
 enum class ActGDPathStatus {
   kCompleted,
   kDfmaxReached,
-  kIterationLimit
+  kIterationLimit,
+  // Cooperative host interrupt at a lambda boundary; the committed prefix
+  // remains usable exactly as for dfmax stopping.
+  kInterrupted
 };
 
 class ActGDSolver {

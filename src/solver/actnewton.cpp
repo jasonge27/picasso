@@ -613,6 +613,10 @@ int ActNewtonSolver::solve_impl(bool objective_state_preinitialized,
 
   for (std::size_t lambda_index = 0; lambda_index < path_size;
        ++lambda_index) {
+    if (interrupt_requested()) {
+      lla_path_status = ActNewtonLlaStatus::kInterrupted;
+      break;
+    }
     const double lambda = lambdas[lambda_index];
     if (!(lambda >= 0.0) || !std::isfinite(lambda)) {
       lla_status_path[lambda_index] =

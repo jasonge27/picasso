@@ -828,8 +828,53 @@ bool test_status_strings() {
                     PICASSO_LLA_STATIONARITY_LIMIT)) ==
                     "lla_stationarity_limit",
                 "stationarity-limit status string mismatch");
+  ok &= require(std::string(PicassoLlaPathStatusString(
+                    PICASSO_LLA_INTERRUPTED)) == "interrupted",
+                "interrupted status string mismatch");
   ok &= require(std::string(PicassoLlaPathStatusString(91)) == "unknown",
                 "unknown status string mismatch");
+  return ok;
+}
+
+int g_interrupt_polls = 0;
+int g_interrupt_after = 0;
+
+int interrupt_after_polls() {
+  ++g_interrupt_polls;
+  return g_interrupt_polls > g_interrupt_after ? 1 : 0;
+}
+
+bool test_cooperative_interrupt() {
+  bool ok = true;
+  const Fixture fixture = make_fixture();
+  std::vector<double> lambda = lambda_path(fixture, Family::kBinomial);
+
+  // Interrupt after two lambda-boundary polls: the committed two-lambda
+  // prefix must remain usable and the failing suffix untouched.
+  g_interrupt_polls = 0;
+  g_interrupt_after = 2;
+  PicassoSetInterruptCallback(interrupt_after_polls);
+  Outputs interrupted(kNlambda);
+  const int status =
+      call_v3(fixture, Family::kBinomial, &lambda, 1, &interrupted);
+  PicassoSetInterruptCallback(nullptr);
+  ok &= require(status == PICASSO_LLA_INTERRUPTED,
+                "interrupt did not report PICASSO_LLA_INTERRUPTED");
+  ok &= require(interrupted.number_fit == 2,
+                "interrupt did not keep the committed two-lambda prefix");
+  // These entry points zero-initialize outputs before solving, so the
+  // uncommitted suffix must still hold that initialization, not a model.
+  ok &= require(interrupted.intercept[2] == 0.0 &&
+                    interrupted.intercept[3] == 0.0,
+                "interrupt committed a model past the reported prefix");
+
+  // A cleared callback must restore uninterrupted full-path behavior.
+  Outputs completed(kNlambda);
+  const int full_status =
+      call_v3(fixture, Family::kBinomial, &lambda, 1, &completed);
+  ok &= require(full_status == PICASSO_LLA_COMPLETED &&
+                    completed.number_fit == kNlambda,
+                "cleared interrupt callback still truncated the path");
   return ok;
 }
 
@@ -843,6 +888,7 @@ int main() {
   ok &= test_native_smooth_objective_paths();
   ok &= test_intercept_dfmax_and_optional_outputs();
   ok &= test_input_validation_and_transactionality();
+  ok &= test_cooperative_interrupt();
   if (!ok) return 1;
   std::cout << "Scalar adaptive-LLA C API tests passed\n";
   return 0;

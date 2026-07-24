@@ -20,11 +20,24 @@
     "numerical_failure",
     "lla_majorization_failed",
     "exception",
-    "lla_stationarity_limit"
+    "lla_stationarity_limit",
+    "interrupted"
   )
   if (length(code) != 1L || is.na(code) || code < 0L || code >= length(labels))
     stop(sprintf("Adaptive LLA solver returned unknown status code %s.", code))
   labels[code + 1L]
+}
+
+
+# The native path loops absorb a pending Ctrl-C via R_ToplevelExec and stop
+# at the next lambda boundary with status code 11. Re-signal the interrupt
+# here so the whole call chain (including cv.picasso fold loops) aborts the
+# way an uncaught Ctrl-C would, and tryCatch(interrupt = ...) still works.
+.picasso_signal_interrupt <- function() {
+  stop(structure(
+    class = c("interrupt", "condition"),
+    list(message = "picasso fit interrupted by user.", call = NULL)
+  ))
 }
 
 
@@ -61,6 +74,7 @@
   num.fit <- as.integer(out$num_fit[1L])
   status.code <- as.integer(out$status[1L])
   status <- .picasso_scalar_lla_status_label(status.code)
+  if (identical(status.code, 11L)) .picasso_signal_interrupt()
   if (is.na(num.fit) || num.fit < 0L || num.fit > nlambda)
     stop(sprintf("%s solver returned invalid num_fit=%s.", family.label, num.fit))
 

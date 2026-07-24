@@ -35,6 +35,7 @@ gaussian_solver <- function(Y, X, lambda, nlambda, gamma, n, d, max.ite, prec,
   num.fit <- as.integer(out$num_fit[1L])
   status.code <- as.integer(out$status[1L])
   status <- .picasso_scalar_lla_status_label(status.code)
+  if (identical(status.code, 11L)) .picasso_signal_interrupt()
   if (is.na(num.fit) || num.fit < 0L || num.fit > nlambda) {
     stop(sprintf("Gaussian solver returned invalid num_fit=%s.", num.fit))
   }
