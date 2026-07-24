@@ -2612,7 +2612,10 @@ near_tie_logits = near_tie_intercept.copy()
 near_tie_softmax_classes = np.argmax(
     pycasso_core._softmax(near_tie_logits), axis=1)
 near_tie_raw_classes = np.argmax(near_tie_logits, axis=1)
-assert np.array_equal(near_tie_softmax_classes, [0, 0, 1]) and \
+# The sub-ulp offsets sit at or near exp()'s rounding boundary, so which of
+# the three rows collapses to a softmax tie is libm-specific. The fixture
+# only needs one collapsed row while every raw logit stays strictly larger.
+assert np.any(near_tie_softmax_classes == 0) and \
     np.array_equal(near_tie_raw_classes, [1, 1, 1]), \
     "near-tie oracle does not exercise softmax rounding"
 legacy_near_tie_metrics = legacy_multinomial_assessment(
