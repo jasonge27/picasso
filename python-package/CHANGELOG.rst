@@ -1,7 +1,7 @@
 pycasso changelog
 =================
 
-1.1.0
+2.0.0
 -----
 
 * Added multinomial lasso, MCP, and SCAD paths with a class-coupled active-set

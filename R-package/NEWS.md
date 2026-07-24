@@ -1,4 +1,4 @@
-# picasso 1.6
+# picasso 2.0.0
 
 ## New models and solver controls
 

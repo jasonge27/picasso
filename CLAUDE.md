@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project overview
 
 PICASSO is a C++11 sparse-learning library shared by an R package (development
-version 1.6) and a Python package (`pycasso`, development version 1.1.0).
+version 2.0.0) and a Python package (`pycasso`, development version 2.0.0).
 Public families are Gaussian, binomial, Poisson, square-root-lasso, and
 multinomial; every family supports lasso, MCP, and SCAD. See the
 [JMLR paper](https://www.jmlr.org/papers/v20/17-722.html) for the original
@@ -59,7 +59,7 @@ R CMD INSTALL --preclean R-package
 Rscript -e 'library(picasso); testthat::test_dir("R-package/tests/testthat", reporter = "summary", stop_on_failure = TRUE)'
 Rscript -e 'library(picasso); testthat::test_file("R-package/tests/testthat/test-multinomial.R")'
 R CMD build R-package
-R CMD check --as-cran picasso_1.6.tar.gz
+R CMD check --as-cran picasso_2.0.0.tar.gz
 ```
 
 Python (point the wrapper at a staged native build):

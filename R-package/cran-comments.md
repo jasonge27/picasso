@@ -1,7 +1,7 @@
 ## Submission
 
 This submission updates `picasso` from CRAN version 1.5, published on
-2026-03-12, to version 1.6.
+2026-03-12, to version 2.0.0.
 
 ## Main changes since 1.5
 

@@ -12,7 +12,7 @@ PICASSO shares a C++11 core across two language packages. Implementations live i
 - `python python-package/test_pycasso.py` runs Python feature assertions.
 - `ctest --test-dir build --output-on-failure` runs the native C++ unit and C API suite after a CMake build.
 - `R CMD build R-package` builds the current R package tarball.
-- `R CMD check --as-cran picasso_1.6.tar.gz` checks examples, documentation, and vignettes.
+- `R CMD check --as-cran picasso_2.0.0.tar.gz` checks examples, documentation, and vignettes.
 
 ## Coding Style & Naming Conventions
 

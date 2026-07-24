@@ -42,13 +42,13 @@ starts carry the master solution forward.
 
 ## R interface
 
-The checkout contains R package version 1.6. A CRAN installation may be an
+The checkout contains R package version 2.0.0. A CRAN installation may be an
 earlier published release; build this checkout to use the interfaces described
 here:
 
 ```bash
 R CMD build R-package
-R CMD INSTALL picasso_1.6.tar.gz
+R CMD INSTALL picasso_2.0.0.tar.gz
 ```
 
 ```r
@@ -65,12 +65,12 @@ cv <- cv.picasso(X, y, family = "gaussian", nfolds = 5, nlambda = 30)
 
 Use `family = "multinomial"` for three or more numeric, character, or
 factor classes. Binomial and Poisson models accept link-scale `offset`
-vectors. See `?picasso` and the installed *PICASSO 1.6 User Guide* for
+vectors. See `?picasso` and the installed *PICASSO 2.0.0 User Guide* for
 complete return values, diagnostics, prediction, assessment, and CV behavior.
 
 ## Python interface
 
-The checkout contains `pycasso` 1.1.0. The latest PyPI release can lag the
+The checkout contains `pycasso` 2.0.0. The latest PyPI release can lag the
 development source, so use a staged native build for the exact API documented
 in this repository:
 
@@ -133,7 +133,7 @@ ctest --test-dir build --output-on-failure
 cmake --build build --target check_mirrors
 
 python python-package/test_pycasso.py
-R CMD check --as-cran picasso_1.6.tar.gz
+R CMD check --as-cran picasso_2.0.0.tar.gz
 ```
 
 The native and R-package C++ trees are intentionally mirrored; the CMake

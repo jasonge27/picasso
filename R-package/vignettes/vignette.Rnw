@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{PICASSO 1.6 user guide}
+%\VignetteIndexEntry{PICASSO 2.0.0 user guide}
 %\VignettePackage{picasso}
 %\VignetteEncoding{UTF-8}
 
@@ -11,7 +11,7 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.55em}
 
-\title{PICASSO 1.6 User Guide}
+\title{PICASSO 2.0.0 User Guide}
 \author{PICASSO authors}
 \date{July 2026}
 
