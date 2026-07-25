@@ -1,3 +1,17 @@
+# picasso 2.0.2
+
+## Metadata
+
+- Corrected the authorship metadata for the bundled Eigen library. Its authors
+  were previously listed as `ctb` (contributors), which in R's role vocabulary
+  means contributors to *this* package; they have never contributed to picasso.
+  They are now listed as `cph` (copyright holders) with comments stating that
+  they authored and hold copyright in the bundled Eigen library rather than in
+  picasso, and a third entry covers the remaining Eigen authors and points to
+  `inst/COPYRIGHTS`. The picasso authors remain the package's `aut`, and
+  `inst/COPYRIGHTS` now states explicitly that copyright in the Eigen sources
+  stays with the Eigen authors.
+
 # picasso 2.0.1
 
 ## Portability

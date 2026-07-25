@@ -4,12 +4,18 @@ Bundled third-party component notices
 This package bundles Eigen header files under:
   src/include/eigen3/
 
-Eigen is a C++ template library maintained by the Eigen project.
+Eigen is an independent C++ template library maintained by the Eigen
+project. It is redistributed here unmodified, apart from restoring one
+missing warning-pragma include in Eigen/SPQRSupport. Its authors are not
+authors of picasso, and the picasso authors claim no copyright over the
+Eigen sources; copyright in those files remains with the Eigen authors.
 
-Copyright holders include (among others):
+Copyright holders of the bundled Eigen sources include (among others):
   - Gael Guennebaud
   - Benoit Jacob
-  - other Eigen contributors (see file headers in src/include/eigen3/Eigen/src/)
+  - Desire Nuentsa-Wakam, Hauke Heibel, Jitse Niesen,
+    Konstantinos Margaritis, Benoit Steiner, and further contributors
+    named in the per-file headers under src/include/eigen3/Eigen/src/
 
 Eigen licensing information is included in:
   - src/include/eigen3/COPYING.README
