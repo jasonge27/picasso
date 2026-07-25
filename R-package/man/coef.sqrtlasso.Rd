@@ -7,7 +7,7 @@ Extract Coefficients from an Object with S3 Class \code{"sqrtlasso"}
 Extract estimated coefficient vectors from selected points on the regularization path.
 }
 \usage{
-\method{coef}{sqrtlasso}(object, lambda.idx = c(1:3), beta.idx = c(1:3), \dots)
+\method{coef}{sqrtlasso}(object, lambda.idx = NULL, beta.idx = NULL, \dots)
 }
 \arguments{
   \item{object}{
@@ -15,10 +15,11 @@ Extract estimated coefficient vectors from selected points on the regularization
   }
   \item{lambda.idx}{
   Indices of regularization parameters in the solution path to extract.
-  The default is \code{c(1:3)}.
+  By default, at most the first three fitted path points are used.
   }
   \item{beta.idx}{
-  Indices of coefficient entries to extract. The default is \code{c(1:3)}.
+  Indices of coefficient entries to extract. By default, at most the first
+  three coefficients are used.
   }
   \item{\dots}{
   Arguments to be passed to methods.

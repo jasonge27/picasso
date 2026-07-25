@@ -8,29 +8,50 @@ picasso.sqrtlasso <- function(X,
                           dfmax = NULL,
                           standardize = TRUE,
                           intercept = TRUE,
-                          prec = 1e-4,
+                          prec = 1e-7,
                           max.ite = 1e4,
-                          verbose = FALSE)
+                          verbose = FALSE,
+                          lla.max.stages = 3L,
+                          fast.mode = FALSE)
 {
+  prec <- .picasso_resolve_precision(prec, fast.mode, "sqrtlasso")
+  lla.max.stages <- .picasso_validate_lla_max_stages(lla.max.stages)
+  standardize <- .picasso_validate_flag(standardize, "standardize")
+  intercept <- .picasso_validate_flag(intercept, "intercept")
+  verbose <- .picasso_validate_flag(verbose, "verbose")
+  max.ite <- .picasso_validate_positive_integer(max.ite, "max.ite")
+  dfmax <- .picasso_validate_nonnegative_integer(
+    dfmax, "dfmax", allow.null = TRUE
+  )
   dims = .picasso_validate_design(X)
   n = dims$n
   d = dims$d
-  Yb = Y
+  if (!is.numeric(Y) || length(Y) != n || anyNA(Y) ||
+      any(!is.finite(Y))) {
+    stop(sprintf("Y must be a finite numeric vector of length %d.", n))
+  }
+  Yb = as.double(Y)
 
   begt = Sys.time()
 
   if (verbose)
     cat("Sparse sqrt lasso regression. \n")
 
-  design = .picasso_prepare_design(X, standardize)
+  design = .picasso_prepare_design(X, standardize, center = intercept)
   xx = design$xx
   xm = design$xm
   xinvc.vec = design$xinvc.vec
 
   yy = Yb
   
-  L0 = sqrt(sum(yy*yy)/n)
-  lambda.max = max(abs(crossprod(xx,yy/n)))/L0
+  lambda.max = if (is.null(lambda)) {
+    eta0 <- .picasso_null_eta(yy, "sqrtlasso", intercept = intercept)
+    residual0 <- yy - eta0
+    L0 = sqrt(sum(residual0 * residual0) / n)
+    if (L0 == 0) 0 else max(abs(crossprod(xx, residual0 / n))) / L0
+  } else {
+    0.0
+  }
   lambda.info = .picasso_lambda_path(lambda, nlambda, lambda.min.ratio, lambda.max)
   lambda = lambda.info$lambda
   nlambda = lambda.info$nlambda
@@ -39,11 +60,11 @@ picasso.sqrtlasso <- function(X,
   method.flag = method.info$flag
   gamma = method.info$gamma
   
-  dfmax.int <- if (is.null(dfmax)) as.integer(-1) else as.integer(dfmax)
+  dfmax.int <- if (is.null(dfmax)) -1L else dfmax
 
   out = sqrtlasso_solver(yy, xx, lambda, nlambda, gamma,
               n, d, max.ite, prec, intercept, verbose,
-              method.flag, dfmax.int)
+              method.flag, dfmax.int, lla.max.stages)
   
   # truncate to actual number of lambdas fit (early stopping)
   num.fit = out$num.fit
@@ -60,20 +81,34 @@ picasso.sqrtlasso <- function(X,
   runt = Sys.time()-begt
   est$runt = out$runt
   est$beta = Matrix(scaled$beta)
-  est$intercept = scaled$intercept
+  est$intercept = if (intercept) scaled$intercept else
+    rep(0.0, length(scaled$intercept))
   est$lambda = lambda
   est$nlambda = nlambda
   est$df = df
   est$method = method
-  est$alg = "actnewton"
+  est$alg = "active-set-quadratic-mm"
 
   est$ite =out$ite
+  est$lla.max.stages = out$lla.max.stages
+  est$status = out$status
+  est$status.code = out$status.code
+  est$failure = out$failure
+  est$diagnostics = out$diagnostics
   est$verbose = verbose
   est$runtime = runt
+  est$fast.mode = fast.mode
+  est$prec = prec
 
-  est$nulldev <- .picasso_null_deviance(as.numeric(Y), "sqrtlasso")
-  fit_dev <- .picasso_fit_deviance(as.numeric(Y), X, as.matrix(est$beta), est$intercept, "sqrtlasso")
-  est$dev.ratio <- pmax(0, pmin(1, 1 - fit_dev / est$nulldev))
+  est$nulldev <- .picasso_null_deviance(
+    Yb, "sqrtlasso", intercept = intercept
+  )
+  fit_dev <- 0.5 * out$smooth.objective^2
+  est$dev.ratio <- if (est$nulldev > 0) {
+    pmax(0, pmin(1, 1 - fit_dev / est$nulldev))
+  } else {
+    rep(0.0, length(fit_dev))
+  }
 
   class(est) = "sqrtlasso"
   return(est)
@@ -89,12 +124,12 @@ plot.sqrtlasso <- function(x, ...)
   .picasso_plot_path(x)
 }
 
-coef.sqrtlasso <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
+coef.sqrtlasso <- function(object, lambda.idx = NULL, beta.idx = NULL, ...)
 {
   .picasso_extract_coef(object, lambda.idx, beta.idx)
 }
 
-predict.sqrtlasso <- function(object, newdata, lambda.idx = c(1:3), Y.pred.idx = c(1:5),
+predict.sqrtlasso <- function(object, newdata, lambda.idx = NULL, Y.pred.idx = NULL,
                               type = "response", s = NULL, ...)
 {
   .picasso_predict(
@@ -102,7 +137,6 @@ predict.sqrtlasso <- function(object, newdata, lambda.idx = c(1:3), Y.pred.idx =
     newdata,
     lambda.idx,
     Y.pred.idx,
-    default_response_idx = c(1:5),
     type = type,
     s = s
   )

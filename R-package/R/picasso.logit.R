@@ -8,14 +8,29 @@ picasso.logit <- function(X,
                           dfmax = NULL,
                           standardize = TRUE,
                           intercept = TRUE,
-                          prec = 1e-4,
+                          prec = 1e-7,
                           max.ite = 1e4,
                           verbose = FALSE,
-                          offset = NULL)
+                          offset = NULL,
+                          lla.max.stages = 3L,
+                          fast.mode = FALSE)
 {
+  prec <- .picasso_resolve_precision(prec, fast.mode, "binomial")
+  lla.max.stages <- .picasso_validate_lla_max_stages(lla.max.stages)
+  standardize <- .picasso_validate_flag(standardize, "standardize")
+  intercept <- .picasso_validate_flag(intercept, "intercept")
+  verbose <- .picasso_validate_flag(verbose, "verbose")
+  max.ite <- .picasso_validate_positive_integer(max.ite, "max.ite")
+  dfmax <- .picasso_validate_nonnegative_integer(
+    dfmax, "dfmax", allow.null = TRUE
+  )
   dims = .picasso_validate_design(X)
   n = dims$n
   d = dims$d
+  if (length(Y) != n || anyNA(Y) ||
+      (is.numeric(Y) && any(!is.finite(Y)))) {
+    stop(sprintf("Y must contain %d finite, non-missing observations.", n))
+  }
   Y = as.factor(Y)
   if (length(levels(Y)) != 2){
     stop(sprintf(
@@ -31,14 +46,21 @@ picasso.logit <- function(X,
   if (verbose)
     cat("Sparse logistic regression. \n")
 
-  design = .picasso_prepare_design(X, standardize)
+  offset.vec <- .picasso_validate_offset(offset, n, "binomial")
+  design = .picasso_prepare_design(X, standardize, center = intercept)
   xx = design$xx
   xm = design$xm
   xinvc.vec = design$xinvc.vec
 
   yy = Yb
   
-  lambda.max = max(abs(crossprod(xx,yy/n)))
+  lambda.max = if (is.null(lambda)) {
+    eta0 <- .picasso_null_eta(yy, "binomial", offset.vec, intercept)
+    mu0 <- stats::plogis(eta0)
+    max(abs(crossprod(xx, (yy - mu0) / n)))
+  } else {
+    0.0
+  }
   lambda.info = .picasso_lambda_path(lambda, nlambda, lambda.min.ratio, lambda.max)
   lambda = lambda.info$lambda
   nlambda = lambda.info$nlambda
@@ -47,12 +69,10 @@ picasso.logit <- function(X,
   method.flag = method.info$flag
   gamma = method.info$gamma
   
-  dfmax.int <- if (is.null(dfmax)) as.integer(-1) else as.integer(dfmax)
-  offset.vec <- if (is.null(offset)) rep(0.0, n) else as.double(offset)
-
+  dfmax.int <- if (is.null(dfmax)) -1L else dfmax
   out = logit_solver(yy, xx, lambda, nlambda, gamma,
               n, d, max.ite, prec, intercept, verbose,
-              method.flag, dfmax.int, offset.vec)
+              method.flag, dfmax.int, offset.vec, lla.max.stages)
   
   # truncate to actual number of lambdas fit (early stopping)
   num.fit = out$num.fit
@@ -68,19 +88,31 @@ picasso.logit <- function(X,
 
   runt = Sys.time()-begt
   est$beta = Matrix(scaled$beta)
-  est$intercept = scaled$intercept
+  est$intercept = if (intercept) scaled$intercept else
+    rep(0.0, length(scaled$intercept))
   est$lambda = lambda
   est$nlambda = nlambda
   est$df = df
   est$method = method
   est$alg = "actnewton"
- 
+  est$runt = out$runt
   est$ite =out$ite
+  est$lla.max.stages = out$lla.max.stages
+  est$status = out$status
+  est$status.code = out$status.code
+  est$failure = out$failure
+  est$diagnostics = out$diagnostics
   est$verbose = verbose
   est$runtime = runt
+  est$fast.mode = fast.mode
+  est$prec = prec
+  est$offset.used = !is.null(offset)
+  est$levels = levels(Y)
 
-  est$nulldev <- .picasso_null_deviance(Yb, "binomial")
-  fit_dev <- .picasso_fit_deviance(Yb, X, as.matrix(est$beta), est$intercept, "binomial")
+  est$nulldev <- .picasso_null_deviance(
+    Yb, "binomial", offset = offset.vec, intercept = intercept
+  )
+  fit_dev <- out$smooth.objective
   est$dev.ratio <- pmax(0, pmin(1, 1 - fit_dev / est$nulldev))
 
   class(est) = "logit"
@@ -97,33 +129,36 @@ plot.logit <- function(x, ...)
   .picasso_plot_path(x)
 }
 
-coef.logit <- function(object, lambda.idx = c(1:3), beta.idx = c(1:3), ...)
+coef.logit <- function(object, lambda.idx = NULL, beta.idx = NULL, ...)
 {
   .picasso_extract_coef(object, lambda.idx, beta.idx)
 }
 
-predict.logit <- function(object, newdata, lambda.idx = c(1:3), p.pred.idx = c(1:5),
-                          type = "response", s = NULL, ...)
+predict.logit <- function(object, newdata, lambda.idx = NULL, p.pred.idx = NULL,
+                          type = "response", s = NULL, newoffset = NULL, ...)
 {
+  type <- .picasso_validate_choice(
+    type, c("response", "link", "class", "nonzero"), "type"
+  )
   if (type == "class") {
-    probs <- .picasso_predict(
+    link <- .picasso_predict(
       object, newdata, lambda.idx, p.pred.idx,
-      default_response_idx = c(1:5),
-      transform = function(z) exp(z) / (1 + exp(z)),
-      type = "response",
-      s = s
+      transform = identity,
+      type = "link",
+      s = s,
+      newoffset = newoffset
     )
-    return(matrix(as.integer(probs > 0.5), nrow = nrow(probs),
-                  dimnames = list(NULL, colnames(probs))))
+    return(matrix(as.integer(link > 0), nrow = nrow(link),
+                  dimnames = list(NULL, colnames(link))))
   }
   .picasso_predict(
     object,
     newdata,
     lambda.idx,
     p.pred.idx,
-    default_response_idx = c(1:5),
-    transform = function(z) exp(z) / (1 + exp(z)),
+    transform = stats::plogis,
     type = type,
-    s = s
+    s = s,
+    newoffset = newoffset
   )
 }

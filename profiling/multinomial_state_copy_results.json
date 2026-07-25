@@ -1,0 +1,261 @@
+{
+  "comparison": {
+    "checksum_equal": true,
+    "peak_rss_delta_reduction_bytes": 10485760,
+    "runtime_speedup_baseline_over_candidate": 1.414179252167616
+  },
+  "config": {
+    "classes": 4,
+    "d": 100000,
+    "gamma": 3.0,
+    "lambda_end_multiplier": 1.05,
+    "lambda_multiplier": 1.5,
+    "max_iterations": 1000,
+    "max_stages": 3,
+    "n": 8,
+    "nlambda": 30,
+    "penalty": 2,
+    "precision": 0.0001,
+    "repeats": 7,
+    "seed": 20260719
+  },
+  "environment": {
+    "cpu": "arm",
+    "machine": "arm64",
+    "numpy": "2.4.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3 (main, Feb  3 2026, 15:32:20) [Clang 17.0.0 (clang-1700.6.3.2)]",
+    "thread_controls": {
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "libraries": {
+    "baseline": {
+      "path": "/private/tmp/picasso-multinomial-state-copy-before-20260719/libpicasso-before.dylib",
+      "sha256": "ff2ed89678a841fee9a0d6321beb65abf91e496f9e545c8459bc9043fdfaf515"
+    },
+    "candidate": {
+      "path": "/private/tmp/picasso-multinomial-state-copy-after-validated-20260719/libpicasso.dylib",
+      "sha256": "a910807411ec4724cef43bbc1f930163cc800d400a871e7d799e26a0b8e2e5b8"
+    }
+  },
+  "script_sha256": "498af533fadbacfa1b5cdc89668f8905ee5a4d009f5894518a1420121cff97ab",
+  "summaries": {
+    "baseline": {
+      "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+      "checksum_stable": true,
+      "control_signature": [
+        0,
+        30,
+        -1,
+        -1
+      ],
+      "control_signature_stable": true,
+      "median_elapsed_seconds": 0.9589016250101849,
+      "median_peak_rss_delta_bytes": 47431680,
+      "runs": [
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.9585310420370661,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-before-20260719/libpicasso-before.dylib",
+          "library_sha256": "ff2ed89678a841fee9a0d6321beb65abf91e496f9e545c8459bc9043fdfaf515",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 47398912,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.9589016250101849,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-before-20260719/libpicasso-before.dylib",
+          "library_sha256": "ff2ed89678a841fee9a0d6321beb65abf91e496f9e545c8459bc9043fdfaf515",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 47398912,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.9541979169589467,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-before-20260719/libpicasso-before.dylib",
+          "library_sha256": "ff2ed89678a841fee9a0d6321beb65abf91e496f9e545c8459bc9043fdfaf515",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 47382528,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.9611795829841867,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-before-20260719/libpicasso-before.dylib",
+          "library_sha256": "ff2ed89678a841fee9a0d6321beb65abf91e496f9e545c8459bc9043fdfaf515",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 47448064,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.9553744999575429,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-before-20260719/libpicasso-before.dylib",
+          "library_sha256": "ff2ed89678a841fee9a0d6321beb65abf91e496f9e545c8459bc9043fdfaf515",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 47448064,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.9638838749960996,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-before-20260719/libpicasso-before.dylib",
+          "library_sha256": "ff2ed89678a841fee9a0d6321beb65abf91e496f9e545c8459bc9043fdfaf515",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 47513600,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.9673632089979947,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-before-20260719/libpicasso-before.dylib",
+          "library_sha256": "ff2ed89678a841fee9a0d6321beb65abf91e496f9e545c8459bc9043fdfaf515",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 47431680,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        }
+      ]
+    },
+    "candidate": {
+      "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+      "checksum_stable": true,
+      "control_signature": [
+        0,
+        30,
+        -1,
+        -1
+      ],
+      "control_signature_stable": true,
+      "median_elapsed_seconds": 0.6780622919904999,
+      "median_peak_rss_delta_bytes": 36945920,
+      "runs": [
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.6786147090024315,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-after-validated-20260719/libpicasso.dylib",
+          "library_sha256": "a910807411ec4724cef43bbc1f930163cc800d400a871e7d799e26a0b8e2e5b8",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 37158912,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.6912047910154797,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-after-validated-20260719/libpicasso.dylib",
+          "library_sha256": "a910807411ec4724cef43bbc1f930163cc800d400a871e7d799e26a0b8e2e5b8",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 37896192,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.6780622919904999,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-after-validated-20260719/libpicasso.dylib",
+          "library_sha256": "a910807411ec4724cef43bbc1f930163cc800d400a871e7d799e26a0b8e2e5b8",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 36929536,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.6720567499869503,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-after-validated-20260719/libpicasso.dylib",
+          "library_sha256": "a910807411ec4724cef43bbc1f930163cc800d400a871e7d799e26a0b8e2e5b8",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 36945920,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.6744291670038365,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-after-validated-20260719/libpicasso.dylib",
+          "library_sha256": "a910807411ec4724cef43bbc1f930163cc800d400a871e7d799e26a0b8e2e5b8",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 36929536,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.6745258750161156,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-after-validated-20260719/libpicasso.dylib",
+          "library_sha256": "a910807411ec4724cef43bbc1f930163cc800d400a871e7d799e26a0b8e2e5b8",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 36929536,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        },
+        {
+          "checksum": "ce53d16b39bcb09167ce1ad835904164e28b64629f3c8aef5db51e937d730ff2",
+          "elapsed_seconds": 0.6792504580225796,
+          "failed_lambda": -1,
+          "failed_stage": -1,
+          "library": "/private/tmp/picasso-multinomial-state-copy-after-validated-20260719/libpicasso.dylib",
+          "library_sha256": "a910807411ec4724cef43bbc1f930163cc800d400a871e7d799e26a0b8e2e5b8",
+          "num_fit": 30,
+          "peak_rss_delta_bytes": 36945920,
+          "status": 0,
+          "total_coordinate_updates": 0,
+          "total_inner_sweeps": 0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "config": {
+    "classes": 4,
+    "d": 30000,
+    "n": 24,
+    "nlambda": 80,
+    "repeats": 5,
+    "seed": 20260719
+  },
+  "native_library": "/private/tmp/picasso-refactor-build-phase1/libpicasso.dylib",
+  "native_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+  "source_files": {
+    "baseline": {
+      "python-package/pycasso/VERSION": {
+        "path": "/private/tmp/picasso-refactor-phase1-validated-20260719/python-package/pycasso/VERSION",
+        "sha256": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8"
+      },
+      "python-package/pycasso/__init__.py": {
+        "path": "/private/tmp/picasso-refactor-phase1-validated-20260719/python-package/pycasso/__init__.py",
+        "sha256": "71028f8ca5b614d3eec5fc60b978ad92bd103b6bed4fd65424b70af7241fab0f"
+      },
+      "python-package/pycasso/core.py": {
+        "path": "/private/tmp/picasso-refactor-phase1-validated-20260719/python-package/pycasso/core.py",
+        "sha256": "c9ad35ef8bae21563ea2bb99f34f3fec8a4277383fd41500d116e84daf4ceeec"
+      },
+      "python-package/pycasso/libpath.py": {
+        "path": "/private/tmp/picasso-refactor-phase1-validated-20260719/python-package/pycasso/libpath.py",
+        "sha256": "f7bdf9b03f8ec6a5f1d8e3bf92ea030d09cd595533c4e0d4bbee02eba9e43526"
+      }
+    },
+    "candidate": {
+      "python-package/pycasso/VERSION": {
+        "path": "/Users/tourzhao/Desktop/picasso-master/python-package/pycasso/VERSION",
+        "sha256": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8"
+      },
+      "python-package/pycasso/__init__.py": {
+        "path": "/Users/tourzhao/Desktop/picasso-master/python-package/pycasso/__init__.py",
+        "sha256": "71028f8ca5b614d3eec5fc60b978ad92bd103b6bed4fd65424b70af7241fab0f"
+      },
+      "python-package/pycasso/core.py": {
+        "path": "/Users/tourzhao/Desktop/picasso-master/python-package/pycasso/core.py",
+        "sha256": "b148641ac728eebbec67ae19ad7b4ebf7e4f9f9fc86e8118a67473c8e29b6637"
+      },
+      "python-package/pycasso/libpath.py": {
+        "path": "/Users/tourzhao/Desktop/picasso-master/python-package/pycasso/libpath.py",
+        "sha256": "76a0785cc3c96cd436a89aa4dd5564d655f290790e5b164680ee92eff71b7599"
+      }
+    }
+  },
+  "sources": {
+    "baseline": "/private/tmp/picasso-refactor-phase1-validated-20260719",
+    "candidate": "/Users/tourzhao/Desktop/picasso-master"
+  },
+  "summaries": {
+    "baseline": {
+      "normal": {
+        "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+        "median_elapsed_seconds": 0.12730462499894202,
+        "median_peak_rss_bytes": 148242432,
+        "runs": [
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12730462499894202,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148242432,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12881179101532325,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148275200,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12588816601783037,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148045824,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12776216596830636,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148193280,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.1260002080234699,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148275200,
+            "status_code": 0
+          }
+        ]
+      },
+      "touch": {
+        "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+        "median_elapsed_seconds": 0.13752350001595914,
+        "median_peak_rss_bytes": 225067008,
+        "runs": [
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.14377620798768476,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 225165312,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.13752350001595914,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 225034240,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.13520091702230275,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 224854016,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.14607541699660942,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 225132544,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.13357529195491225,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/baseline/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 225067008,
+            "status_code": 0
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "normal": {
+        "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+        "median_elapsed_seconds": 0.12399883300531656,
+        "median_peak_rss_bytes": 148160512,
+        "runs": [
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.1256314580095932,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148226048,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12378254102077335,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148078592,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12399883300531656,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148160512,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12511029199231416,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 147881984,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12331891700159758,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "normal",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148242432,
+            "status_code": 0
+          }
+        ]
+      },
+      "touch": {
+        "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+        "median_elapsed_seconds": 0.12652795802569017,
+        "median_peak_rss_bytes": 148258816,
+        "runs": [
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12381345801986754,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148226048,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12822141696233302,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148258816,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12652795802569017,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 148783104,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.13093449996085837,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 149749760,
+            "status_code": 0
+          },
+          {
+            "checksum": "b92542211bf3e377bda080b325f7db0e92107e8b159aa5562dbf6a02464a8db9",
+            "elapsed_seconds": 0.12401362502714619,
+            "loaded_library": "/private/var/folders/kb/k9lb6knx465453shxdrzrwr00000gq/T/picasso-buffer-benchmark-hmw43zf3/candidate/python-package/pycasso/lib/libpicasso.so",
+            "loaded_library_sha256": "0a084616f75b0994a6fbe2a64782703b23e8ff06e74924b563d06b89a374edca",
+            "mode": "touch",
+            "nlambda": 80,
+            "output_bytes": 76808004,
+            "peak_rss_bytes": 147980288,
+            "status_code": 0
+          }
+        ]
+      }
+    }
+  }
+}

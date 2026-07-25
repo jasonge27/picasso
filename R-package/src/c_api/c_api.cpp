@@ -5,9 +5,15 @@
 #include <picasso/solver_params.hpp>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <vector>
 
 namespace {
+picasso::detail::DesignStorage c_api_design_storage(bool use_python) {
+  return use_python ? picasso::detail::DesignStorage::kOwned
+                    : picasso::detail::DesignStorage::kBorrowedColumnMajor;
+}
+
 void zero_solver_outputs(int d, int nlambda, double *beta, double *intcpt,
                          int *ite_lamb, int *size_act, double *runt) {
   const int safe_d = (d > 0) ? d : 0;
@@ -24,8 +30,76 @@ void zero_solver_outputs(int d, int nlambda, double *beta, double *intcpt,
   if (runt != nullptr) std::fill_n(runt, safe_nlambda, 0.0);
 }
 
+bool safe_solver_output_dimensions(int d, int nlambda) {
+  return d > 0 && nlambda > 0 &&
+         d <= std::numeric_limits<int>::max() / nlambda;
+}
+
+void initialize_smooth_objective_path(int nlambda,
+                                      double *smooth_objective) {
+  if (smooth_objective == nullptr || nlambda <= 0) return;
+  std::fill_n(smooth_objective, nlambda,
+              std::numeric_limits<double>::quiet_NaN());
+}
+
 bool invalid_problem_inputs(double *Y, double *X, int n, int d) {
   return Y == nullptr || X == nullptr || n <= 0 || d <= 0;
+}
+
+bool invalid_lambda_path(const double *lambda, int nlambda) {
+  if (lambda == nullptr || nlambda <= 0) return true;
+  for (int index = 0; index < nlambda; ++index) {
+    if (!(lambda[index] >= 0.0) || !std::isfinite(lambda[index]))
+      return true;
+    if (index > 0 && !(lambda[index] < lambda[index - 1]))
+      return true;
+  }
+  return false;
+}
+
+bool invalid_offset_inputs(const double *offset, int n) {
+  if (offset == nullptr) return false;
+  for (int index = 0; index < n; ++index) {
+    if (!std::isfinite(offset[index])) return true;
+  }
+  return false;
+}
+
+void initialize_lla_diagnostics(int nlambda, int *failed_lambda,
+                                int *failed_stage, int *lla_stages,
+                                double *objective, double *kkt,
+                                double *stationarity,
+                                double *smooth_objective) {
+  if (failed_lambda != nullptr) *failed_lambda = -1;
+  if (failed_stage != nullptr) *failed_stage = -1;
+  if (nlambda <= 0) return;
+
+  if (lla_stages != nullptr) std::fill_n(lla_stages, nlambda, 0);
+  const double missing = std::numeric_limits<double>::quiet_NaN();
+  if (objective != nullptr) std::fill_n(objective, nlambda, missing);
+  if (kkt != nullptr) std::fill_n(kkt, nlambda, missing);
+  if (stationarity != nullptr)
+    std::fill_n(stationarity, nlambda, missing);
+  if (smooth_objective != nullptr)
+    std::fill_n(smooth_objective, nlambda, missing);
+}
+
+bool invalid_lla_inputs(double *Y, double *X, double *lambda, int n, int d,
+                        int nlambda, double gamma, int max_iter,
+                        double precision, int reg_type, int dfmax,
+                        int lla_max_stages) {
+  if (invalid_problem_inputs(Y, X, n, d) ||
+      invalid_lambda_path(lambda, nlambda) ||
+      max_iter <= 0 || !(precision > 0.0) ||
+      !std::isfinite(precision) || reg_type < 1 || reg_type > 3 ||
+      dfmax < -1 || lla_max_stages < 3 ||
+      d > std::numeric_limits<int>::max() / n ||
+      d > std::numeric_limits<int>::max() / nlambda)
+    return true;
+  if ((reg_type == 2 && (!(gamma > 1.0) || !std::isfinite(gamma))) ||
+      (reg_type == 3 && (!(gamma > 2.0) || !std::isfinite(gamma))))
+    return true;
+  return false;
 }
 
 picasso::solver::PicassoSolverParams make_params(
@@ -49,28 +123,217 @@ picasso::solver::PicassoSolverParams make_params(
   return param;
 }
 
-template <typename SolverType>
-void extract_results(SolverType &solver, int d, int nlambda, double *beta,
-                     double *intcpt, int *ite_lamb, int *size_act,
-                     double *runt, int *num_fit) {
-  int actual_fit = solver.get_num_lambdas_fit();
-  if (num_fit != nullptr) *num_fit = actual_fit;
+bool invalid_gaussian_inputs(double *Y, double *X, double *lambda, int n,
+                             int d, int nlambda, double gamma, int max_iter,
+                             double precision, int reg_type, int dfmax) {
+  if (invalid_problem_inputs(Y, X, n, d)) return true;
+  if (!safe_solver_output_dimensions(d, nlambda) ||
+      d > std::numeric_limits<int>::max() / n || max_iter <= 0 ||
+      !(precision > 0.0) || !std::isfinite(precision) || reg_type < 1 ||
+      reg_type > 3 || dfmax < -1)
+    return true;
+  if ((reg_type == 2 && (!(gamma > 1.0) || !std::isfinite(gamma))) ||
+      (reg_type == 3 && (!(gamma > 2.0) || !std::isfinite(gamma))))
+    return true;
+  return invalid_lambda_path(lambda, nlambda);
+}
 
-  const auto &itercnt_path = solver.get_itercnt_path();
-  const auto &runtime_path = solver.get_runtime_path();
-  for (int i = 0; i < actual_fit; i++) {
-    const picasso::ModelParam &model_param = solver.get_model_param(i);
-    ite_lamb[i] = itercnt_path[i];
-    size_act[i] = 0;
-    for (int j = 0; j < d; j++) {
-      beta[i * d + j] = model_param.beta[j];
-      if (fabs(beta[i * d + j]) > 1e-8) size_act[i]++;
-    }
-    intcpt[i] = model_param.intercept;
-    runt[i] = runtime_path[i];
+void initialize_gaussian_outputs(int d, int nlambda, double *beta,
+                                 double *intcpt, int *ite_lamb,
+                                 int *size_act, double *runt, int *num_fit,
+                                 double *smooth_objective) {
+  if (num_fit != nullptr) *num_fit = 0;
+  if (!safe_solver_output_dimensions(d, nlambda)) return;
+  zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
+  initialize_smooth_objective_path(nlambda, smooth_objective);
+}
+
+int actgd_status_to_c(picasso::solver::ActGDPathStatus status) {
+  using picasso::solver::ActGDPathStatus;
+  switch (status) {
+    case ActGDPathStatus::kCompleted:
+      return PICASSO_LLA_COMPLETED;
+    case ActGDPathStatus::kDfmaxReached:
+      return PICASSO_LLA_DFMAX_REACHED;
+    case ActGDPathStatus::kIterationLimit:
+      return PICASSO_LLA_INNER_ITERATION_LIMIT;
+    case ActGDPathStatus::kInterrupted:
+      return PICASSO_LLA_INTERRUPTED;
+  }
+  return PICASSO_LLA_NUMERICAL_FAILURE;
+}
+
+template <typename ObjectiveType>
+int solve_gaussian_c_api(
+    double *Y, double *X, int n, int d, double *lambda, int nlambda,
+    double gamma, int max_iter, double precision, int reg_type,
+    bool intercept, int dfmax, double *beta, double *intcpt, int *ite_lamb,
+    int *size_act, double *runt, int *num_fit, bool use_python,
+    double *smooth_objective, int *failed_lambda) {
+  if (num_fit != nullptr) *num_fit = 0;
+  if (failed_lambda != nullptr) *failed_lambda = -1;
+  // Preserve the V2 contract even when d is invalid: this path has length
+  // nlambda and does not depend on the coefficient-output dimensions.
+  initialize_smooth_objective_path(nlambda, smooth_objective);
+  const bool safe_outputs = safe_solver_output_dimensions(d, nlambda);
+  if (invalid_gaussian_inputs(Y, X, lambda, n, d, nlambda, gamma, max_iter,
+                              precision, reg_type, dfmax)) {
+    if (safe_outputs)
+      zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
+    return PICASSO_LLA_INVALID_INPUT;
+  }
+
+  try {
+    ObjectiveType objective(X, Y, n, d, intercept, use_python,
+                            c_api_design_storage(use_python));
+    const auto params = make_params(lambda, nlambda, gamma, max_iter,
+                                    precision, reg_type, intercept, dfmax);
+    picasso::solver::ActGDSolver solver(&objective, params);
+    const int actual_fit = solver.solve_to_buffers(
+        beta, intcpt, ite_lamb, size_act, runt, smooth_objective);
+    if (num_fit != nullptr) *num_fit = actual_fit;
+    if (failed_lambda != nullptr)
+      *failed_lambda = solver.get_failed_lambda();
+    return actgd_status_to_c(solver.get_status());
+  } catch (...) {
+    // These legacy void APIs cannot return an error code. Preserve their ABI
+    // while making failure explicit through an empty, initialized path.
+    initialize_gaussian_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act,
+                                runt, num_fit, smooth_objective);
+    if (failed_lambda != nullptr) *failed_lambda = 0;
+    return PICASSO_LLA_EXCEPTION;
   }
 }
+
+int actnewton_status_to_c(picasso::solver::ActNewtonLlaStatus status) {
+  using picasso::solver::ActNewtonLlaStatus;
+  switch (status) {
+    case ActNewtonLlaStatus::kCompleted:
+      return PICASSO_LLA_COMPLETED;
+    case ActNewtonLlaStatus::kStationarityLimit:
+      return PICASSO_LLA_STATIONARITY_LIMIT;
+    case ActNewtonLlaStatus::kSubproblemFailed:
+      return PICASSO_LLA_SUBPROBLEM_FAILED;
+    case ActNewtonLlaStatus::kMajorizationFailed:
+      return PICASSO_LLA_MAJORIZATION_FAILED;
+    case ActNewtonLlaStatus::kNumericalFailure:
+      return PICASSO_LLA_NUMERICAL_FAILURE;
+    case ActNewtonLlaStatus::kInterrupted:
+      return PICASSO_LLA_INTERRUPTED;
+    case ActNewtonLlaStatus::kNotRun:
+      return PICASSO_LLA_NUMERICAL_FAILURE;
+  }
+  return PICASSO_LLA_NUMERICAL_FAILURE;
+}
+
+template <typename Value>
+void copy_diagnostic_path(const std::vector<Value> &source, int nlambda,
+                          Value *destination) {
+  if (destination == nullptr || nlambda <= 0) return;
+  const int count =
+      std::min(nlambda, static_cast<int>(source.size()));
+  std::copy_n(source.begin(), count, destination);
+}
+
+void copy_actnewton_diagnostics(
+    const picasso::solver::ActNewtonSolver &solver, int nlambda,
+    int *lla_stages, double *objective, double *kkt,
+    double *stationarity, double *smooth_objective) {
+  copy_diagnostic_path(solver.get_lla_stages_path(), nlambda, lla_stages);
+  copy_diagnostic_path(solver.get_objective_path(), nlambda, objective);
+  copy_diagnostic_path(solver.get_kkt_path(), nlambda, kkt);
+  copy_diagnostic_path(solver.get_stationarity_path(), nlambda,
+                       stationarity);
+  copy_diagnostic_path(solver.get_smooth_objective_path(), nlambda,
+                       smooth_objective);
+}
+
+int run_actnewton_v2(
+    picasso::ObjFunction *obj, double *lambda, int nlambda,
+    double gamma, int max_ite, double prec, int reg_type, bool intercept,
+    int dfmax, int lla_max_stages, double *beta, double *intcpt,
+    int *ite_lamb, int *size_act, double *runt, int *num_fit,
+    int *failed_lambda, int *failed_stage, int *lla_stages,
+    double *objective, double *kkt, double *stationarity,
+    double *smooth_objective) {
+  auto param = make_params(lambda, nlambda, gamma, max_ite, prec, reg_type,
+                           intercept, dfmax, lla_max_stages);
+  picasso::solver::ActNewtonSolver solver(obj, param);
+  bool caught_exception = false;
+  int actual_fit = 0;
+  int last_nonzero_count = 0;
+  try {
+    (void)solver.solve_preinitialized_to_buffers(
+        beta, intcpt, ite_lamb, size_act, runt, smooth_objective,
+        &actual_fit, &last_nonzero_count);
+  } catch (...) {
+    caught_exception = true;
+  }
+
+  if (num_fit != nullptr) *num_fit = actual_fit;
+  copy_actnewton_diagnostics(solver, nlambda, lla_stages, objective, kkt,
+                             stationarity, smooth_objective);
+
+  if (caught_exception) {
+    if (failed_lambda != nullptr)
+      *failed_lambda = (actual_fit < nlambda) ? actual_fit : -1;
+    if (failed_stage != nullptr) *failed_stage = solver.get_failed_stage();
+    return PICASSO_LLA_EXCEPTION;
+  }
+
+  const int status = actnewton_status_to_c(solver.get_lla_path_status());
+  if (status == PICASSO_LLA_SUBPROBLEM_FAILED ||
+      status == PICASSO_LLA_NUMERICAL_FAILURE ||
+      status == PICASSO_LLA_MAJORIZATION_FAILED) {
+    if (failed_lambda != nullptr) {
+      const int core_failed_lambda = solver.get_failed_lambda();
+      *failed_lambda = core_failed_lambda >= 0 ? core_failed_lambda
+                                               : actual_fit;
+    }
+    if (failed_stage != nullptr) *failed_stage = solver.get_failed_stage();
+  }
+
+  if (status == PICASSO_LLA_COMPLETED && actual_fit < nlambda &&
+      dfmax >= 0 && last_nonzero_count > dfmax)
+    return PICASSO_LLA_DFMAX_REACHED;
+  return status;
+}
 }  // namespace
+
+extern "C" void PicassoSetInterruptCallback(int (*callback)(void)) {
+  picasso::solver::set_interrupt_callback(callback);
+}
+
+extern "C" const char *PicassoLlaPathStatusString(int status) {
+  switch (status) {
+    case PICASSO_LLA_COMPLETED:
+      return "completed";
+    case PICASSO_LLA_DFMAX_REACHED:
+      return "dfmax_reached";
+    case PICASSO_LLA_INVALID_INPUT:
+      return "invalid_input";
+    case PICASSO_LLA_SUBPROBLEM_FAILED:
+      return "subproblem_failed";
+    case PICASSO_LLA_INNER_ITERATION_LIMIT:
+      return "inner_iteration_limit";
+    case PICASSO_LLA_LINE_SEARCH_FAILED:
+      return "line_search_failed";
+    case PICASSO_LLA_NO_DESCENT_DIRECTION:
+      return "no_descent_direction";
+    case PICASSO_LLA_NUMERICAL_FAILURE:
+      return "numerical_failure";
+    case PICASSO_LLA_MAJORIZATION_FAILED:
+      return "lla_majorization_failed";
+    case PICASSO_LLA_EXCEPTION:
+      return "exception";
+    case PICASSO_LLA_STATIONARITY_LIMIT:
+      return "lla_stationarity_limit";
+    case PICASSO_LLA_INTERRUPTED:
+      return "interrupted";
+    default:
+      return "unknown";
+  }
+}
 
 extern "C" void SolveLogisticRegression(
     double *Y, double *X, int n, int d, double *lambda, int nlambda,
@@ -78,20 +341,11 @@ extern "C" void SolveLogisticRegression(
     int dfmax, double *offset,
     double *beta, double *intcpt, int *ite_lamb, int *size_act, double *runt,
     int *num_fit, bool usePython) {
-  if (invalid_problem_inputs(Y, X, n, d)) {
-    zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
-    if (num_fit != nullptr) *num_fit = 0;
-    return;
-  }
-
-  picasso::LogisticObjective obj(X, Y, n, d, intercept, usePython);
-  if (offset != nullptr) obj.set_offset(offset, n);
-  auto param = make_params(lambda, nlambda, gamma, max_ite, pprec, reg_type,
-                           intercept, dfmax);
-  picasso::solver::ActNewtonSolver solver(&obj, param);
-  solver.solve();
-  extract_results(solver, d, nlambda, beta, intcpt, ite_lamb, size_act, runt,
-                  num_fit);
+  (void)SolveLogisticRegressionV2(
+      Y, X, n, d, lambda, nlambda, gamma, max_ite, pprec, reg_type,
+      intercept, dfmax, offset, beta, intcpt, ite_lamb, size_act, runt,
+      num_fit, usePython, 3, nullptr, nullptr, nullptr, nullptr, nullptr,
+      nullptr);
 }
 
 extern "C" void SolvePoissonRegression(
@@ -100,20 +354,11 @@ extern "C" void SolvePoissonRegression(
     int dfmax, double *offset,
     double *beta, double *intcpt, int *ite_lamb, int *size_act, double *runt,
     int *num_fit, bool usePython) {
-  if (invalid_problem_inputs(Y, X, nn, dd)) {
-    zero_solver_outputs(dd, nnlambda, beta, intcpt, ite_lamb, size_act, runt);
-    if (num_fit != nullptr) *num_fit = 0;
-    return;
-  }
-
-  picasso::PoissonObjective obj(X, Y, nn, dd, intercept, usePython);
-  if (offset != nullptr) obj.set_offset(offset, nn);
-  auto param = make_params(lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
-                           intercept, dfmax);
-  picasso::solver::ActNewtonSolver solver(&obj, param);
-  solver.solve();
-  extract_results(solver, dd, nnlambda, beta, intcpt, ite_lamb, size_act,
-                  runt, num_fit);
+  (void)SolvePoissonRegressionV2(
+      Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
+      intercept, dfmax, offset, beta, intcpt, ite_lamb, size_act, runt,
+      num_fit, usePython, 3, nullptr, nullptr, nullptr, nullptr, nullptr,
+      nullptr);
 }
 
 extern "C" void SolveSqrtLinearRegression(
@@ -122,19 +367,208 @@ extern "C" void SolveSqrtLinearRegression(
     int dfmax,
     double *beta, double *intcpt, int *ite_lamb, int *size_act, double *runt,
     int *num_fit, bool usePython) {
-  if (invalid_problem_inputs(Y, X, nn, dd)) {
-    zero_solver_outputs(dd, nnlambda, beta, intcpt, ite_lamb, size_act, runt);
-    if (num_fit != nullptr) *num_fit = 0;
-    return;
-  }
+  (void)SolveSqrtLinearRegressionV2(
+      Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
+      intercept, dfmax, beta, intcpt, ite_lamb, size_act, runt, num_fit,
+      usePython, 3, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+}
 
-  picasso::SqrtMSEObjective obj(X, Y, nn, dd, intercept, usePython);
-  auto param = make_params(lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
-                           intercept, dfmax);
-  picasso::solver::ActNewtonSolver solver(&obj, param);
-  solver.solve();
-  extract_results(solver, dd, nnlambda, beta, intcpt, ite_lamb, size_act,
-                  runt, num_fit);
+extern "C" int SolveLogisticRegressionV2(
+    double *Y, double *X, int n, int d, double *lambda, int nlambda,
+    double gamma, int max_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *offset, double *beta, double *intcpt, int *ite_lamb,
+    int *size_act, double *runt, int *num_fit, bool usePython,
+    int lla_max_stages, int *failed_lambda, int *failed_stage,
+    int *lla_stages, double *objective, double *kkt, double *stationarity) {
+  if (num_fit != nullptr) *num_fit = 0;
+  initialize_lla_diagnostics(nlambda, failed_lambda, failed_stage, lla_stages,
+                             objective, kkt, stationarity, nullptr);
+  if (safe_solver_output_dimensions(d, nlambda))
+    zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
+  if (invalid_lla_inputs(Y, X, lambda, n, d, nlambda, gamma, max_ite,
+                         pprec, reg_type, dfmax, lla_max_stages) ||
+      invalid_offset_inputs(offset, n))
+    return PICASSO_LLA_INVALID_INPUT;
+
+  try {
+    picasso::LogisticObjective obj(
+        X, Y, n, d, intercept, usePython, c_api_design_storage(usePython));
+    if (offset != nullptr && !obj.set_offset(offset, n))
+      return PICASSO_LLA_INVALID_INPUT;
+    return run_actnewton_v2(
+        &obj, lambda, nlambda, gamma, max_ite, pprec, reg_type, intercept,
+        dfmax, lla_max_stages, beta, intcpt, ite_lamb, size_act, runt,
+        num_fit, failed_lambda, failed_stage, lla_stages, objective, kkt,
+        stationarity, nullptr);
+  } catch (...) {
+    if (failed_lambda != nullptr) *failed_lambda = 0;
+    return PICASSO_LLA_EXCEPTION;
+  }
+}
+
+extern "C" int SolvePoissonRegressionV2(
+    double *Y, double *X, int n, int d, double *lambda, int nlambda,
+    double gamma, int max_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *offset, double *beta, double *intcpt, int *ite_lamb,
+    int *size_act, double *runt, int *num_fit, bool usePython,
+    int lla_max_stages, int *failed_lambda, int *failed_stage,
+    int *lla_stages, double *objective, double *kkt, double *stationarity) {
+  if (num_fit != nullptr) *num_fit = 0;
+  initialize_lla_diagnostics(nlambda, failed_lambda, failed_stage, lla_stages,
+                             objective, kkt, stationarity, nullptr);
+  if (safe_solver_output_dimensions(d, nlambda))
+    zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
+  if (invalid_lla_inputs(Y, X, lambda, n, d, nlambda, gamma, max_ite,
+                         pprec, reg_type, dfmax, lla_max_stages) ||
+      invalid_offset_inputs(offset, n))
+    return PICASSO_LLA_INVALID_INPUT;
+
+  try {
+    picasso::PoissonObjective obj(
+        X, Y, n, d, intercept, usePython, c_api_design_storage(usePython));
+    if (offset != nullptr && !obj.set_offset(offset, n))
+      return PICASSO_LLA_INVALID_INPUT;
+    return run_actnewton_v2(
+        &obj, lambda, nlambda, gamma, max_ite, pprec, reg_type, intercept,
+        dfmax, lla_max_stages, beta, intcpt, ite_lamb, size_act, runt,
+        num_fit, failed_lambda, failed_stage, lla_stages, objective, kkt,
+        stationarity, nullptr);
+  } catch (...) {
+    if (failed_lambda != nullptr) *failed_lambda = 0;
+    return PICASSO_LLA_EXCEPTION;
+  }
+}
+
+extern "C" int SolveSqrtLinearRegressionV2(
+    double *Y, double *X, int n, int d, double *lambda, int nlambda,
+    double gamma, int max_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *beta, double *intcpt, int *ite_lamb, int *size_act,
+    double *runt, int *num_fit, bool usePython, int lla_max_stages,
+    int *failed_lambda, int *failed_stage, int *lla_stages,
+    double *objective, double *kkt, double *stationarity) {
+  if (num_fit != nullptr) *num_fit = 0;
+  initialize_lla_diagnostics(nlambda, failed_lambda, failed_stage, lla_stages,
+                             objective, kkt, stationarity, nullptr);
+  if (safe_solver_output_dimensions(d, nlambda))
+    zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
+  if (invalid_lla_inputs(Y, X, lambda, n, d, nlambda, gamma, max_ite,
+                         pprec, reg_type, dfmax, lla_max_stages))
+    return PICASSO_LLA_INVALID_INPUT;
+
+  try {
+    picasso::SqrtMSEObjective obj(
+        X, Y, n, d, intercept, usePython, c_api_design_storage(usePython));
+    return run_actnewton_v2(
+        &obj, lambda, nlambda, gamma, max_ite, pprec, reg_type, intercept,
+        dfmax, lla_max_stages, beta, intcpt, ite_lamb, size_act, runt,
+        num_fit, failed_lambda, failed_stage, lla_stages, objective, kkt,
+        stationarity, nullptr);
+  } catch (...) {
+    if (failed_lambda != nullptr) *failed_lambda = 0;
+    return PICASSO_LLA_EXCEPTION;
+  }
+}
+
+extern "C" int SolveLogisticRegressionV3(
+    double *Y, double *X, int n, int d, double *lambda, int nlambda,
+    double gamma, int max_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *offset, double *beta, double *intcpt, int *ite_lamb,
+    int *size_act, double *runt, int *num_fit, bool usePython,
+    int lla_max_stages, int *failed_lambda, int *failed_stage,
+    int *lla_stages, double *objective, double *kkt, double *stationarity,
+    double *smooth_objective) {
+  if (num_fit != nullptr) *num_fit = 0;
+  initialize_lla_diagnostics(nlambda, failed_lambda, failed_stage, lla_stages,
+                             objective, kkt, stationarity,
+                             smooth_objective);
+  if (safe_solver_output_dimensions(d, nlambda))
+    zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
+  if (invalid_lla_inputs(Y, X, lambda, n, d, nlambda, gamma, max_ite,
+                         pprec, reg_type, dfmax, lla_max_stages) ||
+      invalid_offset_inputs(offset, n))
+    return PICASSO_LLA_INVALID_INPUT;
+
+  try {
+    picasso::LogisticObjective obj(
+        X, Y, n, d, intercept, usePython, c_api_design_storage(usePython));
+    if (offset != nullptr && !obj.set_offset(offset, n))
+      return PICASSO_LLA_INVALID_INPUT;
+    return run_actnewton_v2(
+        &obj, lambda, nlambda, gamma, max_ite, pprec, reg_type, intercept,
+        dfmax, lla_max_stages, beta, intcpt, ite_lamb, size_act, runt,
+        num_fit, failed_lambda, failed_stage, lla_stages, objective, kkt,
+        stationarity, smooth_objective);
+  } catch (...) {
+    if (failed_lambda != nullptr) *failed_lambda = 0;
+    return PICASSO_LLA_EXCEPTION;
+  }
+}
+
+extern "C" int SolvePoissonRegressionV3(
+    double *Y, double *X, int n, int d, double *lambda, int nlambda,
+    double gamma, int max_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *offset, double *beta, double *intcpt, int *ite_lamb,
+    int *size_act, double *runt, int *num_fit, bool usePython,
+    int lla_max_stages, int *failed_lambda, int *failed_stage,
+    int *lla_stages, double *objective, double *kkt, double *stationarity,
+    double *smooth_objective) {
+  if (num_fit != nullptr) *num_fit = 0;
+  initialize_lla_diagnostics(nlambda, failed_lambda, failed_stage, lla_stages,
+                             objective, kkt, stationarity,
+                             smooth_objective);
+  if (safe_solver_output_dimensions(d, nlambda))
+    zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
+  if (invalid_lla_inputs(Y, X, lambda, n, d, nlambda, gamma, max_ite,
+                         pprec, reg_type, dfmax, lla_max_stages) ||
+      invalid_offset_inputs(offset, n))
+    return PICASSO_LLA_INVALID_INPUT;
+
+  try {
+    picasso::PoissonObjective obj(
+        X, Y, n, d, intercept, usePython, c_api_design_storage(usePython));
+    if (offset != nullptr && !obj.set_offset(offset, n))
+      return PICASSO_LLA_INVALID_INPUT;
+    return run_actnewton_v2(
+        &obj, lambda, nlambda, gamma, max_ite, pprec, reg_type, intercept,
+        dfmax, lla_max_stages, beta, intcpt, ite_lamb, size_act, runt,
+        num_fit, failed_lambda, failed_stage, lla_stages, objective, kkt,
+        stationarity, smooth_objective);
+  } catch (...) {
+    if (failed_lambda != nullptr) *failed_lambda = 0;
+    return PICASSO_LLA_EXCEPTION;
+  }
+}
+
+extern "C" int SolveSqrtLinearRegressionV3(
+    double *Y, double *X, int n, int d, double *lambda, int nlambda,
+    double gamma, int max_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *beta, double *intcpt, int *ite_lamb, int *size_act,
+    double *runt, int *num_fit, bool usePython, int lla_max_stages,
+    int *failed_lambda, int *failed_stage, int *lla_stages,
+    double *objective, double *kkt, double *stationarity,
+    double *smooth_objective) {
+  if (num_fit != nullptr) *num_fit = 0;
+  initialize_lla_diagnostics(nlambda, failed_lambda, failed_stage, lla_stages,
+                             objective, kkt, stationarity,
+                             smooth_objective);
+  if (safe_solver_output_dimensions(d, nlambda))
+    zero_solver_outputs(d, nlambda, beta, intcpt, ite_lamb, size_act, runt);
+  if (invalid_lla_inputs(Y, X, lambda, n, d, nlambda, gamma, max_ite,
+                         pprec, reg_type, dfmax, lla_max_stages))
+    return PICASSO_LLA_INVALID_INPUT;
+
+  try {
+    picasso::SqrtMSEObjective obj(
+        X, Y, n, d, intercept, usePython, c_api_design_storage(usePython));
+    return run_actnewton_v2(
+        &obj, lambda, nlambda, gamma, max_ite, pprec, reg_type, intercept,
+        dfmax, lla_max_stages, beta, intcpt, ite_lamb, size_act, runt,
+        num_fit, failed_lambda, failed_stage, lla_stages, objective, kkt,
+        stationarity, smooth_objective);
+  } catch (...) {
+    if (failed_lambda != nullptr) *failed_lambda = 0;
+    return PICASSO_LLA_EXCEPTION;
+  }
 }
 
 extern "C" void SolveLinearRegressionNaiveUpdate(
@@ -143,19 +577,10 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
     int dfmax,
     double *beta, double *intcpt, int *ite_lamb, int *size_act, double *runt,
     int *num_fit, bool usePython) {
-  if (invalid_problem_inputs(Y, X, nn, dd)) {
-    zero_solver_outputs(dd, nnlambda, beta, intcpt, ite_lamb, size_act, runt);
-    if (num_fit != nullptr) *num_fit = 0;
-    return;
-  }
-
-  picasso::GaussianNaiveUpdateObjective obj(X, Y, nn, dd, intercept, usePython);
-  auto param = make_params(lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
-                           intercept, dfmax);
-  picasso::solver::ActGDSolver solver(&obj, param);
-  solver.solve();
-  extract_results(solver, dd, nnlambda, beta, intcpt, ite_lamb, size_act,
-                  runt, num_fit);
+  solve_gaussian_c_api<picasso::GaussianNaiveUpdateObjective>(
+      Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
+      intercept, dfmax, beta, intcpt, ite_lamb, size_act, runt, num_fit,
+      usePython, nullptr, nullptr);
 }
 
 extern "C" void SolveLinearRegressionCovUpdate(
@@ -164,296 +589,56 @@ extern "C" void SolveLinearRegressionCovUpdate(
     int dfmax,
     double *beta, double *intcpt, int *ite_lamb, int *size_act, double *runt,
     int *num_fit, bool usePython) {
-  if (invalid_problem_inputs(Y, X, nn, dd)) {
-    zero_solver_outputs(dd, nnlambda, beta, intcpt, ite_lamb, size_act, runt);
-    if (num_fit != nullptr) *num_fit = 0;
-    return;
-  }
-
-  picasso::GaussianCovUpdateObjective obj(X, Y, nn, dd, intercept, usePython);
-  auto param = make_params(lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
-                           intercept, dfmax);
-  picasso::solver::ActGDSolver solver(&obj, param);
-  solver.solve();
-  extract_results(solver, dd, nnlambda, beta, intcpt, ite_lamb, size_act,
-                  runt, num_fit);
+  solve_gaussian_c_api<picasso::GaussianCovUpdateObjective>(
+      Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
+      intercept, dfmax, beta, intcpt, ite_lamb, size_act, runt, num_fit,
+      usePython, nullptr, nullptr);
 }
 
-// ---- Multinomial (standalone coordinate descent solver) ----
-
-namespace {
-inline double soft_threshold_mn(double x, double thr) {
-  if (x > thr)  return x - thr;
-  if (x < -thr) return x + thr;
-  return 0.0;
+extern "C" void SolveLinearRegressionNaiveUpdateV2(
+    double *Y, double *X, int nn, int dd, double *lambda, int nnlambda,
+    double gamma, int mmax_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *beta, double *intcpt, int *ite_lamb, int *size_act,
+    double *runt, int *num_fit, bool usePython,
+    double *smooth_objective) {
+  solve_gaussian_c_api<picasso::GaussianNaiveUpdateObjective>(
+      Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
+      intercept, dfmax, beta, intcpt, ite_lamb, size_act, runt, num_fit,
+      usePython, smooth_objective, nullptr);
 }
 
-inline double threshold_mcp_mn(double x, double lam, double gam) {
-  if (std::fabs(x) > gam * lam) return x;
-  return soft_threshold_mn(x, lam) / (1.0 - 1.0 / gam);
+extern "C" void SolveLinearRegressionCovUpdateV2(
+    double *Y, double *X, int nn, int dd, double *lambda, int nnlambda,
+    double gamma, int mmax_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *beta, double *intcpt, int *ite_lamb, int *size_act,
+    double *runt, int *num_fit, bool usePython,
+    double *smooth_objective) {
+  solve_gaussian_c_api<picasso::GaussianCovUpdateObjective>(
+      Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
+      intercept, dfmax, beta, intcpt, ite_lamb, size_act, runt, num_fit,
+      usePython, smooth_objective, nullptr);
 }
 
-inline double threshold_scad_mn(double x, double lam, double gam) {
-  if (std::fabs(x) > gam * lam) return x;
-  if (std::fabs(x) > 2.0 * lam)
-    return soft_threshold_mn(x, gam * lam / (gam - 1.0)) /
-           (1.0 - 1.0 / (gam - 1.0));
-  return soft_threshold_mn(x, lam);
+extern "C" int SolveLinearRegressionNaiveUpdateV3(
+    double *Y, double *X, int nn, int dd, double *lambda, int nnlambda,
+    double gamma, int mmax_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *beta, double *intcpt, int *ite_lamb, int *size_act,
+    double *runt, int *num_fit, bool usePython, double *smooth_objective,
+    int *failed_lambda) {
+  return solve_gaussian_c_api<picasso::GaussianNaiveUpdateObjective>(
+      Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
+      intercept, dfmax, beta, intcpt, ite_lamb, size_act, runt, num_fit,
+      usePython, smooth_objective, failed_lambda);
 }
-}  // namespace (multinomial helpers)
 
-extern "C" void SolveMultinomialRegression(
-    double *Y_int, double *X, int n, int d, int K,
-    double *lambda, int nlambda, double gamma,
-    int max_ite, double pprec, int reg_type,
-    bool intercept_flag, int dfmax,
-    double *beta_out, double *intcpt_out,
-    int *ite_lamb, int *size_act, double *runt, int *num_fit,
-    bool usePython) {
-
-  using Eigen::MatrixXd;
-  using Eigen::VectorXd;
-  using Eigen::VectorXi;
-
-  if (Y_int == nullptr || X == nullptr || n <= 0 || d <= 0 || K < 2) {
-    if (num_fit) *num_fit = 0;
-    return;
-  }
-
-  // Design matrix (column-major in R: X[j*n + i] = X(i,j))
-  MatrixXd Xmat(n, d);
-  if (!usePython) {
-    for (int j = 0; j < d; j++)
-      for (int i = 0; i < n; i++) Xmat(i, j) = X[j * n + i];
-  } else {
-    for (int i = 0; i < n; i++)
-      for (int j = 0; j < d; j++) Xmat(i, j) = X[i * d + j];
-  }
-
-  VectorXi Yclass(n);
-  for (int i = 0; i < n; i++) Yclass(i) = static_cast<int>(Y_int[i]);
-
-  MatrixXd Y_oh = MatrixXd::Zero(n, K);
-  for (int i = 0; i < n; i++) Y_oh(i, Yclass(i)) = 1.0;
-
-  MatrixXd beta_mat   = MatrixXd::Zero(d, K);
-  VectorXd intcpt_vec = VectorXd::Zero(K);
-  MatrixXd Xb         = MatrixXd::Zero(n, K);
-  MatrixXd P(n, K), W(n, K), R(n, K);
-
-  if (intercept_flag) {
-    for (int k = 0; k < K; k++) {
-      double nk = 0;
-      for (int i = 0; i < n; i++) if (Yclass(i) == k) nk += 1.0;
-      intcpt_vec(k) = std::log(std::max(nk / n, 1e-8));
-    }
-  }
-
-  auto update_softmax = [&]() {
-    for (int i = 0; i < n; i++) {
-      double max_lp = -1e300;
-      for (int k = 0; k < K; k++) {
-        double lp = intcpt_vec(k) + Xb(i, k);
-        if (lp > max_lp) max_lp = lp;
-      }
-      double sum_exp = 0.0;
-      for (int k = 0; k < K; k++) {
-        P(i, k) = std::exp(intcpt_vec(k) + Xb(i, k) - max_lp);
-        sum_exp += P(i, k);
-      }
-      for (int k = 0; k < K; k++) {
-        P(i, k) /= sum_exp;
-        W(i, k) = P(i, k) * (1.0 - P(i, k));
-        R(i, k) = Y_oh(i, k) - P(i, k);
-      }
-    }
-  };
-
-  auto eval_loss = [&]() -> double {
-    double v = 0.0;
-    for (int i = 0; i < n; i++)
-      v -= std::log(std::max(P(i, Yclass(i)), 1e-15));
-    return v / n;
-  };
-
-  auto grad_kj = [&](int k, int j) -> double {
-    double g = 0.0;
-    for (int i = 0; i < n; i++) g += R(i, k) * Xmat(i, j);
-    return g / n;
-  };
-
-  auto cd_step = [&](int k, int j, double stage_lam) {
-    double a = 0.0, rsum = 0.0;
-    for (int i = 0; i < n; i++) {
-      double xij = Xmat(i, j);
-      a    += W(i, k) * xij * xij;
-      rsum += R(i, k) * xij;
-    }
-    a /= n;
-    if (a < 1e-15) return;
-
-    double g = beta_mat(j, k) * a + rsum / n;
-
-    double new_beta;
-    if (reg_type == 1)
-      new_beta = soft_threshold_mn(g, stage_lam) / a;
-    else if (reg_type == 2)
-      new_beta = threshold_mcp_mn(g, stage_lam, gamma) / a;
-    else
-      new_beta = threshold_scad_mn(g, stage_lam, gamma) / a;
-
-    double delta = new_beta - beta_mat(j, k);
-    if (std::fabs(delta) > 1e-15) {
-      for (int i = 0; i < n; i++) {
-        double xij = Xmat(i, j);
-        Xb(i, k)  += delta * xij;
-        R(i, k)   -= delta * W(i, k) * xij;
-      }
-      beta_mat(j, k) = new_beta;
-    }
-  };
-
-  auto local_change_kj = [&](int k, int j, double old_b) -> double {
-    double a = 0.0;
-    for (int i = 0; i < n; i++) {
-      double xij = Xmat(i, j);
-      a += W(i, k) * xij * xij;
-    }
-    a /= n;
-    double diff = old_b - beta_mat(j, k);
-    return a * diff * diff / 2.0;
-  };
-
-  auto intercept_update_all = [&]() {
-    if (!intercept_flag) return;
-    for (int k = 0; k < K; k++) {
-      double sum_r = R.col(k).sum();
-      double sum_w = W.col(k).sum();
-      if (std::fabs(sum_w) < 1e-15) continue;
-      double delta = sum_r / sum_w;
-      intcpt_vec(k) += delta;
-      R.col(k) -= delta * W.col(k);
-    }
-  };
-
-  update_softmax();
-  double null_dev = eval_loss();
-  double dev_thr  = null_dev * pprec;
-
-  int total_dim = K * d;
-  std::vector<double> stage_lambdas(total_dim);
-  std::vector<double> grad_mag(total_dim, 0.0);
-  for (int k = 0; k < K; k++)
-    for (int j = 0; j < d; j++)
-      grad_mag[k * d + j] = std::fabs(grad_kj(k, j));
-
-  int actual_fit = 0;
-
-  for (int li = 0; li < nlambda; li++) {
-    double lam = lambda[li];
-
-    for (int idx = 0; idx < total_dim; idx++) stage_lambdas[idx] = lam;
-
-    std::vector<int> actset(total_dim, 0);
-    double threshold = (li > 0) ? 2.0 * lam - lambda[li - 1] : 2.0 * lam;
-    for (int idx = 0; idx < total_dim; idx++)
-      if (grad_mag[idx] > threshold) actset[idx] = 1;
-
-    update_softmax();
-
-    int num_relaxation = (reg_type == 1) ? 1 : 3;
-    int total_iter = 0;
-
-    for (int relax = 0; relax < num_relaxation; relax++) {
-      for (int iter1 = 0; iter1 < max_ite; iter1++) {
-        bool terminate_l1 = true;
-
-        std::vector<double> old_beta(total_dim);
-        for (int idx = 0; idx < total_dim; idx++) {
-          int k = idx / d, j = idx % d;
-          old_beta[idx] = beta_mat(j, k);
-        }
-
-        std::vector<int> actset_idx;
-        for (int idx = 0; idx < total_dim; idx++) {
-          if (!actset[idx]) continue;
-          int k = idx / d, j = idx % d;
-          cd_step(k, j, stage_lambdas[idx]);
-          if (std::fabs(beta_mat(j, k)) > 1e-8) actset_idx.push_back(idx);
-        }
-
-        for (int iter2 = 0; iter2 < max_ite; iter2++) {
-          bool cvg2 = true;
-          for (int idx : actset_idx) {
-            int k = idx / d, j = idx % d;
-            double old_b = beta_mat(j, k);
-            cd_step(k, j, stage_lambdas[idx]);
-            if (local_change_kj(k, j, old_b) > dev_thr) cvg2 = false;
-          }
-          intercept_update_all();
-          total_iter++;
-          if (cvg2) break;
-        }
-
-        for (int idx : actset_idx) {
-          int k = idx / d, j = idx % d;
-          if (local_change_kj(k, j, old_beta[idx]) > dev_thr)
-            terminate_l1 = false;
-        }
-
-        update_softmax();
-
-        bool new_active = false;
-        for (int idx = 0; idx < total_dim; idx++) {
-          if (actset[idx]) continue;
-          int k = idx / d, j = idx % d;
-          grad_mag[idx] = std::fabs(grad_kj(k, j));
-          if (grad_mag[idx] > stage_lambdas[idx]) {
-            actset[idx] = 1;
-            new_active  = true;
-          }
-        }
-
-        if (!new_active && terminate_l1) break;
-      }
-
-      if (reg_type == 1) break;
-      update_softmax();
-      for (int idx = 0; idx < total_dim; idx++) {
-        int k = idx / d, j = idx % d;
-        double b = std::fabs(beta_mat(j, k));
-        if (reg_type == 2)
-          stage_lambdas[idx] = (b > lam * gamma) ? 0.0 : lam - b / gamma;
-        else
-          stage_lambdas[idx] = (b > lam * gamma) ? 0.0 :
-                               (b > lam)          ? (lam * gamma - b) / (gamma - 1.0)
-                                                  : lam;
-      }
-    }
-
-    int nnz = 0;
-    for (int k = 0; k < K; k++)
-      for (int j = 0; j < d; j++)
-        if (std::fabs(beta_mat(j, k)) > 1e-8) nnz++;
-
-    int base_b = li * K * d;
-    int base_i = li * K;
-    for (int k = 0; k < K; k++) {
-      for (int j = 0; j < d; j++)
-        beta_out[base_b + k * d + j] = beta_mat(j, k);
-      intcpt_out[base_i + k] = intcpt_vec(k);
-    }
-    ite_lamb[li] = total_iter;
-    size_act[li] = nnz;
-    runt[li]     = 0.0;
-    actual_fit   = li + 1;
-
-    for (int k = 0; k < K; k++)
-      for (int j = 0; j < d; j++)
-        grad_mag[k * d + j] = std::fabs(grad_kj(k, j));
-
-    if (dfmax >= 0 && nnz > dfmax) break;
-  }
-
-  if (num_fit) *num_fit = actual_fit;
+extern "C" int SolveLinearRegressionCovUpdateV3(
+    double *Y, double *X, int nn, int dd, double *lambda, int nnlambda,
+    double gamma, int mmax_ite, double pprec, int reg_type, bool intercept,
+    int dfmax, double *beta, double *intcpt, int *ite_lamb, int *size_act,
+    double *runt, int *num_fit, bool usePython, double *smooth_objective,
+    int *failed_lambda) {
+  return solve_gaussian_c_api<picasso::GaussianCovUpdateObjective>(
+      Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite, pprec, reg_type,
+      intercept, dfmax, beta, intcpt, ite_lamb, size_act, runt, num_fit,
+      usePython, smooth_objective, failed_lambda);
 }

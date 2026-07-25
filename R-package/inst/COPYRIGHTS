@@ -17,5 +17,6 @@ Eigen licensing information is included in:
   - src/include/eigen3/COPYING.LGPL
   - src/include/eigen3/COPYING.BSD
   - src/include/eigen3/COPYING.MINPACK
+  - src/include/eigen3/COPYING.GPL
 
 The picasso package code remains distributed under GPL-3.

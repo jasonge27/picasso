@@ -31,4 +31,6 @@
 #include "src/CholmodSupport/CholmodSupport.h"
 #include "src/SPQRSupport/SuiteSparseQRSupport.h"
 
+#include "src/Core/util/ReenableStupidWarnings.h"
+
 #endif

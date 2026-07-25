@@ -7,6 +7,13 @@ namespace picasso {
 namespace solver {
 enum RegType { L1, SCAD, MCP };
 
+// Optional cooperative-interrupt hook shared by every native path loop.
+// The callback must be cheap, must not throw or longjmp, and returns nonzero
+// when the caller wants the current path to stop after the committed prefix.
+// A null callback (the default) disables polling entirely.
+void set_interrupt_callback(int (*callback)(void));
+bool interrupt_requested();
+
 // training parameters
 class PicassoSolverParams {
  public:
@@ -22,7 +29,8 @@ class PicassoSolverParams {
   /*! gamma param for SCAD and MCP regularization */
   double gamma;
 
-  /*！ rounds of relaxation when solving SCAD and MCP penalty */
+  /*! Maximum total adaptive-LLA stages for SCAD and MCP. The count includes
+   *  the initial L1 master and must be at least three for nonconvex fits. */
   unsigned num_relaxation_round;
 
   /*! precision of optimization */

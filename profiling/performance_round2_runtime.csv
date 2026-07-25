@@ -1,0 +1,11 @@
+family,shape,picasso_before_seconds,picasso_after_seconds,picasso_speedup,picasso_over_glmnet_before,picasso_over_glmnet_after
+binomial,tall,0.042000,0.038750,1.0839,0.8400,0.7598
+binomial,wide,0.034500,0.027000,1.2778,0.9928,0.7347
+gaussian,tall,0.013455,0.013455,1.0000,1.8182,1.8182
+gaussian,wide,0.024333,0.024333,1.0000,1.1061,1.1061
+multinomial,tall,0.206000,0.190000,1.0842,1.3919,1.2500
+multinomial,wide,0.262000,0.222000,1.1802,1.6273,1.3704
+poisson,tall,0.042500,0.038750,1.0968,1.3934,1.2500
+poisson,wide,0.190000,0.140000,1.3571,3.6538,2.6923
+sqrtlasso,tall,0.026800,0.023600,1.1356,NA,NA
+sqrtlasso,wide,0.298000,0.258000,1.1550,NA,NA

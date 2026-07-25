@@ -23,7 +23,6 @@
 ^[^/]+\.patch$
 ^src/.*\.(o|so|dll|dylib|a)$
 ^Rplots\.pdf$
-^Personal_Statement\.pdf$
 ^MD5$
 ^cran-comments\.md$
 ^CLAUDE\.md$
