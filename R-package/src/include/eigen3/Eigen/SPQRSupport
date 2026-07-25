@@ -31,6 +31,9 @@
 #include "src/CholmodSupport/CholmodSupport.h"
 #include "src/SPQRSupport/SuiteSparseQRSupport.h"
 
+// Upstream Eigen 3.4.0 omits this include, leaving the warning state pushed by
+// DisableStupidWarnings.h above unbalanced for anything included afterwards.
+// Restore the pairing every other Eigen module header uses.
 #include "src/Core/util/ReenableStupidWarnings.h"
 
 #endif

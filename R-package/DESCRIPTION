@@ -1,8 +1,8 @@
 Package: picasso
 Type: Package
 Title: Sparse Learning with Convex and Concave Penalties
-Version: 2.0.0
-Date: 2026-07-24
+Version: 2.0.1
+Date: 2026-07-25
 Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 Authors@R: c(
  person("Jason", "Ge", role = "aut", email = "jiange@princeton.edu"),

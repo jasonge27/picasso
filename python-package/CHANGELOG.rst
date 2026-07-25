@@ -1,6 +1,15 @@
 pycasso changelog
 =================
 
+2.0.1
+-----
+
+* Updated the bundled Eigen headers from 3.3.5 to 3.4.0. The source
+  distribution compiles the native library on the installing machine, so this
+  brings Eigen's improved vectorization and expression evaluation to new
+  installs and compiles cleanly under the C++20 defaults of recent compilers.
+  No Python API or numerical behavior changes.
+
 2.0.0
 -----
 

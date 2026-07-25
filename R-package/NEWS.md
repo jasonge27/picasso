@@ -1,3 +1,13 @@
+# picasso 2.0.1
+
+## Portability
+
+- Updated the bundled Eigen headers from 3.3.5 to 3.4.0 so the package
+  compiles cleanly under the C++20 default of recent R-devel toolchains
+  (GCC 14/16), removing the `-Wdeprecated-enum-enum-conversion` install
+  warnings that originated in the older Eigen sources. No package API or
+  numerical behavior changes.
+
 # picasso 2.0.0
 
 ## New models and solver controls
