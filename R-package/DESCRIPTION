@@ -1,8 +1,8 @@
 Package: picasso
 Type: Package
 Title: Sparse Learning with Convex and Concave Penalties
-Version: 2.0.1
-Date: 2026-07-25
+Version: 2.0.2
+Date: 2026-07-26
 Maintainer: Tuo Zhao <tourzhao@gatech.edu>
 Authors@R: c(
  person("Jason", "Ge", role = "aut", email = "jiange@princeton.edu"),
@@ -12,12 +12,12 @@ Authors@R: c(
  person("Tong", "Zhang", role = "aut"),
  person("Han", "Liu", role = "aut"),
  person("Tuo", "Zhao", role = c("aut", "cre"), email = "tourzhao@gatech.edu"),
- person("Gael", "Guennebaud", role = "ctb",
-        comment = "Contributor to bundled Eigen headers"),
- person("Benoit", "Jacob", role = "ctb",
-        comment = "Contributor to bundled Eigen headers"),
- person("Eigen", "Library Authors", role = "cph",
-        comment = "Copyright holders of bundled Eigen headers in src/include/eigen3")
+ person("Gael", "Guennebaud", role = "cph",
+        comment = "Author and copyright holder of the bundled Eigen library, not of picasso itself"),
+ person("Benoit", "Jacob", role = "cph",
+        comment = "Author and copyright holder of the bundled Eigen library, not of picasso itself"),
+ person("Authors of Eigen", role = "cph",
+        comment = "Remaining authorship and copyright of the bundled Eigen library in src/include/eigen3, as detailed in inst/COPYRIGHTS")
  )
 Depends: R (>= 3.1.0), Matrix
 Imports: methods
