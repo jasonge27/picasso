@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project overview
 
 PICASSO is a C++11 sparse-learning library shared by an R package (development
@@ -169,13 +167,22 @@ that script gates both header declarations and dynamic exports.
 
 ## Conventions
 
-- C++: C++11, two-space indentation, `PascalCase` types,
+- Match nearby code; no repository-wide formatter or linter is configured.
+- C++: C++11, two-space indentation, K&R braces, `PascalCase` types,
   `snake_case` functions, and `m_` members.
 - Python: four spaces, PEP 8 naming, exact public docstrings, deterministic
   assertions in `python-package/test_pycasso.py`.
 - R: generally two spaces and dotted S3 names; avoid unrelated formatting of
   legacy files. Add behavior tests under `R-package/tests/testthat/`.
-- Commits use concise imperative subjects (`Add v1.6 features: ...`).
+- No coverage threshold is declared. Add deterministic Python-facing
+  assertions to `python-package/test_pycasso.py`, R-facing cases under
+  `R-package/tests/testthat/`, and focused native cases under `tests/`. Core
+  or C API changes should pass CTest, both interface suites, and
+  `R CMD check`.
+- Commits use concise imperative subjects (`Add v1.6 features: ...`). Pull
+  requests should summarize affected layers, list validation commands, link
+  relevant issues, and call out API or documentation changes. Include
+  screenshots only for rendered documentation or other visual changes.
 - Performance reports are snapshots tied to their hardware, precision, shape,
   and source state. Do not turn them into universal speed claims. The
   comprehensive fast-mode report predates the current Gaussian automatic
